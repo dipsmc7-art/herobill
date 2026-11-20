@@ -513,6 +513,40 @@ body.locked>*:not(#login):not(.overlay):not(.toast):not(#printArea){display:none
 .pt tr.sig td{border:0;padding:30pt 0 0}
 .psign{display:grid;gap:14pt}.psign div{text-align:center;font-size:8pt;font-weight:700;border-top:.8pt solid #000;padding-top:3pt}
 .pnote{font-size:7pt;color:#444;margin-top:5pt;display:flex;justify-content:space-between}
+
+/* ===== welcome screen: one page, no scrolling ===== */
+.dmwave{position:relative;flex:none;height:78px;margin-top:10px;overflow:hidden}
+.dmwave svg{position:absolute;left:0;bottom:0;width:200%;height:100%}
+.wv path{fill:#2e2a8f}.w1{opacity:.07;animation:dmWave 26s linear infinite}.w2{opacity:.10;animation:dmWave 18s linear infinite reverse}.w3{opacity:.13;animation:dmWave 34s linear infinite}
+@keyframes dmWave{to{transform:translateX(-25%)}}
+.dmride{position:absolute;left:0;right:0;bottom:30px;height:26px;pointer-events:none}.dmride span{position:absolute;left:-40px;font-size:22px;opacity:.75;animation:dmRide 38s linear infinite;transform:scaleX(-1)}
+@keyframes dmRide{0%{left:-40px}100%{left:calc(100% + 40px)}}
+.dmpins i{position:absolute;bottom:34px;width:7px;height:7px;border-radius:50%;background:#2e2a8f;opacity:.18;animation:dmPin 4s ease-in-out infinite}
+.dmpins i:nth-child(2){animation-delay:.8s}.dmpins i:nth-child(3){animation-delay:1.6s}.dmpins i:nth-child(4){animation-delay:2.4s}.dmpins i:nth-child(5){animation-delay:3.2s}
+@keyframes dmPin{50%{opacity:.45;transform:scale(1.5)}}
+.dmwave .dmfoot{position:absolute;left:0;right:0;bottom:4px;padding:0;font-size:11.5px}
+@media (prefers-reduced-motion:reduce){.wv,.dmride span,.dmpins i{animation:none}}
+@media (min-width:1000px){
+  #dmHome{overflow:hidden}
+  .dmtop{padding:10px 28px}.dmbrand img{height:38px}.dmbrand b{font-size:17px}
+  .dmmain{flex:none;padding:2px 24px 0}.dmhi{font-size:24px}.dmsub{margin:2px 0 12px;font-size:13px}.dmsec{margin:0 0 8px;font-size:12px}
+  .dmcards{gap:16px}.dmcard{padding:16px 18px;gap:10px;border-radius:18px}.dmcard:before{width:140px;height:140px;right:-50px;top:-50px}
+  .dmic{width:44px;height:44px;font-size:23px;border-radius:12px}.dmct b{font-size:17px}.dmct span{font-size:12.5px;display:block;line-height:1.35}
+  .cabox{height:68px}.cabox svg{max-height:68px}
+  .dmst{padding-top:10px;gap:8px}.dmst b{font-size:15px}.dmst small{font-size:11px}
+  .dmtrkw{flex:0 1 auto;min-height:0;display:flex;flex-direction:column}
+  .dmtrack{flex:0 1 auto;min-height:0;display:flex;flex-direction:column;margin-top:14px;padding:10px 16px 8px;border-radius:16px}
+  .trh{margin-bottom:4px;flex:none}.trh b{font-size:15px}
+  .trl{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:22px;overflow:auto;min-height:0;align-content:start}
+  .tri{grid-template-columns:28px minmax(0,1fr) auto auto;gap:10px;padding:7px 6px;border-radius:10px}
+  .trlast{display:none}.tric{font-size:17px}.trm b{font-size:13.5px}
+  .trm small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px}
+  .tri .pill{font-size:11px;white-space:nowrap}.tra .btn.sm{padding:5px 10px;font-size:12px}
+}
+@media (min-width:1000px){.dmtop+.dmmain{margin-top:auto}.dmtrkw{margin-bottom:auto}}
+@media (min-width:1000px) and (min-height:900px){.cabox{height:92px}.cabox svg{max-height:92px}.dmcard{padding:20px 22px;gap:12px}.dmhi{font-size:28px}.tri{padding:9px 6px}}
+@media (min-width:1000px) and (max-height:820px){.cabox{height:46px}.cabox svg{max-height:46px}.dmsub{display:none}.dmhi{margin-bottom:8px;font-size:21px}.dmcard{padding:13px 16px;gap:8px}.dmwave{height:60px}.dmride{bottom:22px}.dmpins i{bottom:26px}}
+@media (min-width:1000px) and (max-height:680px){.caw{display:none}}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -2441,7 +2475,7 @@ const TRS={ok:['✅','Loaded','ok'],due:['⏳','Pending','pending'],late:['⚠�
 const trTool={rw:'Route Wise',hb:'Hero Bill',ct:'Collection Target'};
 async function trRender(){const el=$('dmTrack');if(!el)return;const items=await trItems();const pend=items.filter(x=>x.s==='due'||x.s==='late');
   el.innerHTML=`<div class="trh"><div><b>📋 Upload tracker</b><span class="hint">${pend.length?`${pend.length} item(s) need attention`:'everything is up to date ✅'}</span></div><input type="file" id="trFile" hidden></div>
-    <div class="trl">${items.map(x=>{const s=TRS[x.s];return `<div class="tri ${x.s}"><span class="tric">${x.ic}</span><div class="trm"><b>${esc(x.n)}</b><small><span class="trtool ${x.tool}">${trTool[x.tool]}</span> ${esc(x.f)} · ${x.note}</small></div>
+    <div class="trl">${items.map(x=>{const s=TRS[x.s];return `<div class="tri ${x.s}" title="Last: ${esc(x.last)}"><span class="tric">${x.ic}</span><div class="trm"><b>${esc(x.n)}</b><small><span class="trtool ${x.tool}">${trTool[x.tool]}</span> ${esc(x.f)} · ${x.note}</small></div>
       <div class="trlast"><small>last</small>${esc(x.last)}</div><span class="pill ${s[2]}">${s[0]} ${s[1]}</span>
       <div class="tra">${x.act==='up'?`<button class="btn ${x.s==='ok'?'ghost':'primary'} sm" data-trup="${x.k}">⬆ Upload</button>`:x.act==='bills'?`<button class="btn ghost sm" data-trup="bills">⬆ Bill files</button>${x.miss&&x.miss.length?`<button class="btn ${x.s==='ok'?'ghost':'primary'} sm" data-trrem="1">💬 Remind</button>`:''}`:`<button class="btn ${x.s==='ok'?'ghost':'primary'} sm" data-tropen="${x.k}">Open →</button>`}</div></div>`}).join('')}</div>`;
   const acc={recv:'.csv,.xlsx,.xls,.txt',dac:'.csv,.xlsx,.xls',cust:'.csv,.xlsx,.xls,.txt',fare:'.xlsx,.xls,.csv',bills:'.json,.txt,.hb,application/json,text/plain'};
@@ -2569,8 +2603,10 @@ async function dmShow(){
       <div class="dmcard soon" aria-label="More tools coming soon"><div class="gears"><span class="g1">⚙️</span><span class="g2">⚙️</span><span class="g3">🔧</span></div>
         <div class="dmct"><b>More tools</b><span>Under development — coming soon</span></div><div class="dots"><i></i><i></i><i></i></div></div>
     </div></div>
-    <div class="dmmain" style="flex:none;padding-top:0"><div class="dmtrack" id="dmTrack"><div class="hint">Checking uploads…</div></div></div>
-    <div class="dmfoot">Depot Management v1.0 · Designed by: ABM Shafiquzzaman</div>`;
+    <div class="dmmain dmtrkw"><div class="dmtrack" id="dmTrack"><div class="hint">Checking uploads…</div></div></div>
+    <div class="dmwave" aria-hidden="true"><svg viewBox="0 0 1440 80" preserveAspectRatio="none"><g class="wv w1"><path class="" d="M0 46 Q180 32 360 46 T720 46 Q900 32 1080 46 T1440 46 Q1620 32 1800 46 T2160 46 Q2340 32 2520 46 T2880 46 V80 H0Z"/></g><g class="wv w2"><path class="" d="M0 54 Q180 44 360 54 T720 54 Q900 44 1080 54 T1440 54 Q1620 44 1800 54 T2160 54 Q2340 44 2520 54 T2880 54 V80 H0Z"/></g><g class="wv w3"><path class="" d="M0 62 Q180 54 360 62 T720 62 Q900 54 1080 62 T1440 62 Q1620 54 1800 62 T2160 62 Q2340 54 2520 62 T2880 62 V80 H0Z"/></g></svg>
+      <div class="dmride"><span>🛵</span></div><div class="dmpins"><i style="left:12%"></i><i style="left:31%"></i><i style="left:52%"></i><i style="left:71%"></i><i style="left:88%"></i></div>
+      <div class="dmfoot">Depot Management v1.0 · Designed by: ABM Shafiquzzaman</div></div>`;
   caBind($('dmHome'));trRender().then(p=>{if(p&&!DM.nudged){DM.nudged=true;trDailyNudge(p)}});$('dmHB').onclick=()=>dmOpenHB();$('dmRW').onclick=()=>dmOpenRW();$('dmCT').onclick=()=>ctOpen('overview');ctCardStat();
   $('dmOut').onclick=()=>dmLogout();
   const s=DM.rwSum||await rwSummary();DM.rwSum=s;const el=$('dmRwSt');if(!el)return;
