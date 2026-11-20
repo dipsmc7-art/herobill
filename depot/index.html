@@ -224,10 +224,10 @@ main{max-width:1280px;margin:0 auto;padding:20px 20px 30px}
 .lgtools{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}.lgtools li{display:flex;align-items:center;gap:9px;font-size:13px;background:rgba(255,255,255,.10);border-radius:10px;padding:7px 10px}
 .lgtools li span{width:24px;height:24px;border-radius:7px;background:rgba(255,255,255,.16);display:grid;place-items:center;font-size:13px}.lgtools li.soon{opacity:.7;font-style:italic}
 .dmsec{font-size:13px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;margin:0 0 12px}
-.dmcards{grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,.5fr)!important}.dmmain{max-width:1320px!important}
+.dmcards{grid-template-columns:repeat(4,minmax(0,1fr)) minmax(0,.42fr)!important}.dmmain{max-width:1320px!important}
 .dmcard.soon{cursor:default;background:repeating-linear-gradient(135deg,#fff 0 14px,#fbfaff 14px 28px);border-style:dashed;align-items:center;justify-content:center;text-align:center;box-shadow:none}
 .dmcard.soon:hover{transform:none;box-shadow:none;border-color:var(--line)}.dmcard.soon:before{display:none}
-.dmcard.soon .dmct b{font-size:16px}.dmcard.soon .dmct span{font-size:12.5px}
+.dmcard.soon .dmct b{font-size:14px;white-space:nowrap}.dmcard.soon .dmct span{font-size:11.5px}.dmcard.soon{padding:14px 8px!important}
 .gears{position:relative;width:86px;height:66px}.gears span{position:absolute;display:block;line-height:1}
 .gears .g1{font-size:40px;left:4px;top:8px;animation:spin 6s linear infinite}.gears .g2{font-size:28px;left:44px;top:0;animation:spin 4s linear infinite reverse}.gears .g3{font-size:22px;left:50px;top:36px;animation:wob 1.6s ease-in-out infinite;transform-origin:20% 80%}
 @keyframes spin{to{transform:rotate(360deg)}}@keyframes wob{50%{transform:rotate(-25deg)}}
@@ -550,6 +550,30 @@ body.locked>*:not(#login):not(.overlay):not(.toast):not(#printArea){display:none
 @media (min-width:1000px) and (min-height:900px){.cabox{height:92px}.cabox svg{max-height:92px}.dmcard{padding:20px 22px;gap:12px}.dmhi{font-size:28px}.tri{padding:9px 6px}}
 @media (min-width:1000px) and (max-height:820px){.cabox{height:46px}.cabox svg{max-height:46px}.dmsub{display:none}.dmhi{margin-bottom:8px;font-size:21px}.dmcard{padding:13px 16px;gap:8px}.dmwave{height:64px;margin-top:6px}.dmwave .dmfoot,.dmsec{display:none}.dmtrack{margin-top:10px}}
 @media (min-width:1000px) and (max-height:680px){.caw{display:none}}
+
+.tc-scan{animation:tcScan 8s ease-in-out infinite}@keyframes tcScan{0%{transform:translate(68px,0)}20%,30%{transform:translate(96px,6px)}50%,60%{transform:translate(256px,6px)}80%,90%{transform:translate(416px,6px)}100%{transform:translate(68px,0)}}
+.tc-due{transform-box:fill-box;transform-origin:left;animation:tcDue 8s ease-in-out infinite}@keyframes tcDue{0%,20%{transform:scaleX(1)}35%,90%{transform:scaleX(.08)}100%{transform:scaleX(1)}}
+.tc-ok{opacity:0;transform-box:fill-box;transform-origin:center;animation:tcOk 8s ease-out infinite}@keyframes tcOk{0%,33%{opacity:0;transform:scale(.4)}38%{opacity:1;transform:scale(1.15)}42%,88%{opacity:1;transform:scale(1)}95%,100%{opacity:0}}
+.tc-bar{transform-box:fill-box;transform-origin:bottom;animation:tcBar 7s ease-out infinite}@keyframes tcBar{0%{transform:scaleY(0)}12%,88%{transform:scaleY(1)}100%{transform:scaleY(0)}}
+.tc-line{stroke-dashoffset:0;animation:tcLine 7s linear infinite}@keyframes tcLine{to{stroke-dashoffset:-64}}
+@media (prefers-reduced-motion:reduce){.tc-scan,.tc-due,.tc-ok,.tc-bar,.tc-line{animation:none}.tc-ok{opacity:1}}
+/* ===== Target Customer Monitoring ===== */
+#tcWrap{position:fixed;inset:0;z-index:59;background:var(--bg);overflow:auto;--brand:#a1580e;--brand2:#c06d17;--brandSoft:#fbefe1}#tcWrap[hidden]{display:none}
+@media print{#tcWrap{display:none!important}}
+.tcbar{background:#a1580e}
+.dmcard.tc:before{background:#fbefe1}.dmcard.tc .dmic{background:#fbefe1}.dmcard.tc .dmgo{color:#a1580e}.dmcard.tc:hover{border-color:#a1580e;box-shadow:0 16px 40px #a1580e26}
+.tccats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:10px}
+.tccat{border:1px solid var(--line);border-radius:12px;background:#fff;padding:10px 12px;text-align:left;font:inherit;cursor:pointer;border-left:4px solid #c9ccd3}.tccat:hover{background:#fbfaf7}
+.tccat b{display:block;font-size:22px;font-variant-numeric:tabular-nums}.tccat span{display:block;font-weight:600;font-size:13px}.tccat small{color:var(--ink3);font-size:11.5px}
+.tccat.g{border-left-color:#1baf7a}.tccat.m{border-left-color:#eda100}.tccat.b{border-left-color:#e34948}
+.tcstack{display:flex;height:10px;border-radius:6px;overflow:hidden;gap:2px;background:#f2f2f4}.tcstack i{display:block}.tcstack i.g{background:#1baf7a}.tcstack i.m{background:#eda100}.tcstack i.b{background:#e34948}.tcstack i.n{background:#c9ccd3}
+.tcclick{cursor:pointer}.tcclick:hover td{background:#fdf8f1}
+.tcctl select{height:34px;border:1px solid var(--line2);border-radius:8px;padding:0 8px;font:inherit;font-size:13px;background:#fff;max-width:170px}
+.tcq{display:flex;align-items:center;gap:8px;flex:1;min-width:220px;height:34px;border:1px solid var(--line2);border-radius:8px;padding:0 10px;background:#fff}.tcq input{border:0;outline:0;flex:1;font:inherit;font-size:13.5px;min-width:0}
+.tctbl th{cursor:pointer;white-space:nowrap;user-select:none}.tctbl th:hover{color:var(--brand)}.tctbl td{font-size:13px;vertical-align:top}.tctbl tfoot td{background:#fdf8f1;border-top:2px solid var(--line)}
+.tcsub{display:block;color:var(--ink3);font-size:11.5px;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tcwrap{overflow:auto}#tcWrap .ctpage{max-width:1440px}
+@media (max-width:900px){.tccats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -632,6 +656,7 @@ body.locked>*:not(#login):not(.overlay):not(.toast):not(#printArea){display:none
 <div id="printArea"></div>
 <div id="dmHome" hidden></div>
 <div id="ctWrap" hidden></div>
+<div id="tcWrap" hidden></div>
 <div id="rwWrap" hidden><div class="rwbar"><button id="rwHome">⌂ <span>Depot Management</span></button><b>📍 Route Wise Receivable</b><button id="rwHB">🧾 <span>Hero Bill Manager</span></button></div></div>
 
 <script>
@@ -2015,7 +2040,7 @@ document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.shiftKey&&(e.key==='H'||
 $('userChip').onclick=()=>dmLogout();
 async function dmLogout(){const ok=await choice('Log out',`Lock Depot Management? You'll need the password to open it again.`,[{l:'Cancel'},{l:'Log out',v:1,cls:'primary'}]);if(!ok)return;
   await setKV('session',{until:0});try{sessionStorage.removeItem('hbm')}catch(x){}
-  $('dmHome').hidden=true;$('rwWrap').hidden=true;$('ctWrap').hidden=true;document.body.classList.remove('dmon');if(DM.rwFrame){DM.rwFrame.remove();DM.rwFrame=null}document.title='Depot Management';showLogin('login')}
+  $('dmHome').hidden=true;$('rwWrap').hidden=true;$('ctWrap').hidden=true;$('tcWrap').hidden=true;document.body.classList.remove('dmon');if(DM.rwFrame){DM.rwFrame.remove();DM.rwFrame=null}document.title='Depot Management';showLogin('login')}
 
 /* =============== Head-office Google Drive backup (one Drive for all depots, write-only from depots) =============== */
 const HB_DEPOT_KEY='';
@@ -2043,7 +2068,7 @@ async function rwDumpLite(){const x=await rwDump();const reps=(x.reports||[]).sl
   const mine=r=>rwNorm(r.depot||r.depotCode)===rwNorm(S.cfg.depot);return {...x,reports:reps.map(r=>{const k=r.rows.filter(mine);return k.length?{...r,rows:k}:r}),trimmed:true}}
 async function gdSnapshot(full,allBills){const bills=await getAll('bills');const cut=gdCutoff();const keep=full||allBills?bills:bills.filter(b=>b.date>=cut||b.status==='pending');
   return {app:'HeroBillManager',v:2,at:new Date().toISOString(),depot:S.cfg.depot,full:!!full,archivedBefore:full||allBills?null:cut,
-  kv:(await getAll('kv')).filter(x=>x.key!=='session'&&x.key!=='gdrive'),fares:await getAll('fares'),heroes:await getAll('heroes'),bills:keep,rw:await (full?rwDump():rwDumpLite()).catch(()=>null),ct:typeof ctSummaryForBackup==='function'?await ctSummaryForBackup():null,tracker:await gdTracker()}}
+  kv:(await getAll('kv')).filter(x=>x.key!=='session'&&x.key!=='gdrive'&&(full||x.key!=='tcm')), /* target-customer list stays on the depot PC (in the manual full backup only) */fares:await getAll('fares'),heroes:await getAll('heroes'),bills:keep,rw:await (full?rwDump():rwDumpLite()).catch(()=>null),ct:typeof ctSummaryForBackup==='function'?await ctSummaryForBackup():null,tracker:await gdTracker()}}
 async function gzB64(str){const z=await streamBytes(new TextEncoder().encode(str),CompressionStream,'gzip');let s='';for(let i=0;i<z.length;i+=0x8000)s+=String.fromCharCode.apply(null,z.subarray(i,i+0x8000));return btoa(s)}
 async function gunzipB64(b){const s=atob(b),a=new Uint8Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return new TextDecoder().decode(await streamBytes(a,DecompressionStream,'gzip'))}
 async function gdApi(action,extra,key){let r;
@@ -2174,7 +2199,7 @@ function ctHistory(t2){return Object.keys(S.ctTargets).sort().map(date=>{const T
   return {date,routes,has:!!S.ctColl[date],tgt:sum(Object.values(routes),x=>x.target),ach:sum(Object.values(routes),x=>x.ach),saC:sum(Object.values(routes),x=>x.sa)}})}
 
 /* ---------- open / shell ---------- */
-async function ctOpen(page){await ctLoad();ctSyncPending();CT.page=page||CT.page||'overview';$('dmHome').hidden=true;$('rwWrap').hidden=true;$('ctWrap').hidden=false;document.body.classList.add('dmon');document.title='Collection Target · Depot Management';ctRender()}
+async function ctOpen(page){await ctLoad();ctSyncPending();CT.page=page||CT.page||'overview';$('dmHome').hidden=true;$('rwWrap').hidden=true;$('tcWrap').hidden=true;$('ctWrap').hidden=false;document.body.classList.add('dmon');document.title='Collection Target · Depot Management';ctRender()}
 async function ctRender(){const W=$('ctWrap');
   W.innerHTML=`<div class="ctbar"><button id="ctHome">⌂ <span>Depot Management</span></button><b>🎯 Collection Target · ${esc(S.cfg.depot||'')}</b><span></span></div>
     <div class="cttabs">${[['overview','📊 Overview & insight'],['set','🎯 Set target'],['upload','⬆ DA Collection report'],['results','📋 Results by day'],['recon','🔍 Hero app vs system']].map(([k,l])=>`<button data-ctp="${k}" class="${CT.page===k?'on':''}">${l}</button>`).join('')}</div>
@@ -2396,9 +2421,229 @@ async function ctRecon(){const P=$('ctPage');const days=Object.keys(S.ctColl).so
     <div class="ctnote" style="margin-top:12px"><b>How to read it</b><br>💸 <b>Not in system</b>: the hero says they collected more than the report shows — check whether the cash was deposited.<br>⬇ <b>Less in app</b> / 📵 <b>Not reported in app</b>: the system shows collection the hero did not enter — remind them to record collections in the app.<br>❓ <b>No hero for this DA</b>: import SAs from Route Wise in Delivery Heroes so the DA is linked.</div>`;
   $('rcSel').onchange=e=>{CT.rsel=e.target.value;ctRecon()}}
 
+/* ================= TARGET CUSTOMER MONITORING (watch-list of customers: dues at adding vs. receivable since) ================= */
+const TC={page:'summary',q:'',f:{route:'',sa:'',mio:'',type:'',status:'',cat:''},sort:{k:'rem',d:-1},data:null};
+const tcCode=s=>String(s??'').replace(/[\s ]+/g,'').toUpperCase();
+const TC_CAT={cleared:['Cleared','g'],ontrack:['On track','g'],slow:['Slow','m'],critical:['Critical','b'],nodue:['No dues','n']};
+const TC_ST={full:'Fully collected',part:'Partly collected',none:'Not collected',nodue:'No dues at adding'};
+async function tcLoad(){const d=(await getKV('tcm'))||{};d.list=d.list||{};d.set=Object.assign({critDays:15,horizon:30},d.set||{});TC.data=d;return d}
+const tcSave=()=>setKV('tcm',TC.data);
+const tcDays=(a,b)=>Math.max(0,Math.round((new Date((b||todayISO())+'T12:00:00')-new Date(a+'T12:00:00'))/864e5));
+
+/* customer facts from the latest receivable + customer list + route master */
+async function tcLookup(){const L=await rwLatest().catch(()=>null);const t2=await ctRouteMaster().catch(()=>({}));
+  const custs=new Map((await rwAll('customers').catch(()=>[])).map(c=>[tcCode(c.code),c]));
+  const by=new Map();if(L)for(const r of L.rows){const k=tcCode(r.code);if(!k)continue;let o=by.get(k);if(!o){o={rows:[]};by.set(k,o)}o.rows.push(r)}
+  return {L,t2,custs,by}}
+function tcInfo(code,X){const o=X.by.get(code),c=X.custs.get(code)||{},r=(o&&o.rows[0])||{};const terr=r.route||c.route||'';const rm=X.t2[terr]||{};
+  return {name:r.name||c.name||'',type:r.ctype||'',market:r.market||c.market||'',address:c.address||'',mobile:r.mobile||c.mobile||'',owner:c.owner||'',thana:c.thana||'',district:c.district||'',
+    terr,route:rm.route||terr,sa:rm.sa||'',mio:r.mio||'',area:r.area||'',zone:r.zone||''}}
+const tcInvMap=rows=>{const m={};for(const r of rows||[]){const a=+r.recv||0;if(a<=0)continue;const k=r.invoice||('row'+Object.keys(m).length);m[k]=(m[k]||0)+a}return m};
+
+/* add customers by code; returns {added, again, nodue, unknown} */
+async function tcAdd(codes,deadline){await tcLoad();const X=await tcLookup();const res={added:[],again:[],nodue:[],unknown:[]};const now=Date.now(),today=todayISO();
+  for(const raw of codes){const code=tcCode(raw);if(!code||code.length<2)continue;
+    if(TC.data.list[code]&&!TC.data.list[code].removed){res.again.push(code);continue}
+    const o=X.by.get(code);const inv=tcInvMap(o&&o.rows);const amt=Object.values(inv).reduce((s,v)=>s+v,0);
+    const known=!!o||X.custs.has(code);if(!known){res.unknown.push(code);continue}
+    const days=o?Math.max(0,...o.rows.map(r=>+r.days||0)):0;
+    TC.data.list[code]={code,added:today,addedAt:now,deadline:deadline||'',info:tcInfo(code,X),
+      snap:{repAt:X.L?X.L.rep.uploadedAt:0,rep:X.L?X.L.rep.fileName:'',amt,inv,n:Object.keys(inv).length,maxDays:days},
+      cur:{repAt:X.L?X.L.rep.uploadedAt:0,rem:amt,newAmt:0,newN:0,n:Object.keys(inv).length},hist:[{d:today,rem:amt,nw:0}]};
+    (amt>0?res.added:res.nodue).push(code)}
+  await tcSave();return res}
+
+/* bring every target customer up to date with the latest receivable (called on open and after each receivable upload) */
+async function tcSync(force){const d=await tcLoad();const codes=Object.keys(d.list).filter(k=>!d.list[k].removed);if(!codes.length)return d;
+  const X=await tcLookup();if(!X.L)return d;const at=X.L.rep.uploadedAt||0,day=iso(new Date(at||Date.now()));let ch=false;
+  for(const k of codes){const c=d.list[k];if(!force&&c.cur&&c.cur.repAt>=at)continue;
+    const o=X.by.get(k);const now=tcInvMap(o&&o.rows);let rem=0,newAmt=0,newN=0;
+    for(const [inv,a] of Object.entries(c.snap.inv))rem+=Math.min(a,now[inv]||0);
+    for(const [inv,a] of Object.entries(now))if(!(inv in c.snap.inv)){newAmt+=a;newN++}
+    c.cur={repAt:at,rem,newAmt,newN,n:Object.keys(now).length};
+    const fresh=tcInfo(k,X);for(const f of Object.keys(fresh))if(fresh[f])c.info[f]=fresh[f];
+    c.hist=(c.hist||[]).filter(h=>h.d!==day);c.hist.push({d:day,rem,nw:newAmt});c.hist.sort((a,b)=>a.d<b.d?-1:1);if(c.hist.length>120)c.hist=c.hist.slice(-120);ch=true}
+  if(ch)await tcSave();return d}
+
+/* derived numbers, status and category for one customer */
+function tcEval(c){const s=TC.data.set;const amt=c.snap.amt,rem=c.cur?c.cur.rem:amt,col=Math.max(0,amt-rem),pct=amt>0?col/amt:0,days=tcDays(c.added);
+  const status=amt<=0?'nodue':rem<=0?'full':col>0?'part':'none';
+  let cat,exp=null,late=false;
+  if(amt<=0)cat='nodue';else if(rem<=0)cat='cleared';else{
+    if(c.deadline){const tot=Math.max(1,tcDays(c.added,c.deadline));exp=Math.min(1,days/tot);late=todayISO()>c.deadline}else exp=Math.min(1,days/s.horizon);
+    if(late||(col<=0&&days>=s.critDays))cat='critical';else if(pct+0.1>=exp||days<3)cat='ontrack';else cat='slow'}
+  return {...c,amt,rem,col,pct,days,status,cat,exp,late,newAmt:c.cur?c.cur.newAmt:0,newN:c.cur?c.cur.newN:0,nNow:c.cur?c.cur.n:c.snap.n,left:c.deadline?tcDays(todayISO(),c.deadline)*(todayISO()>c.deadline?-1:1):null}}
+function tcRows(){return Object.values(TC.data.list).filter(c=>!c.removed).map(tcEval)}
+
+/* ---------- shell ---------- */
+async function tcOpen(page){TC.page=page||TC.page||'summary';$('dmHome').hidden=true;$('rwWrap').hidden=true;$('ctWrap').hidden=true;$('tcWrap').hidden=false;document.body.classList.add('dmon');
+  document.title='Target Customer Monitoring · Depot Management';$('tcWrap').innerHTML='<div class="hint" style="padding:60px;text-align:center">Loading…</div>';await tcSync();tcRender()}
+function tcRender(){const W=$('tcWrap');const n=tcRows().length;
+  W.innerHTML=`<div class="ctbar tcbar"><button id="tcHome">⌂ <span>Depot Management</span></button><b>👁️ Target Customer Monitoring · ${esc(S.cfg.depot||'')}</b><span></span></div>
+    <div class="cttabs">${[['summary','📊 Summary & insight'],['details',`📋 Details${n?` <em>${n}</em>`:''}`],['add','➕ Add customers']].map(([k,l])=>`<button data-tcp="${k}" class="${TC.page===k?'on':''}">${l}</button>`).join('')}</div>
+    <div class="ctpage" id="tcPage"></div>`;
+  $('tcHome').onclick=()=>{$('tcWrap').hidden=true;dmShow()};
+  W.querySelectorAll('[data-tcp]').forEach(b=>b.onclick=()=>{TC.page=b.dataset.tcp;tcRender()});
+  ({summary:tcSummary,details:tcDetails,add:tcAddPage})[TC.page]()}
+const tcPill=k=>`<span class="ctach ${TC_CAT[k][1]==='n'?'':TC_CAT[k][1]}" ${TC_CAT[k][1]==='n'?'style="background:#eef0f2;color:#5b6270"':''}>${TC_CAT[k][0]}</span>`;
+const tcPct=p=>`${Math.round(p*100)}%`;
+const tcBar=p=>`<span class="ctpb" style="min-width:70px"><i class="${p>=.8?'g':p>=.4?'m':'b'}" style="width:${Math.min(100,p*100).toFixed(0)}%"></i></span>`;
+
+/* ---------- summary & insight ---------- */
+async function tcSummary(){const P=$('tcPage');const R=tcRows();
+  if(!R.length){P.innerHTML=`<div class="card empty"><div class="big">👁️</div><h3>No target customers yet</h3><div class="hint">Add the customers you want to watch — one by one or a bulk list of Customer Codes. Their dues are captured from the latest receivable report at that moment, and every new receivable upload shows how much has been collected since.</div>
+    <div style="margin-top:14px"><button class="btn primary" id="tcGoAdd">➕ Add customers</button></div></div>`;$('tcGoAdd').onclick=()=>{TC.page='add';tcRender()};return}
+  const L=await rwLatest().catch(()=>null);
+  const A=sum(R,x=>x.amt),C=sum(R,x=>x.col),M=sum(R,x=>x.rem),NW=sum(R,x=>x.newAmt);const cnt=k=>R.filter(x=>x.cat===k).length;
+  const avgD=Math.round(sum(R,x=>x.days)/R.length);
+  let h=`<div class="ptitle" style="margin:0 0 6px"><div><h2 style="margin:0">Summary &amp; insight</h2><p class="hint" style="margin:2px 0 0">${R.length} target customers · progress from the receivable uploaded ${L?esc(fmtStamp(L.rep.uploadedAt)):'—'}</p></div>
+      <div class="acts"><button class="btn ghost" id="tcRe">↻ Refresh from latest receivable</button></div></div>
+    <div class="kpis">
+      <div class="card kpi"><div class="l">Target customers</div><div class="v">${R.length}</div><div class="s">avg ${avgD} day(s) watched</div></div>
+      <div class="card kpi k2"><div class="l">Dues when added</div><div class="v">${tk(A)}</div><div class="s">${sum(R,x=>x.snap.n)} open invoices</div></div>
+      <div class="card kpi k3"><div class="l">Collected since</div><div class="v">${tk(C)}</div><div class="s">${tcPct(A?C/A:0)} recovered</div></div>
+      <div class="card kpi k4"><div class="l">Still outstanding</div><div class="v">${tk(M)}</div><div class="s">${R.filter(x=>x.rem>0).length} customers</div></div>
+      <div class="card kpi k5"><div class="l">New dues added</div><div class="v">${tk(NW)}</div><div class="s">${R.filter(x=>x.newAmt>0).length} customers bought again</div></div></div>
+    <div class="card ic" style="margin-bottom:14px"><div class="ich"><h3>Category</h3><span class="hint">progress &amp; speed</span></div><div class="tccats">
+      ${['cleared','ontrack','slow','critical','nodue'].map(k=>`<button class="tccat ${TC_CAT[k][1]}" data-tccat="${k}"><b>${cnt(k)}</b><span>${TC_CAT[k][0]}</span><small>${tk(sum(R.filter(x=>x.cat===k),x=>x.rem))} due</small></button>`).join('')}</div>
+      <div class="tcstack">${['cleared','ontrack','slow','critical','nodue'].map(k=>cnt(k)?`<i class="${TC_CAT[k][1]}" style="flex:${cnt(k)}" title="${TC_CAT[k][0]}: ${cnt(k)}"></i>`:'').join('')}</div></div>
+    <div class="hgrid"><div class="card ic"><div class="ich"><h3>Outstanding trend</h3><span class="hint">target customers, by receivable upload</span></div><div id="tcCh"></div></div>
+      <div class="card ic"><div class="ich"><h3>Insight &amp; what to do</h3></div><div id="tcIn"></div></div></div>
+    <div class="hgrid" style="margin-top:14px">${['route','sa','mio','type'].map(g=>`<div class="card ic"><div class="ich"><h3>By ${{route:'route',sa:'SA',mio:'MIO',type:'customer type'}[g]}</h3></div><div class="tw">${tcGroup(R,g)}</div></div>`).join('')}</div>`;
+  P.innerHTML=h;$('tcRe').onclick=async()=>{await tcSync(true);toast('Updated from the latest receivable');tcRender()};
+  P.querySelectorAll('[data-tccat]').forEach(b=>b.onclick=()=>{TC.f={route:'',sa:'',mio:'',type:'',status:'',cat:b.dataset.tccat};TC.page='details';tcRender()});
+  P.querySelectorAll('[data-tcg]').forEach(b=>b.onclick=()=>{const [g,v]=b.dataset.tcg.split('|');TC.f={route:'',sa:'',mio:'',type:'',status:'',cat:''};TC.f[g]=v;TC.page='details';tcRender()});
+  /* trend: sum of outstanding (snapshot invoices) per upload date, carrying each customer's last value forward */
+  const dates=[...new Set(R.flatMap(x=>(x.hist||[]).map(hh=>hh.d)))].sort().slice(-30);
+  if(dates.length>1){const rem=[],nw=[];for(const d of dates){let a=0,b=0;for(const x of R){if(x.added>d)continue;const hs=(x.hist||[]).filter(hh=>hh.d<=d);const l=hs[hs.length-1];if(l){a+=l.rem;b+=l.nw||0}}rem.push(Math.round(a));nw.push(Math.round(b))}
+    lineChart($('tcCh'),{labels:dates.map(d=>fmtDate(d).slice(0,6)),series:[{name:'Outstanding (dues when added)',color:'#a1580e',values:rem},{name:'New dues',color:'#8e8ca4',dash:true,values:nw}]})}
+  else $('tcCh').innerHTML='<div class="hint" style="padding:26px;text-align:center">The trend appears after the next receivable upload.</div>';
+  $('tcIn').innerHTML=tcInsights(R)}
+function tcGroup(R,g){const m=new Map();for(const x of R){const k=(g==='type'?x.info.type:x.info[g])||'—';const o=m.get(k)||{n:0,a:0,c:0,r:0,crit:0};o.n++;o.a+=x.amt;o.c+=x.col;o.r+=x.rem;if(x.cat==='critical')o.crit++;m.set(k,o)}
+  const rows=[...m.entries()].sort((a,b)=>b[1].r-a[1].r);
+  return `<table class="tbl"><thead><tr><th>${{route:'Route',sa:'SA',mio:'MIO',type:'Type'}[g]}</th><th class="num">Cust.</th><th class="num">Dues when added</th><th class="num">Collected</th><th style="min-width:110px">Recovery</th><th class="num">Critical</th></tr></thead><tbody>
+    ${rows.map(([k,o])=>`<tr class="tcclick" data-tcg="${g}|${esc(k)}"><td><b>${esc(k)}</b></td><td class="num">${o.n}</td><td class="num">${tk(o.a)}</td><td class="num">${tk(o.c)}</td><td><div style="display:flex;align-items:center;gap:8px">${tcBar(o.a?o.c/o.a:0)}<small>${tcPct(o.a?o.c/o.a:0)}</small></div></td><td class="num">${o.crit?`<span class="ctlate">${o.crit}</span>`:'—'}</td></tr>`).join('')}</tbody></table>`}
+function tcInsights(R){const out=[];const s=TC.data.set;const crit=R.filter(x=>x.cat==='critical').sort((a,b)=>b.rem-a.rem),slow=R.filter(x=>x.cat==='slow').sort((a,b)=>b.rem-a.rem);
+  const nm=x=>`<b>${esc(x.info.name||x.code)}</b> <span class="muted">(${esc(x.code)})</span>`;
+  if(crit.length)out.push(['bad',`${crit.length} critical customer(s) · ${tk(sum(crit,x=>x.rem))} stuck`,`No collection for ${s.critDays}+ days or the deadline has passed. Biggest: ${crit.slice(0,3).map(x=>`${nm(x)} ${tk(x.rem)}`).join(', ')}.`,'Visit with the MIO and SA together this week; agree a written payment date and stop new credit until a part payment comes in.']);
+  if(slow.length)out.push(['warn',`${slow.length} slow customer(s)`,`Collecting slower than the deadline needs. Largest: ${slow.slice(0,3).map(x=>`${nm(x)} ${tcPct(x.pct)} of ${tk(x.amt)}`).join(', ')}.`,'Put them on the SA\'s daily collection target and follow up every visit until they are back on track.']);
+  const nb=R.filter(x=>x.newAmt>0&&x.rem>0).sort((a,b)=>b.newAmt-a.newAmt);
+  if(nb.length)out.push(['warn',`${nb.length} customer(s) got new invoices while old dues are open`,`${tk(sum(nb,x=>x.newAmt))} of new credit, e.g. ${nb.slice(0,3).map(x=>`${nm(x)} +${tk(x.newAmt)}`).join(', ')}.`,'Ask distribution to collect the old dues before delivering more on credit.']);
+  const soon=R.filter(x=>x.deadline&&x.rem>0&&x.left!=null&&x.left>=0&&x.left<=7).sort((a,b)=>a.left-b.left);
+  if(soon.length)out.push(['info',`${soon.length} deadline(s) in the next 7 days`,soon.slice(0,4).map(x=>`${nm(x)} · ${fmtDate(x.deadline)} · ${tk(x.rem)} left`).join('<br>'),'Plan these shops first in the coming routes.']);
+  const sa=new Map();for(const x of R){const k=x.info.sa||'—';const o=sa.get(k)||{a:0,c:0,n:0};o.a+=x.amt;o.c+=x.col;o.n++;sa.set(k,o)}
+  const saL=[...sa.entries()].filter(([k,o])=>o.n>=2&&o.a>0).sort((a,b)=>a[1].c/a[1].a-b[1].c/b[1].a);
+  if(saL.length>1){const [k,o]=saL[0];out.push(['info',`Lowest recovery: SA ${esc(k)}`,`${tcPct(o.c/o.a)} recovered on ${o.n} target customers (${tk(o.a-o.c)} still due).`,'Review this SA\'s list together and split it across the week.'])}
+  const cl=R.filter(x=>x.cat==='cleared');if(cl.length)out.push(['info',`${cl.length} customer(s) fully cleared ✅`,`${tk(sum(cl,x=>x.amt))} recovered in full.`,'Remove them from the list in Details when you no longer need to watch them.']);
+  if(!out.length)return '<div class="hint" style="padding:14px">All target customers are on track. 👍</div>';
+  return out.map(([c,t,d,s2])=>`<div class="ctbn ${c}"><div class="ctbt"><b>${t}</b></div><div class="ctbd">${d}</div><div class="ctbs">💡 ${s2}</div></div>`).join('')}
+
+/* ---------- details: sort, filter, search, export, print ---------- */
+const TC_COLS=[['code','Code'],['name','Customer'],['route','Route · SA · MIO'],['days','Added'],['deadline','Deadline'],
+  ['amt','Dues when added'],['col','Collected'],['pct','%'],['rem','Outstanding'],['newAmt','New dues'],['cat','Status']];
+const tcVal=(x,k)=>({deadline:x.deadline||'9999',type:x.info.type,route:x.info.route,sa:x.info.sa,mio:x.info.mio,market:x.info.market,inv:x.snap.n,cat:['critical','slow','ontrack','cleared','nodue'].indexOf(x.cat)})[k]??x[k];
+function tcFiltered(){const R=tcRows();const q=tcCode(TC.q).toLowerCase(),f=TC.f;
+  let L=R.filter(x=>(!f.route||x.info.route===f.route)&&(!f.sa||(x.info.sa||'—')===f.sa)&&(!f.mio||(x.info.mio||'—')===f.mio)&&(!f.type||(x.info.type||'—')===f.type)&&(!f.status||x.status===f.status)&&(!f.cat||x.cat===f.cat)
+    &&(!q||tcCode([x.code,x.info.name,x.info.market,x.info.address,x.info.mobile,x.info.route,x.info.sa,x.info.mio].join(' ')).toLowerCase().includes(q)));
+  const {k,d}=TC.sort;L.sort((a,b)=>{const va=tcVal(a,k),vb=tcVal(b,k);return (typeof va==='number'&&typeof vb==='number'?va-vb:natCmp(String(va||''),String(vb||'')))*d});return {R,L}}
+function tcDetails(){const P=$('tcPage');const {R,L}=tcFiltered();
+  if(!R.length){tcSummary();return}
+  const opt=(g,vals,lab)=>`<select data-tcf="${g}"><option value="">${lab}: all</option>${vals.map(([v,l])=>`<option value="${esc(v)}" ${TC.f[g]===v?'selected':''}>${esc(l)}</option>`).join('')}</select>`;
+  const uniq=f=>[...new Set(R.map(f))].sort(natCmp).map(v=>[v,v]);
+  const T={a:sum(L,x=>x.amt),c:sum(L,x=>x.col),r:sum(L,x=>x.rem),n:sum(L,x=>x.newAmt)};
+  P.innerHTML=`<div class="card ctctl tcctl"><div class="tcq"><span>🔍</span><input id="tcQ" placeholder="Search code, name, market, mobile, SA…" value="${esc(TC.q)}"></div>
+      ${opt('route',uniq(x=>x.info.route||'—'),'Route')}${opt('sa',uniq(x=>x.info.sa||'—'),'SA')}${opt('mio',uniq(x=>x.info.mio||'—'),'MIO')}${opt('type',uniq(x=>x.info.type||'—'),'Type')}
+      ${opt('status',Object.entries(TC_ST),'Status')}${opt('cat',Object.entries(TC_CAT).map(([k,v])=>[k,v[0]]),'Category')}
+      ${Object.values(TC.f).some(Boolean)||TC.q?'<button class="btn ghost sm" id="tcClr">✕ Clear</button>':''}
+      <span style="flex:1"></span><button class="btn ghost sm" id="tcDl">⬇ Excel</button><button class="btn ghost sm" id="tcPr">🖨 Print</button><button class="btn ghost sm" id="tcDead">📅 Deadline…</button></div>
+    <div class="hint" style="margin:6px 2px 8px">${L.length} of ${R.length} customers · click a column to sort · ${tk(T.r)} outstanding</div>
+    <div class="card tcwrap"><table class="tbl tctbl"><thead><tr>${TC_COLS.map(([k,l])=>`<th data-tcs="${k}" class="${['amt','col','pct','rem','newAmt'].includes(k)?'num':''}">${l}${TC.sort.k===k?(TC.sort.d>0?' ▲':' ▼'):''}</th>`).join('')}<th></th></tr></thead>
+      <tbody>${L.map(x=>`<tr><td class="mono">${esc(x.code)}</td><td><b>${esc(x.info.name||'—')}</b><small class="tcsub">${esc([x.info.type,x.info.market,x.info.mobile].filter(Boolean).join(' · '))}</small><small class="tcsub">${esc(x.info.address||'')}</small></td>
+        <td>${esc(x.info.route||'—')}<small class="tcsub">SA: ${esc(x.info.sa||'—')}</small><small class="tcsub">MIO: ${esc(x.info.mio||'—')}</small></td>
+        <td>${fmtDate(x.added)}<small class="tcsub">${x.days} day(s) ago</small></td>
+        <td>${x.deadline?`<span class="${x.late&&x.rem>0?'ctlate':''}">${fmtDate(x.deadline)}</span><small class="tcsub">${x.rem<=0?'':x.late?'passed':x.left+' day(s) left'}</small>`:'<span class="muted">—</span>'}</td>
+        <td class="num">${tk(x.amt)}<small class="tcsub">${x.snap.n} invoice(s)</small></td><td class="num">${tk(x.col)}</td><td class="num"><div style="display:flex;align-items:center;gap:6px;justify-content:flex-end">${tcBar(x.pct)}${tcPct(x.pct)}</div></td>
+        <td class="num"><b>${tk(x.rem)}</b><small class="tcsub">${x.nNow} open now</small></td><td class="num">${x.newAmt?`${tk(x.newAmt)}<small class="tcsub">${x.newN} new inv.</small>`:'—'}</td><td>${tcPill(x.cat)}<small class="tcsub">${TC_ST[x.status]}</small></td>
+        <td><button class="btn ghost sm" data-tcrm="${esc(x.code)}" title="Remove from list">✕</button></tr>`).join('')||`<tr><td colspan="12" class="hint" style="text-align:center;padding:24px">No customers match.</td></tr>`}</tbody>
+      <tfoot><tr><td colspan="5"><b>Total · ${L.length}</b></td><td class="num">${tk(T.a)}</td><td class="num">${tk(T.c)}</td><td class="num">${tcPct(T.a?T.c/T.a:0)}</td><td class="num"><b>${tk(T.r)}</b></td><td class="num">${tk(T.n)}</td><td colspan="2"></td></tr></tfoot></table></div>`;
+  let tq;$('tcQ').oninput=e=>{TC.q=e.target.value;clearTimeout(tq);tq=setTimeout(()=>{tcDetails();const n=$('tcQ');n.focus();n.setSelectionRange(n.value.length,n.value.length)},250)};
+  P.querySelectorAll('[data-tcf]').forEach(s=>s.onchange=()=>{TC.f[s.dataset.tcf]=s.value;tcDetails()});
+  if($('tcClr'))$('tcClr').onclick=()=>{TC.q='';TC.f={route:'',sa:'',mio:'',type:'',status:'',cat:''};tcDetails()};
+  P.querySelectorAll('[data-tcs]').forEach(th=>th.onclick=()=>{const k=th.dataset.tcs;TC.sort=TC.sort.k===k?{k,d:-TC.sort.d}:{k,d:['code','name','type','route','sa','mio','market','status','deadline','added'].includes(k)?1:-1};tcDetails()});
+  P.querySelectorAll('[data-tcrm]').forEach(b=>b.onclick=async()=>{const k=b.dataset.tcrm;const ok=await choice('Remove target customer',`Stop watching <b>${esc(k)}</b>? Its history is deleted.`,[{l:'Cancel'},{l:'Remove',v:1,cls:'danger'}]);if(ok){delete TC.data.list[k];await tcSave();toast('Removed');tcRender()}});
+  $('tcDl').onclick=()=>tcExport(L);$('tcPr').onclick=()=>tcPrint(L);$('tcDead').onclick=()=>tcDeadline(L)}
+function tcExport(L){const w=XLSX.utils.book_new();
+  const head=['Customer Code','Customer Name','Customer Type','Route','Territory','SA','MIO','Market','Address','Mobile','Added','Days','Deadline','Dues when added','Open invoices (then)','Open invoices (now)','Collected','Collected %','Outstanding','New dues','New invoices','Status','Category'];
+  const rows=L.map(x=>[x.code,x.info.name,x.info.type,x.info.route,x.info.terr,x.info.sa,x.info.mio,x.info.market,x.info.address,x.info.mobile,x.added,x.days,x.deadline,Math.round(x.amt),x.snap.n,x.nNow,Math.round(x.col),Math.round(x.pct*1000)/10,Math.round(x.rem),Math.round(x.newAmt),x.newN,TC_ST[x.status],TC_CAT[x.cat][0]]);
+  const ws=XLSX.utils.aoa_to_sheet([head,...rows]);ws['!cols']=head.map((h,i)=>({wch:[12,28,14,14,10,16,18,16,30,14,11,6,11,14,10,10,12,9,12,10,8,16,10][i]}));
+  XLSX.utils.book_append_sheet(w,ws,'Target customers');XLSX.writeFile(w,`Target_Customers_${(S.cfg.depot||'Depot').replace(/\W+/g,'_')}_${todayISO()}.xlsx`)}
+function tcPrint(L){const T={a:sum(L,x=>x.amt),c:sum(L,x=>x.col),r:sum(L,x=>x.rem)};
+  $('printArea').innerHTML=`<style>@page{size:A4 landscape;margin:10mm}.tcp{font:11px Ubuntu,Arial,sans-serif;color:#111}.tcp h2{margin:0 0 2px;font-size:16px}.tcp .s{color:#555;margin-bottom:8px}.tcp table{width:100%;border-collapse:collapse}.tcp th,.tcp td{border:1px solid #bbb;padding:3px 5px;text-align:left;vertical-align:top}.tcp th{background:#f1f1f1}.tcp .n{text-align:right;white-space:nowrap}.tcp tfoot td{font-weight:700;background:#f7f7f7}</style>
+    <div class="tcp"><h2>Target Customer Monitoring · ${esc(S.cfg.depot||'')}</h2><div class="s">${fmtDate(todayISO())} · ${L.length} customers · dues when added ${tk(T.a)} · collected ${tk(T.c)} (${tcPct(T.a?T.c/T.a:0)}) · outstanding ${tk(T.r)}</div>
+    <table><thead><tr><th>#</th><th>Code</th><th>Customer / address</th><th>Route · SA · MIO</th><th>Added</th><th class="n">Days</th><th>Deadline</th><th class="n">Dues when added</th><th class="n">Collected</th><th class="n">%</th><th class="n">Outstanding</th><th class="n">New dues</th><th>Category</th></tr></thead>
+    <tbody>${L.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.code)}</td><td><b>${esc(x.info.name)}</b><br>${esc([x.info.market,x.info.address,x.info.mobile].filter(Boolean).join(' · '))}</td><td>${esc([x.info.route,x.info.sa,x.info.mio].filter(Boolean).join(' · '))}</td><td>${fmtDate(x.added)}</td><td class="n">${x.days}</td><td>${x.deadline?fmtDate(x.deadline):''}</td><td class="n">${fmt(x.amt)}</td><td class="n">${fmt(x.col)}</td><td class="n">${tcPct(x.pct)}</td><td class="n">${fmt(x.rem)}</td><td class="n">${x.newAmt?fmt(x.newAmt):''}</td><td>${TC_CAT[x.cat][0]}</td></tr>`).join('')}</tbody>
+    <tfoot><tr><td colspan="7">Total</td><td class="n">${fmt(T.a)}</td><td class="n">${fmt(T.c)}</td><td class="n">${tcPct(T.a?T.c/T.a:0)}</td><td class="n">${fmt(T.r)}</td><td colspan="2"></td></tr></tfoot></table></div>`;
+  setTimeout(()=>window.print(),120)}
+function tcDeadline(L){const open=L.filter(x=>x.rem>0);
+  modal('Set deadline',`<p style="margin:0 0 10px">Set a deadline for the <b>${open.length}</b> customer(s) shown that still have dues (use the filters to choose them).</p>
+    <div class="fgrid"><div class="field"><label>Deadline date</label><input type="date" id="tcDD" min="${todayISO()}"></div><div class="field"><label>or days from today</label><input type="number" id="tcDN" min="1" placeholder="e.g. 30"></div></div>
+    <p class="hint" style="margin:8px 0 0">Leave both empty and press Save to remove the deadline.</p>`,[{l:'Cancel'},{l:'Save',cls:'primary',fn:async()=>{let d=$('tcDD').value;const n=+$('tcDN').value;if(!d&&n>0){const x=new Date();x.setDate(x.getDate()+n);d=iso(x)}
+      for(const x of open)TC.data.list[x.code].deadline=d||'';await tcSave();toast(d?`Deadline ${fmtDate(d)} set for ${open.length}`:'Deadline removed');tcDetails();return true}}])}
+
+/* ---------- add one / bulk ---------- */
+async function tcAddPage(){const P=$('tcPage');const L=await rwLatest().catch(()=>null);
+  P.innerHTML=`${L?`<div class="ctv g">Dues are captured from the latest receivable: <b>${esc(L.rep.fileName||'')}</b> · uploaded ${esc(fmtStamp(L.rep.uploadedAt))}. Upload today's receivable in Route Wise first for exact amounts.</div>`:`<div class="ctv b">No receivable report yet — upload one in <b>Route Wise Receivable</b> first, so the dues can be captured.</div>`}
+    <div class="hgrid"><div class="card ic"><div class="ich"><h3>➕ Add customers</h3><span class="hint">one or many</span></div>
+        <div class="field"><label>Customer Code(s) — one per line, or separated by comma / space</label><textarea id="tcCodes" rows="5" placeholder="e.g. C-10021&#10;C-10044" style="width:100%;font:inherit;border:1px solid var(--line2);border-radius:10px;padding:10px"></textarea></div>
+        <div class="fgrid" style="margin-top:8px"><div class="field"><label>Deadline (optional)</label><input type="date" id="tcAD" min="${todayISO()}"></div><div class="field"><label>or days from today</label><input type="number" id="tcAN" min="1" placeholder="e.g. 30"></div></div>
+        <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn primary" id="tcAddGo">➕ Add &amp; capture dues</button></div></div>
+      <div class="card ic"><div class="ich"><h3>⬆ Bulk upload</h3><span class="hint">Excel / CSV</span></div>
+        <div class="card ctdrop" id="tcDrop" style="box-shadow:none"><div class="big">⬆</div><b>Drop a file here or click to choose</b><span class="hint">Only one column is needed: <b>Customer Code</b> (optional: <b>Deadline</b>)</span><input type="file" id="tcFile" accept=".xlsx,.xls,.csv" hidden></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:10px;flex-wrap:wrap"><span class="hint">Not sure of the format?</span><button class="btn ghost sm" id="tcFmt">⬇ Sample format</button></div></div></div>
+    <div id="tcRes" style="margin-top:14px"></div>`;
+  const dl=()=>{let d=$('tcAD').value;const n=+$('tcAN').value;if(!d&&n>0){const x=new Date();x.setDate(x.getDate()+n);d=iso(x)}return d};
+  $('tcAddGo').onclick=async()=>{const codes=$('tcCodes').value.split(/[\s,;]+/).filter(Boolean);if(!codes.length){toast('Type at least one Customer Code');return}const r=await tcAdd(codes,dl());tcShowRes(r);if(r.added.length||r.nodue.length)$('tcCodes').value=''};
+  const f=$('tcFile'),dz=$('tcDrop');dz.onclick=()=>f.click();f.onchange=e=>{const x=e.target.files[0];e.target.value='';if(x)tcBulk(x,dl())};
+  dz.ondragover=e=>{e.preventDefault();dz.classList.add('over')};dz.ondragleave=()=>dz.classList.remove('over');dz.ondrop=e=>{e.preventDefault();dz.classList.remove('over');const x=e.dataTransfer.files[0];if(x)tcBulk(x,dl())};
+  $('tcFmt').onclick=()=>{const w=XLSX.utils.book_new();const ws=XLSX.utils.aoa_to_sheet([['Customer Code','Deadline (optional, YYYY-MM-DD)'],['C-10021',''],['C-10044',iso(new Date(Date.now()+30*864e5))]]);ws['!cols']=[{wch:16},{wch:30}];XLSX.utils.book_append_sheet(w,ws,'Target customers');XLSX.writeFile(w,'Target_Customers_Upload_Format.xlsx')}}
+async function tcBulk(file,defDead){try{const wb=XLSX.read(await file.arrayBuffer(),{type:'array',raw:false});const A=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:''});
+    if(!A.length){toast('The file is empty');return}const hd=A[0].map(x=>String(x).toLowerCase().replace(/[^a-z]/g,''));let ci=hd.findIndex(h=>/customercode|custcode|code|customerid/.test(h));const di=hd.findIndex(h=>/deadline|targetdate/.test(h));
+    let rows=A.slice(1);if(ci<0){ci=0;rows=A}/* no header → first column */
+    const byDead=new Map();for(const r of rows){const c=String(r[ci]||'').trim();if(!c)continue;const d=di>=0?ctDate(r[di]):'';const k=d||defDead||'';(byDead.get(k)||byDead.set(k,[]).get(k)).push(c)}
+    const res={added:[],again:[],nodue:[],unknown:[]};for(const [d,codes] of byDead){const r=await tcAdd(codes,d);for(const k in res)res[k].push(...r[k])}
+    tcShowRes(res,file.name)}catch(e){toast('Could not read the file: '+e.message)}}
+function tcShowRes(r,fname){const el=$('tcRes');if(!el)return;const n=r.added.length+r.nodue.length;
+  el.innerHTML=`<div class="card ic"><div class="ich"><h3>${n?'✅':'ℹ️'} ${n} customer(s) added${fname?` from ${esc(fname)}`:''}</h3>${n?'<button class="btn primary sm" id="tcSee">See details →</button>':''}</div>
+    ${r.added.length?`<div class="ctnote g">${r.added.length} with open dues captured.</div>`:''}
+    ${r.nodue.length?`<div class="ctnote">${r.nodue.length} have <b>no dues</b> in the current receivable (added as "No dues"): ${r.nodue.slice(0,12).map(esc).join(', ')}${r.nodue.length>12?'…':''}</div>`:''}
+    ${r.again.length?`<div class="ctnote">${r.again.length} already in the list (skipped): ${r.again.slice(0,12).map(esc).join(', ')}${r.again.length>12?'…':''}</div>`:''}
+    ${r.unknown.length?`<div class="ctnote" style="background:#fff3e6;color:#9a4b00">${r.unknown.length} code(s) not found in the receivable or customer list (not added): ${r.unknown.slice(0,20).map(esc).join(', ')}${r.unknown.length>20?'…':''}</div>`:''}</div>`;
+  if($('tcSee'))$('tcSee').onclick=()=>{TC.page='details';tcRender()};
+  const tb=document.querySelector('[data-tcp="details"]');if(tb)tb.innerHTML=`📋 Details <em>${tcRows().length}</em>`}
+
+/* welcome-card numbers */
+async function tcCardStat(){const el=$('dmTcSt');if(!el)return;try{await tcSync();const R=tcRows();
+  if(!R.length){el.innerHTML='<div><b>—</b><small>no target customers yet</small></div>';return}
+  const A=sum(R,x=>x.amt),C=sum(R,x=>x.col);
+  el.innerHTML=`<div><b>${R.length}</b><small>target customers</small></div><div><b>৳ ${kfmt(sum(R,x=>x.rem))}</b><small>outstanding · ${tcPct(A?C/A:0)} recovered</small></div><div><b>${R.filter(x=>x.cat==='critical').length}</b><small>critical</small></div>`}catch(e){el.innerHTML='<div><b>—</b><small>open to set up</small></div>'}}
+
 /* =============== welcome-card animations (line-art, same style as Route Wise login) =============== */
 const CA_K='#2b2b2b',CA_G='#9a9a9a';
 const CA={
+  tcA:{n:'Watch list',svg:()=>`<svg viewBox="0 0 460 112">
+    <line x1="6" y1="98" x2="454" y2="98" stroke="${CA_K}" stroke-width="2"/><g transform="translate(40 0)"><path d="M0 98V62h56v36M-5 62l7-13h52l7 13z" fill="#fff" stroke="${CA_K}" stroke-width="2" stroke-linejoin="round"/><rect x="18" y="76" width="20" height="22" fill="none" stroke="${CA_K}" stroke-width="1.6"/>
+      <rect x="2" y="104" width="52" height="5" rx="2.5" fill="#e6e6e6"/><rect class="tc-due" x="2" y="104" width="52" height="5" rx="2.5" fill="${CA_K}" style="animation-delay:0.44s"/></g><g transform="translate(200 0)"><path d="M0 98V62h56v36M-5 62l7-13h52l7 13z" fill="#fff" stroke="${CA_K}" stroke-width="2" stroke-linejoin="round"/><rect x="18" y="76" width="20" height="22" fill="none" stroke="${CA_K}" stroke-width="1.6"/>
+      <rect x="2" y="104" width="52" height="5" rx="2.5" fill="#e6e6e6"/><rect class="tc-due" x="2" y="104" width="52" height="5" rx="2.5" fill="${CA_K}" style="animation-delay:2.22s"/></g><g transform="translate(360 0)"><path d="M0 98V62h56v36M-5 62l7-13h52l7 13z" fill="#fff" stroke="${CA_K}" stroke-width="2" stroke-linejoin="round"/><rect x="18" y="76" width="20" height="22" fill="none" stroke="${CA_K}" stroke-width="1.6"/>
+      <rect x="2" y="104" width="52" height="5" rx="2.5" fill="#e6e6e6"/><rect class="tc-due" x="2" y="104" width="52" height="5" rx="2.5" fill="${CA_K}" style="animation-delay:4.00s"/></g>
+    <g class="tc-ok" style="animation-delay:0s"><circle cx="96" cy="44" r="9" fill="${CA_K}"/><path d="M91 44l4 4 6-7" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></g>
+    <g class="tc-ok" style="animation-delay:1.6s"><circle cx="256" cy="44" r="9" fill="${CA_K}"/><path d="M251 44l4 4 6-7" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></g>
+    <g class="tc-scan"><circle cx="0" cy="40" r="15" fill="#ffffffcc" stroke="${CA_K}" stroke-width="2.6"/><path d="M11 51l13 13" stroke="${CA_K}" stroke-width="4" stroke-linecap="round"/></g>
+    <text x="230" y="20" text-anchor="middle" font-size="8.5" fill="${CA_G}" font-family="Ubuntu,Arial" letter-spacing=".5">TARGET CUSTOMERS</text></svg>`},
+  tcB:{n:'Dues falling',svg:()=>`<svg viewBox="0 0 460 112">
+    <line x1="40" y1="98" x2="440" y2="98" stroke="${CA_K}" stroke-width="2"/><line x1="40" y1="14" x2="40" y2="98" stroke="${CA_K}" stroke-width="2"/>
+    ${[78,66,55,41,30,19,10].map((h,i)=>`<rect class="tc-bar" x="${64+i*52}" y="${98-h}" width="26" height="${h}" fill="${i===6?CA_K:'#fff'}" stroke="${CA_K}" stroke-width="1.8" style="animation-delay:${i*.35}s"/>`).join('')}
+    <path class="tc-line" d="M77 14 L129 28 L181 40 L233 54 L285 66 L337 78 L389 86" fill="none" stroke="${CA_K}" stroke-width="1.6" stroke-dasharray="4 4"/>
+    <text x="440" y="110" text-anchor="end" font-size="8.5" fill="${CA_G}" font-family="Ubuntu,Arial" letter-spacing=".5">OUTSTANDING ↓</text></svg>`},
   rw:{n:'Invoice → SA → DIC',svg:()=>{const src=(RW_SRC.match(/<div class="lganim"[^>]*>\s*(<svg[\s\S]*?<\/svg>)/)||[])[1]||'';return src}},
   hbA:{n:'Ride & claim',svg:()=>`<svg viewBox="0 0 460 112">
     <line x1="6" y1="98" x2="454" y2="98" stroke="${CA_K}" stroke-width="2"/><path d="M30 98V66l26-18 26 18v32" fill="#fff" stroke="${CA_K}" stroke-width="2" stroke-linejoin="round"/><rect x="48" y="78" width="16" height="20" fill="${CA_K}"/>
@@ -2585,10 +2830,10 @@ async function rwLatest(){const reps=await rwAll('reports');if(!reps.length)retu
 async function rwSummary(){try{const L=await rwLatest();if(!L)return null;const rows=L.rows;
   return {at:L.rep.uploadedAt,file:L.rep.fileName,total:rows.reduce((s,r)=>s+(+r.recv||0),0),cust:new Set(rows.map(r=>r.code)).size,inv:rows.length,routes:new Set(rows.map(r=>r.route)).size,
     over:rows.filter(r=>(+r.days||0)>44).reduce((s,r)=>s+(+r.recv||0),0)}}catch(e){return null}}
-window.dmRwChanged=()=>{DM.rwSum=null;if(typeof gdDirty==='function')gdDirty()};
+window.dmRwChanged=()=>{DM.rwSum=null;if(typeof gdDirty==='function')gdDirty();if(typeof tcSync==='function')setTimeout(()=>tcSync().catch(()=>{}),1500)};
 
 async function dmShow(){
-  document.title='Depot Management';$('dmHome').hidden=false;document.body.classList.add('dmon');$('rwWrap').hidden=true;$('ctWrap').hidden=true;
+  document.title='Depot Management';$('dmHome').hidden=false;document.body.classList.add('dmon');$('rwWrap').hidden=true;$('ctWrap').hidden=true;$('tcWrap').hidden=true;
   const hb=S.bills.map(evalBill);const pend=hb.filter(b=>b.status==='pending').length;const mStart=todayISO().slice(0,8)+'01';
   const mClaim=hb.filter(b=>b.date>=mStart).reduce((s,b)=>s+b._claimed,0);
   const hr=new Date().getHours();const greet=hr<12?'Good morning':hr<17?'Good afternoon':'Good evening';
@@ -2603,13 +2848,15 @@ async function dmShow(){
         <div class="dmst"><div><b>${pend}</b><small>bills pending review</small></div><div><b>৳ ${kfmt(mClaim)}</b><small>claimed this month</small></div><div><b>${S.heroes.filter(h=>h.active!==false).length}</b><small>Delivery Heroes</small></div></div><div class="dmgo">Open →</div></button>
       <button class="dmcard ct" id="dmCT"><div class="dmic">🎯</div><div class="dmct"><b>Collection Target</b><span>Set route / SA-wise daily targets, track achievement</span></div>${caHtml('ct',['ctA','ctB'])}
         <div class="dmst" id="dmCtSt"><span class="muted">Loading…</span></div><div class="dmgo">Open →</div></button>
+      <button class="dmcard tc" id="dmTC"><div class="dmic">👁️</div><div class="dmct"><b>Target Customers</b><span>Monitoring — dues when added vs collected since</span></div>${caHtml('tc',['tcA','tcB'])}
+        <div class="dmst" id="dmTcSt"><span class="muted">Loading…</span></div><div class="dmgo">Open →</div></button>
       <div class="dmcard soon" aria-label="More tools coming soon"><div class="gears"><span class="g1">⚙️</span><span class="g2">⚙️</span><span class="g3">🔧</span></div>
         <div class="dmct"><b>More tools</b><span>Under development — coming soon</span></div><div class="dots"><i></i><i></i><i></i></div></div>
     </div></div>
     <div class="dmmain dmtrkw"><div class="dmtrack" id="dmTrack"><div class="hint">Checking uploads…</div></div></div>
     <div class="dmwave" aria-hidden="true">${dmFlow()}
       <div class="dmfoot">Depot Management v1.0 · Designed by: ABM Shafiquzzaman</div></div>`;
-  caBind($('dmHome'));trRender().then(p=>{if(p&&!DM.nudged){DM.nudged=true;trDailyNudge(p)}});$('dmHB').onclick=()=>dmOpenHB();$('dmRW').onclick=()=>dmOpenRW();$('dmCT').onclick=()=>ctOpen('overview');ctCardStat();
+  caBind($('dmHome'));trRender().then(p=>{if(p&&!DM.nudged){DM.nudged=true;trDailyNudge(p)}});$('dmHB').onclick=()=>dmOpenHB();$('dmRW').onclick=()=>dmOpenRW();$('dmCT').onclick=()=>ctOpen('overview');ctCardStat();$('dmTC').onclick=()=>tcOpen('summary');tcCardStat();
   $('dmOut').onclick=()=>dmLogout();
   const s=DM.rwSum||await rwSummary();DM.rwSum=s;const el=$('dmRwSt');if(!el)return;
   el.innerHTML=s?`<div><b>৳ ${kfmt(s.total)}</b><small>receivable</small></div><div><b>${s.cust}</b><small>customers · ${s.routes} territories</small></div><div><b>${fmtStamp(s.at).split(',')[0]}</b><small>last upload</small></div>`
@@ -2630,8 +2877,8 @@ function dmFlow(){const X=[150,435,720,1005,1290],Y=34;
     ${goods}${cash}
     ${X.map((x,i)=>`<g class="fn" transform="translate(${x} ${Y})" style="animation-delay:${i*.9}s"><circle class="halo" r="26"/>${ic[i]}</g>`).join('')}
     <text class="fk" x="${(X[0]+X[1])/2+60}" y="${Y-12}">goods →</text><text class="fk c" x="${(X[3]+X[4])/2-60}" y="${Y+24}" text-anchor="end">← collection</text></svg>`}
-function dmOpenHB(){$('dmHome').hidden=true;$('rwWrap').hidden=true;$('ctWrap').hidden=true;document.body.classList.remove('dmon');document.title='Hero Bill Manager · Depot Management';render();window.scrollTo(0,0)}
-function dmOpenRW(){$('dmHome').hidden=true;$('rwWrap').hidden=false;document.body.classList.add('dmon');document.title='Route Wise Receivable · Depot Management';
+function dmOpenHB(){$('dmHome').hidden=true;$('rwWrap').hidden=true;$('ctWrap').hidden=true;$('tcWrap').hidden=true;document.body.classList.remove('dmon');document.title='Hero Bill Manager · Depot Management';render();window.scrollTo(0,0)}
+function dmOpenRW(){$('dmHome').hidden=true;$('tcWrap').hidden=true;$('ctWrap').hidden=true;$('rwWrap').hidden=false;document.body.classList.add('dmon');document.title='Route Wise Receivable · Depot Management';
   if(!DM.rwFrame){const f=document.createElement('iframe');f.id='rwFrame';f.title='Route Wise Receivable';
     const inj=`<script>window.DM_EMBED=${JSON.stringify({depot:S.cfg.depot||''})};<\/script>`;f.srcdoc=RW_SRC.replace('<head>','<head>'+inj);$('rwWrap').appendChild(f);DM.rwFrame=f}}
 
