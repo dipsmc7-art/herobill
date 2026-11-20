@@ -1,5 +1,5 @@
 /* Hero Bill service worker — works offline; updates when you replace files on the server */
-const VERSION = '8774de59fe';
+const VERSION = '7caf2988ae';
 const CACHE = 'herobill-' + VERSION;
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL))); });

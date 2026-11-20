@@ -673,64 +673,29 @@ function normPhone(p){let d=String(p||'').replace(/\D/g,'');if(!d)return '';if(d
 const validPhone=p=>/^\+8801[3-9]\d{8}$/.test(p);
 const waDigits=p=>String(normPhone(p)).replace(/\D/g,'');
 </script>
-<script>/* ===== Hero Bill shared DEMO data (same in Manager and Delivery Hero app) ===== */
-const DEMO_DEPOT='Barishal';
-const DEMO_FARES=[["Bakerganj","Bakerganj Bazar","Kalashkathi","Padri Shibpur",30,"2026-11-05"],["Bakerganj","Bakerganj Bazar","Padri Shibpur","Bakerganj Bazar",95,"2026-11-12"],["Bakerganj","Bakerganj Bazar","Kalashkathi","Depot",350,"2026-10-20"],["Bakerganj","Bakerganj Bazar","Depot","Kalashkathi",360,"2026-11-05"],["Bakerganj","Bakerganj Bazar","Padri Shibpur","Depot",365,"2026-11-05"],["Bakerganj","Bakerganj Bazar","Bakerganj Bazar","Padri Shibpur",100,"2026-10-20"],["Bakerganj","Bakerganj Bazar","Depot","Bakerganj Bazar",320,"2026-10-20"],["Bakerganj","Bakerganj Bazar","Depot","Padri Shibpur",330,"2026-11-05"],["Bakerganj","Bakerganj Bazar","Padri Shibpur","Kalashkathi",30,"2026-11-12"],["Bakerganj","Bakerganj Bazar","Bakerganj Bazar","Depot",300,"2026-11-12"],["Bakerganj","Dudhal","Charadi","Depot",375,"2026-10-20"],["Bakerganj","Dudhal","Depot","Dudhal Bazar",385,"2026-10-20"],["Bakerganj","Dudhal","Charadi","Dudhal Bazar",70,"2026-11-01"],["Bakerganj","Dudhal","Dudhal Bazar","Depot",380,"2026-11-05"],["Bakerganj","Dudhal","Dudhal Bazar","Charadi",75,"2026-11-12"],["Bakerganj","Dudhal","Depot","Charadi",420,"2026-11-01"],["Bakerganj","Dudhal","Depot","Charadi",395,"2026-10-01"],["Gournadi","Agailjhara","Agailjhara Bazar","Depot",380,"2026-09-15"],["Gournadi","Agailjhara","Depot","Agailjhara Bazar",415,"2026-10-20"],["Gournadi","Agailjhara","Gaila","Agailjhara Bazar",75,"2026-10-20"],["Gournadi","Agailjhara","Agailjhara Bazar","Gaila",70,"2026-11-01"],["Gournadi","Agailjhara","Gaila","Depot",455,"2026-10-20"],["Gournadi","Agailjhara","Agailjhara Bazar","Depot",405,"2026-10-10"],["Gournadi","Agailjhara","Depot","Gaila",450,"2026-11-01"],["Gournadi","Gournadi Bazar","Depot","Tarki Bandar",410,"2026-09-15"],["Gournadi","Gournadi Bazar","Gournadi Bazar","Depot",400,"2026-10-20"],["Gournadi","Gournadi Bazar","Tarki Bandar","Gournadi Bazar",50,"2026-09-15"],["Gournadi","Gournadi Bazar","Tarki Bandar","Depot",455,"2026-11-05"],["Gournadi","Gournadi Bazar","Depot","Tarki Bandar",430,"2026-10-20"],["Gournadi","Gournadi Bazar","Batajor","Depot",425,"2026-11-01"],["Gournadi","Gournadi Bazar","Tarki Bandar","Gournadi Bazar",75,"2026-11-05"],["Gournadi","Gournadi Bazar","Batajor","Tarki Bandar",125,"2026-11-01"],["Gournadi","Gournadi Bazar","Tarki Bandar","Batajor",130,"2026-10-10"],["Gournadi","Gournadi Bazar","Depot","Gournadi Bazar",420,"2026-11-05"],["Gournadi","Gournadi Bazar","Gournadi Bazar","Tarki Bandar",75,"2026-10-10"],["Gournadi","Gournadi Bazar","Depot","Gournadi Bazar",405,"2026-09-01"],["Gournadi","Gournadi Bazar","Depot","Batajor",405,"2026-11-05"],["Sadar","Alamdanga","Alamdanga Bazar","Hospital More",30,"2026-10-20"],["Sadar","Alamdanga","College Road","Depot",110,"2026-11-05"],["Sadar","Alamdanga","Alamdanga Bazar","Depot",85,"2026-11-12"],["Sadar","Alamdanga","Hospital More","Depot",95,"2026-11-12"],["Sadar","Alamdanga","Depot","Hospital More",100,"2026-11-05"],["Sadar","Alamdanga","Depot","College Road",105,"2026-11-01"],["Sadar","Alamdanga","Alamdanga Bus Stand","Depot",115,"2026-11-05"],["Sadar","Alamdanga","Depot","Alamdanga Bus Stand",120,"2026-11-01"],["Sadar","Alamdanga","Hospital More","College Road",30,"2026-11-01"],["Sadar","Alamdanga","Hospital More","Alamdanga Bazar",30,"2026-11-05"],["Sadar","Alamdanga","College Road","Hospital More",30,"2026-11-01"],["Sadar","Alamdanga","Depot","Alamdanga Bazar",85,"2026-11-12"],["Sadar","Alamdanga","Alamdanga Bus Stand","College Road",30,"2026-11-05"],["Sadar","Alamdanga","College Road","Alamdanga Bus Stand",30,"2026-10-20"],["Sadar","Chowk Bazar","Depot","Bazar Road",85,"2026-11-05"],["Sadar","Chowk Bazar","Bazar Road","Depot",90,"2026-11-01"],["Sadar","Chowk Bazar","Chowk Bazar","Depot",55,"2026-09-15"],["Sadar","Chowk Bazar","Chowk Bazar","Depot",75,"2026-11-12"],["Sadar","Chowk Bazar","Chowk Bazar","Sadar Road",30,"2026-11-12"],["Sadar","Chowk Bazar","Launch Ghat","Bazar Road",30,"2026-11-05"],["Sadar","Chowk Bazar","Depot","Launch Ghat",95,"2026-11-01"],["Sadar","Chowk Bazar","Depot","Sadar Road",75,"2026-11-12"],["Sadar","Chowk Bazar","Bazar Road","Sadar Road",30,"2026-11-05"],["Sadar","Chowk Bazar","Bazar Road","Launch Ghat",30,"2026-11-05"],["Sadar","Chowk Bazar","Depot","Chowk Bazar",75,"2026-11-05"],["Sadar","Chowk Bazar","Sadar Road","Bazar Road",30,"2026-10-10"],["Sadar","Chowk Bazar","Sadar Road","Depot",85,"2026-10-10"],["Sadar","Chowk Bazar","Sadar Road","Chowk Bazar",30,"2026-10-20"],["Sadar","Chowk Bazar","Launch Ghat","Depot",95,"2026-11-01"],["Sadar","Nathullabad","Depot","Rupatoli",130,"2026-10-10"],["Sadar","Nathullabad","Depot","Rupatoli",115,"2026-09-01"],["Sadar","Nathullabad","Depot","Nathullabad Bus Stand",105,"2026-10-20"],["Sadar","Nathullabad","Medical College Gate","Amtala More",30,"2026-11-01"],["Sadar","Nathullabad","Rupatoli","Nathullabad Bus Stand",30,"2026-10-10"],["Sadar","Nathullabad","Rupatoli","Amtala More",25,"2026-09-01"],["Sadar","Nathullabad","Rupatoli","Amtala More",30,"2026-10-10"],["Sadar","Nathullabad","Nathullabad Bus Stand","Rupatoli",30,"2026-10-20"],["Sadar","Nathullabad","Medical College Gate","Depot",115,"2026-11-12"],["Sadar","Nathullabad","Amtala More","Rupatoli",30,"2026-10-10"],["Sadar","Nathullabad","Depot","Medical College Gate",115,"2026-11-01"],["Sadar","Nathullabad","Rupatoli","Depot",95,"2026-09-15"],["Sadar","Nathullabad","Rupatoli","Depot",120,"2026-10-20"],["Sadar","Nathullabad","Depot","Amtala More",105,"2026-11-05"],["Sadar","Nathullabad","Amtala More","Depot",105,"2026-11-01"],["Sadar","Nathullabad","Amtala More","Medical College Gate",30,"2026-11-01"],["Sadar","Nathullabad","Nathullabad Bus Stand","Depot",95,"2026-11-01"],["Sadar","Nathullabad","Depot","Amtala More",90,"2026-09-15"],["Sadar ex","Babuganj","Depot","Babuganj Bazar",245,"2026-11-12"],["Sadar ex","Babuganj","Rahmatpur","Depot",205,"2026-10-20"],["Sadar ex","Babuganj","Madhabpasha","Rahmatpur",130,"2026-11-01"],["Sadar ex","Babuganj","Depot","Madhabpasha",280,"2026-11-05"],["Sadar ex","Babuganj","Depot","Rahmatpur",195,"2026-11-05"],["Sadar ex","Babuganj","Rahmatpur","Madhabpasha",140,"2026-10-10"],["Sadar ex","Babuganj","Babuganj Bazar","Depot",265,"2026-11-01"],["Sadar ex","Babuganj","Rahmatpur","Babuganj Bazar",105,"2026-11-12"],["Sadar ex","Babuganj","Babuganj Bazar","Rahmatpur",100,"2026-11-05"],["Sadar ex","Babuganj","Madhabpasha","Depot",285,"2026-11-05"],["Sadar ex","Ex Alamdanga","Kashipur","Bottola",30,"2026-11-01"],["Sadar ex","Ex Alamdanga","Kashipur","Depot",165,"2026-10-10"],["Sadar ex","Ex Alamdanga","Char Kawa","Depot",210,"2026-11-05"],["Sadar ex","Ex Alamdanga","Bottola","Kashipur",30,"2026-11-12"],["Sadar ex","Ex Alamdanga","Bottola","Depot",195,"2026-11-12"],["Sadar ex","Ex Alamdanga","Bottola","Char Kawa",75,"2026-11-05"],["Sadar ex","Ex Alamdanga","Depot","Kashipur",170,"2026-11-05"],["Sadar ex","Ex Alamdanga","Depot","Bottola",175,"2026-11-12"],["Sadar ex","Ex Alamdanga","Kashipur","Bottola",25,"2026-10-01"],["Sadar ex","Ex Alamdanga","Bottola","Char Kawa",65,"2026-09-15"],["Sadar ex","Ex Alamdanga","Depot","Char Kawa",205,"2026-10-10"],["Sadar ex","Ex Alamdanga","Char Kawa","Bottola",75,"2026-11-01"],["Ujirpur","Banaripara","Chakhar","Banaripara Bazar",105,"2026-10-10"],["Ujirpur","Banaripara","Depot","Chakhar",350,"2026-11-12"],["Ujirpur","Banaripara","Chakhar","Depot",345,"2026-10-20"],["Ujirpur","Banaripara","Banaripara Bazar","Depot",305,"2026-11-01"],["Ujirpur","Banaripara","Banaripara Bazar","Chakhar",120,"2026-10-10"],["Ujirpur","Banaripara","Depot","Banaripara Bazar",285,"2026-11-12"],["Ujirpur","Ujirpur Bazar","Depot","Ujirpur Bazar",380,"2026-10-20"],["Ujirpur","Ujirpur Bazar","Depot","Shikarpur",335,"2026-11-12"],["Ujirpur","Ujirpur Bazar","Depot","Guthia",300,"2026-11-01"],["Ujirpur","Ujirpur Bazar","Ujirpur Bazar","Shikarpur",85,"2026-11-05"],["Ujirpur","Ujirpur Bazar","Ujirpur Bazar","Depot",365,"2026-11-05"],["Ujirpur","Ujirpur Bazar","Shikarpur","Ujirpur Bazar",80,"2026-10-01"],["Ujirpur","Ujirpur Bazar","Guthia","Shikarpur",105,"2026-10-20"],["Ujirpur","Ujirpur Bazar","Guthia","Depot",295,"2026-10-20"],["Ujirpur","Ujirpur Bazar","Shikarpur","Depot",355,"2026-11-12"],["Ujirpur","Ujirpur Bazar","Shikarpur","Guthia",105,"2026-10-10"],["Ujirpur","Ujirpur Bazar","Shikarpur","Ujirpur Bazar",90,"2026-10-20"],["Ujirpur","Ujirpur Bazar","Ujirpur Bazar","Shikarpur",65,"2026-09-01"]]; /* [route, market, from, to, fare, lastUpdated] */
-const DEMO_HEROES=[
-  {id:'hd01',code:'DH-01',name:'Md. Rahim Uddin',phone:'+8801711000001',routes:['Sadar']},
-  {id:'hd02',code:'DH-02',name:'Karim Hossain',phone:'+8801811000002',routes:['Sadar ex']},
-  {id:'hd03',code:'DH-03',name:'Jamal Sheikh',phone:'+8801911000003',routes:['Bakerganj']},
-  {id:'hd04',code:'DH-04',name:'Shafiul Alam',phone:'+8801611000004',routes:['Sadar','Sadar ex']},
-  {id:'hd05',code:'DH-05',name:'Abdul Kader',phone:'+8801511000005',routes:['Ujirpur']},
-  {id:'hd06',code:'DH-06',name:'Rafiqul Islam',phone:'+8801311000006',routes:['Gournadi']}];
-const DEMO_PIN='1234';
-const DEMO_DAYS=91;
-/* how "honest" each hero is: chance a trip is claimed above chart, and how much */
-const DEMO_STYLE={hd01:[.05,20],hd02:[.32,60],hd03:[.10,30],hd04:[.08,25],hd05:[.12,30],hd06:[.06,20]};
-function demoRng(seed){let h=1779033703^seed.length;for(let i=0;i<seed.length;i++){h=Math.imul(h^seed.charCodeAt(i),3432918353);h=h<<13|h>>>19}
-  let a=h>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-function demoChart(){const m=new Map();for(const [r,mk,f,t,a,u] of DEMO_FARES){const k=fareKey(r,mk,f,t);const p=m.get(k);if(!p||u>=p.u)m.set(k,{r,mk,f,t,a,u})}return m}
-function demoSetup(){const ch=demoChart();const s={t:'HBSETUP',v:1,demo:true,depot:DEMO_DEPOT,title:'Delivery Hero Conveyance Bill',mgrPhone:'+8801700000000',mgrEmail:'',ver:'demo-2026',
-  heroes:DEMO_HEROES.map(h=>({...h,pin:pinHash(h.id,DEMO_PIN)})),fares:[...ch.values()].map(x=>[x.r,x.mk,x.f,x.t,x.a])};s.sig=signObj(s);return s}
-const _isoD=d=>{const x=new Date(d);return new Date(x-x.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
-function demoDates(){const out=[];const t=new Date();t.setHours(12,0,0,0);for(let i=DEMO_DAYS;i>=1;i--){const d=new Date(t);d.setDate(t.getDate()-i);if(d.getDay()!==5)out.push(_isoD(d))}return out} /* Fridays off */
-/* returns signed HBBILL objects for every hero for the last ~3 months (yesterday back) */
-function sampleBills(fares,heroes,depot){
-  const ch=new Map();for(const [r,mk,f,t,a] of fares)ch.set(fareKey(r,mk,f,t),{r,mk,f,t,a});const tree={};
-  for(const x of ch.values()){((tree[x.r]=tree[x.r]||{})[x.mk]=tree[x.r][x.mk]||[]).push(x)}
-  const allRoutes=Object.keys(tree).sort();
-  const homeOf=(r,mk)=>{const L=[...new Set(tree[r][mk].flatMap(e=>[e.f,e.t]))];return L.find(l=>/depot|ডিপো/i.test(l))||L.sort()[0]};
-  const fareOf=(r,mk,f,t)=>{const v=ch.get(fareKey(r,mk,f,t));return v?v.a:null};
-  const modes=[['cng',.38],['easybike',.24],['rickshaw',.2],['bus',.12],['van',.06]];
-  const pickMode=rn=>{let x=rn(),s=0;for(const [k,w] of modes){s+=w;if(x<s)return k}return 'cng'};
-  const overReasons=['রাতের ভাড়া (Night fare)','বৃষ্টি (Rain)','রাস্তা বন্ধ / ঘুরপথ (Road closed / detour)','বেশি মাল (Extra load)','যানবাহন পাওয়া যায়নি (No regular transport)'];
-  const newPlaces=['Notun Bazar','Station Road','Kheyaghat','Mollikpur More','Hat Khola'];
-  /* demo distance: fixed per leg (≈ ৳14 per km), entered on every trip */
-  const kmOf=(r,f,t,fare,rn)=>{rn();const q=demoRng('km|'+[r,f,t].map(normKey).sort().join('|'))();return {km:Math.max(.5,Math.round(fare/14*(.8+q*.4)*2)/2)}};
-  const bills=[];const dates=demoDates();
-  for(const h of heroes){const sty=DEMO_STYLE[h.id]||(()=>{const r=demoRng('style|'+h.id);return [.04+r()*.2,20+Math.round(r()*40)]})();const [pOver,maxOver]=sty;
-    const hr=(h.routes&&h.routes.length?h.routes:allRoutes).filter(r=>tree[r]);if(!hr.length)continue;
-    dates.forEach((date,di)=>{
-      const rn=demoRng(h.id+'|'+date);
-      if(rn()<.05)return; /* absent / leave */
-      const route=hr[di%hr.length];const mks=Object.keys(tree[route]||{});if(!mks.length)return;
-      const nMk=mks.length>1&&rn()<.45?2:1;const start=Math.floor(rn()*mks.length);const items=[];
-      for(let q=0;q<nMk;q++){const mk=mks[(start+q)%mks.length];const edges=tree[route][mk];
-        const home=homeOf(route,mk);let cur=home;const stops=2+Math.floor(rn()*3);
-        for(let s=0;s<stops;s++){const nx=edges.filter(e=>e.f===cur&&e.t!==home);if(!nx.length)break;const e=nx[Math.floor(rn()*nx.length)];
-          let amt=e.a,reason='';if(rn()<pOver){amt=e.a+5*Math.ceil((10+rn()*(maxOver-10))/5);reason=overReasons[Math.floor(rn()*overReasons.length)]}
-          items.push({type:'trip',market:mk,from:cur,to:e.t,mode:pickMode(rn),amount:amt,chart:e.a,reason,...kmOf(route,cur,e.t,e.a,rn)});cur=e.t}
-        if(cur!==home){const back=fareOf(route,mk,cur,home);if(back!=null){let amt=back,reason='';if(rn()<pOver*.6){amt=back+5*Math.ceil((10+rn()*(maxOver-10))/5);reason=overReasons[0]}items.push({type:'trip',market:mk,from:cur,to:home,mode:pickMode(rn),amount:amt,chart:back,reason,...kmOf(route,cur,home,back,rn)})}}}
-      if(rn()<.035){const mk=mks[start];items.push({type:'trip',market:mk,from:homeOf(route,mk),to:newPlaces[Math.floor(rn()*newPlaces.length)],mode:'cng',amount:5*Math.round((90+rn()*120)/5),chart:null,reason:'নতুন দোকান / জায়গা (New shop / place)',km:Math.round((6+rn()*10)*2)/2})}
-      if(rn()<.12){const cats=[['labour','Loading help at market',80,160],['food','Lunch on long route',60,110],['toll','Ghat toll',20,50]];const c=cats[Math.floor(rn()*cats.length)];items.push({type:'other',cat:c[0],amount:5*Math.round((c[2]+rn()*(c[3]-c[2]))/5),note:c[1]})}
-      if(pOver>.25&&rn()<.08&&items.length)items.push({...items[0]}); /* repeated trip */
-      if(!items.length)return;
-      const ts=new Date(date+'T19:30:00').getTime()+Math.floor(rn()*7200e3);
-      const o={t:'HBBILL',v:1,heroId:h.id,heroCode:h.code,heroName:h.name,depot,date,route,items,total:items.reduce((s,i)=>s+i.amount,0),createdAt:ts,setupVer:'demo-2026'};
-      o.sig=signObj(o);
-      bills.push(o)})}
-  return bills}
-function demoBills(){return sampleBills([...demoChart().values()].map(x=>[x.r,x.mk,x.f,x.t,x.a]),DEMO_HEROES,DEMO_DEPOT)}
+<script>/* ===== Demo / sample features were removed. This only deletes old demo & sample data left on a device. ===== */
+const OLD_DEMO_HEROES=['hd01','hd02','hd03','hd04','hd05','hd06'];
+const OLD_DEMO_FARES=[["Bakerganj","Bakerganj Bazar","Kalashkathi","Padri Shibpur",30,"2026-11-05"],["Bakerganj","Bakerganj Bazar","Padri Shibpur","Bakerganj Bazar",95,"2026-11-12"],["Bakerganj","Bakerganj Bazar","Kalashkathi","Depot",350,"2026-10-20"],["Bakerganj","Bakerganj Bazar","Depot","Kalashkathi",360,"2026-11-05"],["Bakerganj","Bakerganj Bazar","Padri Shibpur","Depot",365,"2026-11-05"],["Bakerganj","Bakerganj Bazar","Bakerganj Bazar","Padri Shibpur",100,"2026-10-20"],["Bakerganj","Bakerganj Bazar","Depot","Bakerganj Bazar",320,"2026-10-20"],["Bakerganj","Bakerganj Bazar","Depot","Padri Shibpur",330,"2026-11-05"],["Bakerganj","Bakerganj Bazar","Padri Shibpur","Kalashkathi",30,"2026-11-12"],["Bakerganj","Bakerganj Bazar","Bakerganj Bazar","Depot",300,"2026-11-12"],["Bakerganj","Dudhal","Charadi","Depot",375,"2026-10-20"],["Bakerganj","Dudhal","Depot","Dudhal Bazar",385,"2026-10-20"],["Bakerganj","Dudhal","Charadi","Dudhal Bazar",70,"2026-11-01"],["Bakerganj","Dudhal","Dudhal Bazar","Depot",380,"2026-11-05"],["Bakerganj","Dudhal","Dudhal Bazar","Charadi",75,"2026-11-12"],["Bakerganj","Dudhal","Depot","Charadi",420,"2026-11-01"],["Bakerganj","Dudhal","Depot","Charadi",395,"2026-10-01"],["Gournadi","Agailjhara","Agailjhara Bazar","Depot",380,"2026-09-15"],["Gournadi","Agailjhara","Depot","Agailjhara Bazar",415,"2026-10-20"],["Gournadi","Agailjhara","Gaila","Agailjhara Bazar",75,"2026-10-20"],["Gournadi","Agailjhara","Agailjhara Bazar","Gaila",70,"2026-11-01"],["Gournadi","Agailjhara","Gaila","Depot",455,"2026-10-20"],["Gournadi","Agailjhara","Agailjhara Bazar","Depot",405,"2026-10-10"],["Gournadi","Agailjhara","Depot","Gaila",450,"2026-11-01"],["Gournadi","Gournadi Bazar","Depot","Tarki Bandar",410,"2026-09-15"],["Gournadi","Gournadi Bazar","Gournadi Bazar","Depot",400,"2026-10-20"],["Gournadi","Gournadi Bazar","Tarki Bandar","Gournadi Bazar",50,"2026-09-15"],["Gournadi","Gournadi Bazar","Tarki Bandar","Depot",455,"2026-11-05"],["Gournadi","Gournadi Bazar","Depot","Tarki Bandar",430,"2026-10-20"],["Gournadi","Gournadi Bazar","Batajor","Depot",425,"2026-11-01"],["Gournadi","Gournadi Bazar","Tarki Bandar","Gournadi Bazar",75,"2026-11-05"],["Gournadi","Gournadi Bazar","Batajor","Tarki Bandar",125,"2026-11-01"],["Gournadi","Gournadi Bazar","Tarki Bandar","Batajor",130,"2026-10-10"],["Gournadi","Gournadi Bazar","Depot","Gournadi Bazar",420,"2026-11-05"],["Gournadi","Gournadi Bazar","Gournadi Bazar","Tarki Bandar",75,"2026-10-10"],["Gournadi","Gournadi Bazar","Depot","Gournadi Bazar",405,"2026-09-01"],["Gournadi","Gournadi Bazar","Depot","Batajor",405,"2026-11-05"],["Sadar","Alamdanga","Alamdanga Bazar","Hospital More",30,"2026-10-20"],["Sadar","Alamdanga","College Road","Depot",110,"2026-11-05"],["Sadar","Alamdanga","Alamdanga Bazar","Depot",85,"2026-11-12"],["Sadar","Alamdanga","Hospital More","Depot",95,"2026-11-12"],["Sadar","Alamdanga","Depot","Hospital More",100,"2026-11-05"],["Sadar","Alamdanga","Depot","College Road",105,"2026-11-01"],["Sadar","Alamdanga","Alamdanga Bus Stand","Depot",115,"2026-11-05"],["Sadar","Alamdanga","Depot","Alamdanga Bus Stand",120,"2026-11-01"],["Sadar","Alamdanga","Hospital More","College Road",30,"2026-11-01"],["Sadar","Alamdanga","Hospital More","Alamdanga Bazar",30,"2026-11-05"],["Sadar","Alamdanga","College Road","Hospital More",30,"2026-11-01"],["Sadar","Alamdanga","Depot","Alamdanga Bazar",85,"2026-11-12"],["Sadar","Alamdanga","Alamdanga Bus Stand","College Road",30,"2026-11-05"],["Sadar","Alamdanga","College Road","Alamdanga Bus Stand",30,"2026-10-20"],["Sadar","Chowk Bazar","Depot","Bazar Road",85,"2026-11-05"],["Sadar","Chowk Bazar","Bazar Road","Depot",90,"2026-11-01"],["Sadar","Chowk Bazar","Chowk Bazar","Depot",55,"2026-09-15"],["Sadar","Chowk Bazar","Chowk Bazar","Depot",75,"2026-11-12"],["Sadar","Chowk Bazar","Chowk Bazar","Sadar Road",30,"2026-11-12"],["Sadar","Chowk Bazar","Launch Ghat","Bazar Road",30,"2026-11-05"],["Sadar","Chowk Bazar","Depot","Launch Ghat",95,"2026-11-01"],["Sadar","Chowk Bazar","Depot","Sadar Road",75,"2026-11-12"],["Sadar","Chowk Bazar","Bazar Road","Sadar Road",30,"2026-11-05"],["Sadar","Chowk Bazar","Bazar Road","Launch Ghat",30,"2026-11-05"],["Sadar","Chowk Bazar","Depot","Chowk Bazar",75,"2026-11-05"],["Sadar","Chowk Bazar","Sadar Road","Bazar Road",30,"2026-10-10"],["Sadar","Chowk Bazar","Sadar Road","Depot",85,"2026-10-10"],["Sadar","Chowk Bazar","Sadar Road","Chowk Bazar",30,"2026-10-20"],["Sadar","Chowk Bazar","Launch Ghat","Depot",95,"2026-11-01"],["Sadar","Nathullabad","Depot","Rupatoli",130,"2026-10-10"],["Sadar","Nathullabad","Depot","Rupatoli",115,"2026-09-01"],["Sadar","Nathullabad","Depot","Nathullabad Bus Stand",105,"2026-10-20"],["Sadar","Nathullabad","Medical College Gate","Amtala More",30,"2026-11-01"],["Sadar","Nathullabad","Rupatoli","Nathullabad Bus Stand",30,"2026-10-10"],["Sadar","Nathullabad","Rupatoli","Amtala More",25,"2026-09-01"],["Sadar","Nathullabad","Rupatoli","Amtala More",30,"2026-10-10"],["Sadar","Nathullabad","Nathullabad Bus Stand","Rupatoli",30,"2026-10-20"],["Sadar","Nathullabad","Medical College Gate","Depot",115,"2026-11-12"],["Sadar","Nathullabad","Amtala More","Rupatoli",30,"2026-10-10"],["Sadar","Nathullabad","Depot","Medical College Gate",115,"2026-11-01"],["Sadar","Nathullabad","Rupatoli","Depot",95,"2026-09-15"],["Sadar","Nathullabad","Rupatoli","Depot",120,"2026-10-20"],["Sadar","Nathullabad","Depot","Amtala More",105,"2026-11-05"],["Sadar","Nathullabad","Amtala More","Depot",105,"2026-11-01"],["Sadar","Nathullabad","Amtala More","Medical College Gate",30,"2026-11-01"],["Sadar","Nathullabad","Nathullabad Bus Stand","Depot",95,"2026-11-01"],["Sadar","Nathullabad","Depot","Amtala More",90,"2026-09-15"],["Sadar ex","Babuganj","Depot","Babuganj Bazar",245,"2026-11-12"],["Sadar ex","Babuganj","Rahmatpur","Depot",205,"2026-10-20"],["Sadar ex","Babuganj","Madhabpasha","Rahmatpur",130,"2026-11-01"],["Sadar ex","Babuganj","Depot","Madhabpasha",280,"2026-11-05"],["Sadar ex","Babuganj","Depot","Rahmatpur",195,"2026-11-05"],["Sadar ex","Babuganj","Rahmatpur","Madhabpasha",140,"2026-10-10"],["Sadar ex","Babuganj","Babuganj Bazar","Depot",265,"2026-11-01"],["Sadar ex","Babuganj","Rahmatpur","Babuganj Bazar",105,"2026-11-12"],["Sadar ex","Babuganj","Babuganj Bazar","Rahmatpur",100,"2026-11-05"],["Sadar ex","Babuganj","Madhabpasha","Depot",285,"2026-11-05"],["Sadar ex","Ex Alamdanga","Kashipur","Bottola",30,"2026-11-01"],["Sadar ex","Ex Alamdanga","Kashipur","Depot",165,"2026-10-10"],["Sadar ex","Ex Alamdanga","Char Kawa","Depot",210,"2026-11-05"],["Sadar ex","Ex Alamdanga","Bottola","Kashipur",30,"2026-11-12"],["Sadar ex","Ex Alamdanga","Bottola","Depot",195,"2026-11-12"],["Sadar ex","Ex Alamdanga","Bottola","Char Kawa",75,"2026-11-05"],["Sadar ex","Ex Alamdanga","Depot","Kashipur",170,"2026-11-05"],["Sadar ex","Ex Alamdanga","Depot","Bottola",175,"2026-11-12"],["Sadar ex","Ex Alamdanga","Kashipur","Bottola",25,"2026-10-01"],["Sadar ex","Ex Alamdanga","Bottola","Char Kawa",65,"2026-09-15"],["Sadar ex","Ex Alamdanga","Depot","Char Kawa",205,"2026-10-10"],["Sadar ex","Ex Alamdanga","Char Kawa","Bottola",75,"2026-11-01"],["Ujirpur","Banaripara","Chakhar","Banaripara Bazar",105,"2026-10-10"],["Ujirpur","Banaripara","Depot","Chakhar",350,"2026-11-12"],["Ujirpur","Banaripara","Chakhar","Depot",345,"2026-10-20"],["Ujirpur","Banaripara","Banaripara Bazar","Depot",305,"2026-11-01"],["Ujirpur","Banaripara","Banaripara Bazar","Chakhar",120,"2026-10-10"],["Ujirpur","Banaripara","Depot","Banaripara Bazar",285,"2026-11-12"],["Ujirpur","Ujirpur Bazar","Depot","Ujirpur Bazar",380,"2026-10-20"],["Ujirpur","Ujirpur Bazar","Depot","Shikarpur",335,"2026-11-12"],["Ujirpur","Ujirpur Bazar","Depot","Guthia",300,"2026-11-01"],["Ujirpur","Ujirpur Bazar","Ujirpur Bazar","Shikarpur",85,"2026-11-05"],["Ujirpur","Ujirpur Bazar","Ujirpur Bazar","Depot",365,"2026-11-05"],["Ujirpur","Ujirpur Bazar","Shikarpur","Ujirpur Bazar",80,"2026-10-01"],["Ujirpur","Ujirpur Bazar","Guthia","Shikarpur",105,"2026-10-20"],["Ujirpur","Ujirpur Bazar","Guthia","Depot",295,"2026-10-20"],["Ujirpur","Ujirpur Bazar","Shikarpur","Depot",355,"2026-11-12"],["Ujirpur","Ujirpur Bazar","Shikarpur","Guthia",105,"2026-10-10"],["Ujirpur","Ujirpur Bazar","Shikarpur","Ujirpur Bazar",90,"2026-10-20"],["Ujirpur","Ujirpur Bazar","Ujirpur Bazar","Shikarpur",65,"2026-09-01"]]; /* [route, market, from, to, fare, lastUpdated] of the old built-in demo chart */
+/* Hero app: clears demo mode and sample bills (localStorage) */
+function purgeDemoHero(d){if(!d)return d;let ch=false;
+  if(d.demo||(d.setup&&d.setup.demo)){d={bills:[]};ch=true}
+  const n=(d.bills||[]).length;d.bills=(d.bills||[]).filter(b=>!b.sample&&!OLD_DEMO_HEROES.includes(b.heroId));if(d.bills.length!==n)ch=true;
+  d._purged=ch;return d}
+/* Manager: sample bills, demo heroes + their fare chart, sample collection-target history, sample receivable */
+async function purgeDemoManager(){let n=0;
+  const sb=S.bills.filter(b=>b.sample||OLD_DEMO_HEROES.includes(b.heroId));
+  if(sb.length){await delMany('bills',sb.map(b=>b.id));const ids=new Set(sb.map(b=>b.id));S.bills=S.bills.filter(b=>!ids.has(b.id));n+=sb.length}
+  const dh=S.heroes.filter(h=>OLD_DEMO_HEROES.includes(h.id));
+  if(dh.length){await delMany('heroes',dh.map(h=>h.id));S.heroes=S.heroes.filter(h=>!OLD_DEMO_HEROES.includes(h.id));n+=dh.length;
+    const keys=new Set(OLD_DEMO_FARES.map(f=>f.join('|')));const df=S.fares.filter(f=>keys.has([f.route,f.market,f.from,f.to,f.fare,f.updated].join('|')));
+    if(df.length){await delMany('fares',df.map(f=>f.id));const ids=new Set(df.map(f=>f.id));S.fares=S.fares.filter(f=>!ids.has(f.id));n+=df.length}
+    if(S.cfg.mgrPhone==='+8801700000000'){S.cfg.mgrPhone='';await setKV('cfg',S.cfg)}}
+  try{const T=await getKV('ctTargets')||{},C=await getKV('ctColl')||{};let c=0;
+    for(const [d,x] of Object.entries(T))if(x&&x.sample){delete T[d];delete C[d];c++}
+    if(c){await setKV('ctTargets',T);await setKV('ctColl',C);n+=c}}catch(e){}
+  try{const reps=await rwAll('reports');const bad=reps.filter(r=>r.sample);
+    if(bad.length){const d=await rwDB();await new Promise((res,rej)=>{const t=d.transaction('reports','readwrite');bad.forEach(r=>t.objectStore('reports').delete(r.id));t.oncomplete=res;t.onerror=()=>rej(t.error)});d.close();n+=bad.length}}catch(e){}
+  return n}
 </script>
 <script>
 "use strict";
@@ -916,7 +881,6 @@ function renderReview(){
     <div class="card kpi k4"><div class="l">Flagged</div><div class="v">${tot.flag}</div><div class="s">over chart / not in chart / edited</div></div>
   </div>`;
   if(!S.bills.length)h+=`<div class="card empty"><div class="big">🧾</div><h3>No bills yet</h3><div class="hint">Bills appear here after you upload the files or paste the WhatsApp codes.</div>
-    <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">${S.heroes.length&&FIDX.size?'<button class="btn primary" onclick="loadMySamples().then(ok=>{if(ok){S.range={k:\'all\'};render()}})">Add 3-month sample bills</button>':''}<button class="btn ghost" onclick="loadDemo().then(ok=>{if(ok){S.range={k:\'all\'};render()}})">Load built-in demo</button></div>
     <div class="steps"><div><b>1</b> · Fare chart &amp; heroes</div><div><b>2</b> · Send setup file</div><div><b>3</b> · Heroes submit daily bills</div><div><b>4</b> · Upload &amp; approve here</div></div></div>`;
   else{
     const allSel=list.length&&list.every(x=>S.sel.has(x.id));
@@ -1091,7 +1055,7 @@ function renderInsights(){
     <div class="field" style="min-width:150px"><select id="insHero" style="height:34px"><option value="">All Delivery Heroes</option>${S.heroes.slice().sort((a,b)=>natCmp(a.name,b.name)).map(x=>`<option value="${x.id}" ${INS.hero===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div>
     <div class="seg" id="insBasis" title="Claimed = what heroes asked for. Approved = after your review (pending bills excluded)."><button data-b="claimed" class="${INS.basis==='claimed'?'on':''}">Claimed</button><button data-b="approved" class="${INS.basis==='approved'?'on':''}">Approved</button></div></div>
   <div class="itabs">${tabs.map(([k,l])=>`<button class="${INS.tab===k?'on':''}" data-it="${k}">${l}</button>`).join('')}</div>`;
-  if(!rows.length){h+=`<div class="card empty"><div class="big">📊</div><h3>No bills in this selection</h3><div class="hint">Change the dates or filters, or add sample bills from Settings.</div></div>`;$('page').innerHTML=h;bindIns();return}
+  if(!rows.length){h+=`<div class="card empty"><div class="big">📊</div><h3>No bills in this selection</h3><div class="hint">Change the dates or filters.</div></div>`;$('page').innerHTML=h;bindIns();return}
   h+=`<div class="kpis">
     <div class="card kpi"><div class="l">Total ${INS.basis} cost</div><div class="v">${tk(total)}</div><div class="s">${bills} bills · ${trips.length} trips</div></div>
     <div class="card kpi k2"><div class="l">Cost per hero-day</div><div class="v">${tk(heroDays?total/heroDays:0)}</div><div class="s">${heroDays} working days</div></div>
@@ -1570,8 +1534,8 @@ async function renderTargets(){
   let h=`<div class="ptitle"><div><h2>Collection Targets</h2><p>Turn the latest receivable report into each Delivery Hero's collection list. They see it in the Hero app, market by market and shop by shop, and report what they collect.</p></div>
     <div class="acts">${src?`<button class="btn primary" id="tgAll">📣 Send to all (team group)</button>`:''}</div></div>`;
   if(!src){$('page').innerHTML=h+`<div class="card empty"><div class="big">🎯</div><h3>No receivable report yet</h3><div class="hint">Upload today's receivable in <b>Route Wise Receivable</b>, then come back here.</div>
-    <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="btn primary" id="tgRW">📍 Open Route Wise Receivable</button>${S.heroes.length&&FIDX.size?'<button class="btn ghost" id="tgSample">Load sample receivable (test)</button>':''}</div></div>`;
-    $('tgRW').onclick=()=>dmOpenRW();if($('tgSample'))$('tgSample').onclick=async()=>{await tgSampleReceivable();render()};return}
+    <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="btn primary" id="tgRW">📍 Open Route Wise Receivable</button></div></div>`;
+    $('tgRW').onclick=()=>dmOpenRW();return}
   const map=tgRouteMap(src);const hbRoutes=[...new Set(depotFares().map(f=>f.route))].sort(natCmp);
   const total=sum(src.groups,g=>g.amt),mapped=sum(src.groups.filter(g=>map[g.name]),g=>g.amt);
   const age=(Date.now()-(src.rep.uploadedAt||0))/864e5;
@@ -1612,18 +1576,6 @@ function tgMarketTable(src,map){const rows=[];
       rows.push(`<tr class="${cur?'':'tgun'}"><td>${esc(hr)}</td><td><b>${esc(m||'(no market)')}</b></td><td class="num">${tk(amt)}</td><td><select class="tgsel" data-tgm="${esc(hr+'|'+normKey(m))}"><option value="">— keep own name —</option>${ms.map(x=>`<option ${x===cur?'selected':''}>${esc(x)}</option>`).join('')}</select></td></tr>`)}}
   return `<div class="tw" style="margin-top:10px"><table class="tbl"><thead><tr><th>Hero Bill route</th><th>Receivable market</th><th class="num">Amount</th><th>Fare-chart market</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`}
 
-/* test data: a receivable report shaped like the company export, for the demo routes */
-async function tgSampleReceivable(){
-  const rng=demoRng('rcv|'+todayISO());const shops=['Rahman Pharmacy','Maa Medical Hall','Sonali Store','Bismillah Traders','New Popular Pharmacy','Bhai Bhai Store','Janata Medicine Corner','Hasan Enterprise','Al-Madina Store','Shapla Pharma','Mukti Medical','Rupali Store','Nur Traders','Lucky Pharmacy','Green Life Medicine'];
-  const depot=(S.cfg.depot||'Barishal')+' Distribution Center';const rows=[];let k=1;const tree=routesTree();const hbRoutes=[...new Set(S.heroes.flatMap(h=>h.routes||[]))].filter(r=>tree.some(t=>t.name===r));
-  hbRoutes.forEach((hr,ri)=>{const t=tree.find(x=>x.name===hr);const terr='SMP-'+(101+ri);
-    for(const mk of t.markets.keys()){const n=3+Math.floor(rng()*4);for(let i=0;i<n;i++){const code='C'+String(10000+k++);const inv=1+Math.floor(rng()*3);
-      for(let j=0;j<inv;j++)rows.push({code,name:shops[Math.floor(rng()*shops.length)]+(rng()<.5?' ('+mk+')':''),ctype:'Retail',market:rng()<.85?mk:mk+' Bazar',days:Math.floor(rng()*70),recv:50*Math.round((800+rng()*14000)/50),net:0,paid:0,route:terr,
-        invoice:'INV'+String(240000000+Math.floor(rng()*9e6)),invDate:'',depot,depotCode:'',mio:'',mioCode:'',area:'',zone:'',mobile:'017'+String(10000000+Math.floor(rng()*89999999))})}}
-    S.tgtMap=S.tgtMap||{};S.tgtMap[terr]=hr});
-  await setKV('tgtMap',S.tgtMap);
-  const d=await rwDB();await new Promise((res,rej)=>{const t=d.transaction('reports','readwrite');t.objectStore('reports').put({fileName:'Sample receivable (test).xlsx',uploadedAt:Date.now(),rows,sample:true});t.oncomplete=res;t.onerror=()=>rej(t.error)});d.close();
-  DM.rwSum=null;if(DM.rwFrame){DM.rwFrame.remove();DM.rwFrame=null}toast(`Sample receivable added · ${rows.length} invoices`)}
 
 /* target vs collected by day, with conveyance cost per ৳100 collected */
 function tgDaysHtml(col){const days=Object.values(S.tgtSent||{}).sort((a,b)=>a.date<b.date?1:-1).slice(0,10);if(!days.length)return '';
@@ -1957,10 +1909,6 @@ function renderSettings(){
     <div style="margin-top:4px"><b style="font-size:13.5px">Manual backup file</b></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn soft" id="bBk">Download full backup</button><button class="btn ghost" onclick="$('fRs').click()">Restore backup</button><input type="file" id="fRs" accept=".json" hidden>
     </div>
-    <div style="margin-top:18px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#faf9fd">
-      <b>Test data (3 months)</b><p class="hint" style="margin:4px 0 10px">Daily sample bills from 3 months ago to yesterday — older ones already reviewed, the last 7 days pending. The Hero app makes the same bills for the same hero, so both sides match.</p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" id="bMine" ${S.heroes.length&&FIDX.size?'':'disabled'}>Add 3-month sample bills for my heroes</button><button class="btn ghost" id="bDemo">Load built-in Barishal demo</button>
-      ${S.bills.some(b=>b.sample)?`<button class="btn danger" id="bRmS">Remove sample bills (${S.bills.filter(b=>b.sample).length})</button>`:''}</div></div>
     <div style="margin-top:18px;padding-top:14px;border-top:1px dashed var(--line2);display:flex;gap:8px;flex-wrap:wrap"><button class="btn danger sm" id="bClrBills">Delete all bills</button><button class="btn danger sm" id="bClrAll">Delete everything</button></div>
     <p class="hint" style="margin-top:12px">${S.bills.length} bills · ${S.fares.length} fare rows · ${S.heroes.length} Delivery Heroes stored.</p>`;
   $('page').innerHTML=`<div class="ptitle"><div><h2>Settings</h2><p>Depot details, signatures, passwords and backups.</p></div></div>
@@ -1975,9 +1923,6 @@ function renderSettings(){
   if($('mSave'))$('mSave').onclick=async()=>{const a=await getKV('auth');if(sha256(a.salt+'M'+$('mO').value)!==a.master){toast('Current master password is wrong');return}if($('mN').value.length<6||$('mN').value!==$('mC').value){toast('Master passwords must match (min 6 characters)');return}a.master=sha256(a.salt+'M'+$('mN').value);await setKV('auth',a);toast('Master password changed');['mO','mN','mC'].forEach(i=>$(i).value='')};
   if($('bBk'))$('bBk').onclick=async()=>{const d=await gdSnapshot(true);dl(`HeroBill_Backup_${todayISO()}.json`,JSON.stringify(d),'application/json');toast('Backup downloaded')};
   if($('fRs'))$('fRs').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{await restoreBackup(JSON.parse(await f.text()))}catch(err){toast('Restore failed: '+err.message)}};
-  if($('bMine'))$('bMine').onclick=async()=>{const ok=await choice('Add sample bills',`Create about 3 months of daily sample bills for your <b>${S.heroes.filter(h=>h.active!==false).length}</b> Delivery Heroes using your fare chart? Real bills are never changed, and you can remove the samples later.`,[{l:'Cancel'},{l:'Add sample bills',v:1,cls:'primary'}]);if(ok&&await loadMySamples()){S.range={k:'all'};go('review')}};
-  if($('bRmS'))$('bRmS').onclick=async()=>{const ok=await choice('Remove sample bills','Delete every sample bill? Real bills stay.',[{l:'Cancel'},{l:'Remove',v:1,cls:'danger'}]);if(ok){await removeSamples();render()}};
-  if($('bDemo'))$('bDemo').onclick=async()=>{const ok=await choice('Load demo data','Add the demo Barishal fare chart (5 routes), 6 Delivery Heroes (PIN 1234) and about 3 months of daily bills — older ones already reviewed, the last 7 days pending. Delete them later from here.',[{l:'Cancel'},{l:'Load demo',v:1,cls:'primary'}]);if(ok&&await loadDemo()){S.range={k:'all'};toast('3 months of demo data loaded');go('review')}};
   if($('bClrBills'))$('bClrBills').onclick=async()=>{const ok=await choice('Delete all bills',`Permanently delete all <b>${S.bills.length}</b> bills from this PC?`,[{l:'Cancel'},{l:'Delete bills',v:1,cls:'danger'}]);if(ok){await clearS('bills');S.bills=[];toast('Bills deleted');render()}};
   if($('bClrAll'))$('bClrAll').onclick=async()=>{const ok=await choice('Delete everything','Delete ALL data including the password? The app will start fresh.',[{l:'Cancel'},{l:'Delete everything',v:1,cls:'danger'}]);if(ok){for(const s of ['kv','fares','heroes','bills'])await clearS(s);location.reload()}}}
 
@@ -2034,42 +1979,6 @@ $('userChip').onclick=()=>dmLogout();
 async function dmLogout(){const ok=await choice('Log out',`Lock Depot Management? You'll need the password to open it again.`,[{l:'Cancel'},{l:'Log out',v:1,cls:'primary'}]);if(!ok)return;
   await setKV('session',{until:0});try{sessionStorage.removeItem('hbm')}catch(x){}
   $('dmHome').hidden=true;$('rwWrap').hidden=true;$('ctWrap').hidden=true;document.body.classList.remove('dmon');if(DM.rwFrame){DM.rwFrame.remove();DM.rwFrame=null}document.title='Depot Management';showLogin('login')}
-
-/* =============== Demo =============== */
-function sampleRecs(objs,tamperId){
-  objs.filter(o=>o.heroId===tamperId).forEach((o,i)=>{if(i%23===9){o.items[0].amount+=200;o.total+=200}}); /* files edited after the hero signed them */
-  const cut=iso(new Date(Date.now()-7*864e5));const recs=[];
-  for(const o of objs){
-    const rec={sample:true,id:`${o.heroId}|${o.date}|${normKey(o.route)}`,heroId:o.heroId,heroName:o.heroName,heroCode:o.heroCode,depot:o.depot,date:o.date,route:o.route,
-      items:o.items.map(it=>({type:it.type,market:it.market||'',...(it.fromMarket&&it.fromMarket!==it.market?{fromMarket:it.fromMarket}:{}),...(it.fromMarket&&it.fromMarket!==it.market?{fromMarket:it.fromMarket}:{}),from:it.from||'',to:it.to||'',mode:it.mode||'',cat:it.cat||'',amount:it.amount,chartAtEntry:it.chart==null?null:it.chart,reason:it.reason||'',note:it.note||'',...(it.km>0?{km:it.km}:{})})),
-      total:o.total,createdAt:o.createdAt,receivedAt:o.createdAt+36e5*14,setupVer:o.setupVer,sigOk:verifyObj(o),status:'pending',review:null,raw:o};
-    if(o.date<cut){const rn=demoRng('rev|'+rec.id);const at=o.createdAt+864e5*(1+Math.floor(rn()*3));
-      if(!rec.sigOk){rec.status='rejected';rec.review={lines:rec.items.map(()=>({})),remark:'File edited after submission',at}}
-      else if(rn()<.025){rec.status='rejected';rec.review={lines:rec.items.map(()=>({})),remark:'Duplicate claim — route not visited that day',at}}
-      else{const seen=new Set();rec.status='approved';
-        rec.review={remark:'',at,lines:rec.items.map(it=>{const L={};
-          if(it.type==='trip'){const k=fareKey('',it.market,it.from,it.to);if(seen.has(k)){L.rej=true;L.remark='Repeated trip'}seen.add(k);
-            const c=chartFare(rec.route,it.market,it.from,it.to);
-            if(!L.rej&&c==null){if(rn()<.5)L.remark='Verified new shop';else{L.rej=true;L.remark='Not verified'}}
-            else if(!L.rej&&it.amount>c){if(it.amount-c>30||rn()<.55){L.amount=c;L.remark='Capped at chart fare'}else L.remark='Reason accepted'}}
-          return L})};
-        if(rec.review.lines.some(l=>l.rej||l.amount!=null))rec.review.remark='Adjusted to fare chart'}}
-    recs.push(rec)}
-  return recs}
-async function loadMySamples(){
-  const hs=S.heroes.filter(h=>h.active!==false);if(!hs.length||!FIDX.size){toast('Add your fare chart and Delivery Heroes first');return false}
-  const objs=sampleBills([...FIDX.values()].map(f=>[f.route,f.market,f.from,f.to,f.fare]),hs.map(h=>({id:h.id,code:h.code,name:h.name,routes:h.routes})),S.cfg.depot);
-  const have=new Set(S.bills.map(b=>b.id));const recs=sampleRecs(objs,hs.length>1?hs[1].id:'').filter(r=>!have.has(r.id));
-  await putMany('bills',recs);S.bills.push(...recs);toast(`${recs.length} sample bills added for ${hs.length} Delivery Heroes`);return true}
-async function removeSamples(){const ids=S.bills.filter(b=>b.sample).map(b=>b.id);await delMany('bills',ids);S.bills=S.bills.filter(b=>!b.sample);toast(`${ids.length} sample bills removed`)}
-async function loadDemo(){
-  if(S.heroes.some(h=>DEMO_HEROES.some(d=>d.id===h.id))){toast('Demo data is already loaded');return false}
-  const depot=DEMO_DEPOT;S.cfg.depot=depot;if(!S.cfg.mgrPhone)S.cfg.mgrPhone='+8801700000000';
-  const fares=DEMO_FARES.map(([route,market,from,to,fare,updated])=>({id:uid('f'),depot,route,market,from,to,fare,updated}));
-  await putMany('fares',fares);S.fares.push(...fares);rebuildIndex();
-  const hs=DEMO_HEROES.map(h=>({...h,pin:pinHash(h.id,DEMO_PIN),active:true}));await putMany('heroes',hs);S.heroes.push(...hs);
-  const recs=sampleRecs(demoBills(),'hd02');
-  await putMany('bills',recs);S.bills.push(...recs);await touch();return true}
 
 /* =============== Head-office Google Drive backup (one Drive for all depots, write-only from depots) =============== */
 const HB_DEPOT_KEY='';
@@ -2249,13 +2158,11 @@ async function ctOverview(){const P=$('ctPage');const {list,t2,rep}=await ctOuts
     <div class="card kpi k2"><div class="l">Target vs achieved · last ${last.length} day(s)</div><div class="v">${last.length?pct(tot.a,tot.t).toFixed(0)+'%':'—'}</div><div class="s">${tk(tot.a)} of ${tk(tot.t)}</div></div>
     <div class="card kpi k3"><div class="l">Collected by SA</div><div class="v">${tot.a?pct(tot.sa,tot.a).toFixed(0)+'%':'—'}</div><div class="s">rest collected by MIO</div></div>
     <div class="card kpi k5"><div class="l">Today · ${fmtDate(today)}</div><div class="v">${tT?tk(sum(Object.values(tT.routes),x=>x.target)):'Not set'}</div><div class="s">${tT?Object.keys(tT.routes).length+' routes · '+ctSyncBadge(tT):'set it before routes start'}</div></div></div>`;
-  if(!H.length&&!list.length){P.innerHTML=h+`<div class="card empty"><div class="big">🎯</div><h3>Start in two steps</h3><div class="hint">1) Upload the receivable in Route Wise Receivable (outstanding by route). 2) Set today's target here.</div>
-    <div style="margin-top:14px"><button class="btn ghost" id="ctDemo">Load 2-week sample history (test)</button></div></div>`;ctBindTop();$('ctDemo').onclick=ctSample;return}
+  if(!H.length&&!list.length){P.innerHTML=h+`<div class="card empty"><div class="big">🎯</div><h3>Start in two steps</h3><div class="hint">1) Upload the receivable in Route Wise Receivable (outstanding by route). 2) Set today's target here.</div></div>`;ctBindTop();return}
   h+=`<div class="hgrid"><div class="card ic"><div class="ich"><h3>Target vs achieved — daily</h3><span class="hint">all routes</span></div><div id="ctCh"></div></div>
     <div class="card ic"><div class="ich"><h3>Bottlenecks &amp; what to do</h3></div><div id="ctBn"></div></div></div>
-    <div class="card ic" style="margin-top:14px"><div class="ich"><h3>SA performance — last ${last.length} target day(s)</h3><span class="hint">sorted by achievement</span></div><div id="ctSA"></div></div>
-    <div style="margin-top:12px">${H.length?'':'<button class="btn ghost" id="ctDemo">Load 2-week sample history (test)</button>'}${Object.values(S.ctTargets).some(x=>x.sample)?'<button class="btn ghost" id="ctRmS" style="color:var(--bad)">Remove sample history</button>':''}</div>`;
-  P.innerHTML=h;ctBindTop();if($('ctDemo'))$('ctDemo').onclick=ctSample;if($('ctRmS'))$('ctRmS').onclick=async()=>{for(const [d,x] of Object.entries(S.ctTargets))if(x.sample){delete S.ctTargets[d];delete S.ctColl[d]}await setKV('ctTargets',S.ctTargets);await setKV('ctColl',S.ctColl);toast('Sample history removed');ctRender()};
+    <div class="card ic" style="margin-top:14px"><div class="ich"><h3>SA performance — last ${last.length} target day(s)</h3><span class="hint">sorted by achievement</span></div><div id="ctSA"></div></div>`;
+  P.innerHTML=h;ctBindTop();
   if(last.length)lineChart($('ctCh'),{labels:last.map(x=>fmtDate(x.date).slice(0,6)),series:[{name:'Target',color:'#8e8ca4',dash:true,values:last.map(x=>Math.round(x.tgt))},{name:'Achieved',color:'#0f766e',values:last.map(x=>Math.round(x.ach))},{name:'By SA',color:'#eda100',values:last.map(x=>Math.round(x.saC))}]});
   else $('ctCh').innerHTML='<div class="hint hempty">Results appear after you set a target and upload that day\'s DA Collection report.</div>';
   const sa=ctSAStats(last,list);
@@ -2351,14 +2258,6 @@ async function ctSummaryForBackup(){try{await ctLoad();const t2=await ctRouteMas
     routes:Object.entries(d.routes).map(([r,x])=>({route:r,sa:x.saName||'',target:x.target,achieved:Math.round(x.ach),bySA:Math.round(x.sa),byMIO:Math.round(x.mio),outstanding:x.out||0}))}))}}catch(e){return null}}
 
 /* ---------- test history ---------- */
-async function ctSample(){const {list}=await ctOutstanding();let routes=list.filter(x=>x.terrs.length).slice(0,10);
-  if(!routes.length){toast('Upload a receivable or set up routes in Route Wise first');return}
-  const rng=demoRng('ct|'+S.cfg.depot);const t=new Date();const style=routes.map(()=>[.4+rng()*.9,rng()]);
-  for(let i=14;i>=1;i--){const d=new Date(t);d.setDate(t.getDate()-i);if(d.getDay()===5)continue;const ds=iso(d);if(S.ctColl[ds]||S.ctTargets[ds])continue;const T={date:ds,at:d.getTime(),routes:{},sample:true};const C={};
-    routes.forEach((x,k)=>{const out=x.out||200000+rng()*400000;const tgt=Math.round(out*(.03+rng()*.03)/100)*100;T.routes[x.route]={target:tgt,out:Math.round(out),over:Math.round(x.over||0),chem:x.chem,inv:x.inv,sa:x.sa,terrs:x.terrs};
-      const ach=Math.max(0,tgt*(style[k][0]+(rng()-.5)*.5));const saShare=style[k][1];C[x.terrs[0]]={route:x.route,tname:'',da:x.sa||'',daCode:'',sa:ach*saShare,mio:ach*(1-saShare),total:ach}});
-    S.ctTargets[ds]=T;S.ctColl[ds]=C}
-  await setKV('ctTargets',S.ctTargets);await setKV('ctColl',S.ctColl);toast('Sample history added (last 2 weeks)');ctRender()}
 
 /* save pop-up: what this target means, then save and optionally send to the central distribution team */
 function ctConfirm({routes,list,avg7,left,rep,days}){
@@ -2698,7 +2597,7 @@ async function rwTrim(){if(!S.cfg.depot)return;try{const db=await rwDB();const a
   db.close()}catch(e){console.warn('rwTrim',e)}}
 
 /* =============== Boot =============== */
-async function loadAll(){S.cfg={...DEF,...(await getKV('cfg')||{})};S.cfg.mgrPhone=normPhone(S.cfg.mgrPhone);S.fares=await getAll('fares');S.heroes=(await getAll('heroes')).map(h=>({...h,phone:normPhone(h.phone)}));S.bills=await getAll('bills');S.legKm=await getKV('legKm')||{};rebuildIndex()}
+async function loadAll(){S.cfg={...DEF,...(await getKV('cfg')||{})};S.cfg.mgrPhone=normPhone(S.cfg.mgrPhone);S.fares=await getAll('fares');S.heroes=(await getAll('heroes')).map(h=>({...h,phone:normPhone(h.phone)}));S.bills=await getAll('bills');if(await purgeDemoManager().catch(()=>0))toast('Old demo / sample data removed');S.legKm=await getKV('legKm')||{};rebuildIndex()}
 (async()=>{
   try{await openDB();if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});await loadAll()}
   catch(e){document.body.innerHTML='<div style="padding:40px;font-family:sans-serif">This browser blocks local storage, so Hero Bill Manager cannot run here. Please open the file in Chrome or Edge.</div>';return}
