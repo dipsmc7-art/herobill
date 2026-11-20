@@ -11,10 +11,12 @@ self.addEventListener('fetch', e => {
   const req = e.request; if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin === location.origin) {
-    if (req.mode === 'navigate') {   // app page: cached copy instantly, works offline
+    const scopePath = new URL(self.registration.scope).pathname;
+    if (req.mode === 'navigate' && (url.pathname === scopePath || url.pathname === scopePath + 'index.html')) {   // app page: cached copy instantly, works offline
       e.respondWith(caches.match('./index.html').then(r => r || fetch(req)));
       return;
     }
+    if (req.mode === 'navigate' || !url.pathname.startsWith(scopePath) || url.pathname.slice(scopePath.length).includes('/')) return;   // other apps under this site (e.g. /depot/) handle themselves
     e.respondWith(caches.match(req).then(r => r || fetch(req).then(res => { const c = res.clone(); caches.open(CACHE).then(x => x.put(req, c)); return res; })));
     return;
   }
