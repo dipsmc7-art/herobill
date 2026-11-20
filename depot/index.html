@@ -519,10 +519,10 @@ body.locked>*:not(#login):not(.overlay):not(.toast):not(#printArea){display:none
 .dmwave{position:relative;flex:none;height:84px;margin-top:10px;overflow:hidden}
 #dmHome .caw,#dmHome .dmcard.soon .gears,#dmHome .dmcard.soon .dots{opacity:.85}
 .dmflow{position:absolute;left:0;right:0;top:0;width:100%;height:64px;opacity:.3}
-.dmflow .fl{fill:none;stroke:#2e2a8f;stroke-opacity:.22;stroke-width:1.6;stroke-dasharray:3 6;animation:dmDash 1.6s linear infinite}.dmflow .fl.back{stroke:#0f766e;stroke-opacity:.25;animation-direction:reverse}
+.dmflow .fl{fill:none;stroke:#2e2a8f;stroke-opacity:.22;stroke-width:1.6;stroke-dasharray:3 6}.dmflow .fl.back{stroke:#0f766e;stroke-opacity:.25}
 @keyframes dmDash{to{stroke-dashoffset:-9}}
 .dmflow .fn{fill:none;stroke:#2e2a8f;stroke-opacity:.55;stroke-width:1.7;stroke-linejoin:round;stroke-linecap:round}
-.dmflow .fn .halo{fill:#fff;stroke:#2e2a8f;stroke-opacity:.12;animation:dmHalo 4.5s ease-in-out infinite;animation-delay:inherit}
+.dmflow .fn .halo{fill:#fff;stroke:#2e2a8f;stroke-opacity:.15}
 @keyframes dmHalo{0%,100%{stroke-opacity:.1;fill:#fff}50%{stroke-opacity:.35;fill:#f1f0fc}}
 .dmflow .fg rect{fill:#d9a25a;fill-opacity:.85}.dmflow .fc text{fill:#0f766e;font:700 13px 'Ubuntu',sans-serif}
 .dmflow .ft{fill:#2e2a8f;fill-opacity:.55;font:600 10.5px 'Ubuntu','Hind Siliguri',sans-serif;letter-spacing:.04em}
@@ -2887,7 +2887,6 @@ function dmFlow(){const X=[150,435,720,1005,1290],Y=34;
   const cash=[0,1,2].map(i=>`<g class="fc" opacity="0"><text y="4" text-anchor="middle">৳</text><animateMotion dur="12s" begin="${2+i*4}s" repeatCount="indefinite" path="${back}"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.07;.93;1" dur="12s" begin="${2+i*4}s" repeatCount="indefinite"/></g>`).join('');
   return `<svg class="dmflow" viewBox="0 2 1440 64" preserveAspectRatio="xMidYMid meet">
     <path class="fl" d="${out}"/><path class="fl back" d="${back}"/>
-    ${goods}${cash}
     ${X.map((x,i)=>`<g class="fn" transform="translate(${x} ${Y})" style="animation-delay:${i*.9}s"><circle class="halo" r="26"/>${ic[i]}</g>`).join('')}
     <text class="fk" x="${(X[0]+X[1])/2+60}" y="${Y-12}">goods →</text><text class="fk c" x="${(X[3]+X[4])/2-60}" y="${Y+24}" text-anchor="end">← collection</text></svg>`}
 function dmOpenHB(){$('dmHome').hidden=true;$('rwWrap').hidden=true;$('ctWrap').hidden=true;$('tcWrap').hidden=true;document.body.classList.remove('dmon');document.title='Hero Bill Manager · Depot Management';render();window.scrollTo(0,0)}
