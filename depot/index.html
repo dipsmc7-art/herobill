@@ -2476,7 +2476,7 @@ async function trItems(){await ctLoad();const today=todayISO(),yd=prevWorkDay(to
    {k:'heroes',tool:'hb',ic:'🛵',n:'Delivery Heroes (from SAs)',f:'When SAs change',last:`${act.length} active`,s:!act.length?'due':(saDiff||noLogin.length)?'late':'ok',note:!act.length?'import SAs from Route Wise':[saDiff&&`${saDiff} SA change(s) to review`,noLogin.length&&`${noLogin.length} without mobile/PIN`].filter(Boolean).join(' · ')||'in sync',act:'open'}]}
 const TRS={ok:['✅','Loaded','ok'],due:['⏳','Pending','pending'],late:['⚠️','Overdue','bad'],na:['—','—','pending']};
 const trTool={rw:'Route Wise',hb:'Hero Bill',ct:'Collection Target'};
-async function trRender(){const el=$('dmTrack');if(!el)return;const items=(await trItems()).filter(x=>x.act!=='open'); /* only file uploads here; the in-app tasks still go to the central status */const pend=items.filter(x=>x.s==='due'||x.s==='late');
+async function trRender(){const el=$('dmTrack');if(!el)return;const all=await trItems();const items=all.filter(x=>x.act!=='open'); /* only file uploads here; the in-app tasks still go to the central status */const pend=items.filter(x=>x.s==='due'||x.s==='late');
   el.innerHTML=`<div class="trh"><div><b>📋 Upload tracker</b><span class="hint" style="margin-right:10px">${items.length} reports</span><span class="hint">${pend.length?`${pend.length} item(s) need attention`:'everything is up to date ✅'}</span></div><div class="trkey"><span><i class="y"></i>Needs upload</span><span><i class="g"></i>Up to date</span></div><input type="file" id="trFile" hidden></div>
     <div class="trl">${items.map(x=>{const s=TRS[x.s];return `<div class="tri ${x.s}" title="Last: ${esc(x.last)}"><span class="tric">${x.ic}</span><div class="trm"><b>${esc(x.n)}</b><small><span class="trtool ${x.tool}">${trTool[x.tool]}</span> ${esc(x.f)} · ${x.note}</small></div>
       <div class="trlast"><small>last</small>${esc(x.last)}</div><span class="pill ${s[2]}">${s[0]} ${s[1]}</span>
@@ -2485,7 +2485,7 @@ async function trRender(){const el=$('dmTrack');if(!el)return;const items=(await
   el.querySelectorAll('[data-trup]').forEach(b=>b.onclick=()=>{const k=b.dataset.trup;const f=$('trFile');f.accept=acc[k];f.multiple=k==='bills';f.onchange=async e=>{const fs=[...e.target.files];e.target.value='';if(fs.length)await trUpload(k,fs)};f.click()});
   el.querySelectorAll('[data-tropen]').forEach(b=>b.onclick=()=>{const k=b.dataset.tropen;if(k==='tgt'){CT.date=todayISO();ctOpen('set')}else if(k==='routes')dmOpenRW();else if(k==='heroes'){dmOpenHB();go('heroes')}});
   el.querySelectorAll('[data-trrem]').forEach(b=>b.onclick=()=>trRemind(items.find(x=>x.k==='bills').miss));
-  return pend}
+  return pend.concat(all.filter(x=>x.k==='tgt'&&(x.s==='due'||x.s==='late')))} /* the daily pop-up still reminds about today's target */
 async function trUpload(k,files){const f=files[0];
   if(k==='dac'){if(await ctImportFile(f,true))trRender();return}
   if(k==='fare'){await importFareFile(f);trRender();return}
@@ -2504,7 +2504,7 @@ function trRemind(miss){const yd=prevWorkDay();const c=S.cfg;
 /* once a day, after login: remind about pending daily uploads */
 async function trDailyNudge(pend){const daily=pend.filter(x=>/^Daily/.test(x.f));if(!daily.length)return;let last='';try{last=localStorage.getItem('dm_nudge')||''}catch(e){}
   const key=todayISO()+'|'+daily.map(x=>x.k).join(',');if(last===key)return;try{localStorage.setItem('dm_nudge',key)}catch(e){}
-  modal('Today\'s uploads',`<p style="margin:0 0 10px">These daily items are still pending for <b>${esc(S.cfg.depot||'your depot')}</b>:</p>${daily.map(x=>`<div class="trnud"><span>${x.ic}</span><b>${esc(x.n)}</b><small>${x.note}</small></div>`).join('')}<p class="hint" style="margin:10px 0 0">Use the <b>Upload tracker</b> on the welcome screen to load them.</p>`,[{l:'Later'},{l:'Show tracker',cls:'primary',fn:()=>{$('dmTrack').scrollIntoView({behavior:'smooth',block:'start'});return true}}])}
+  modal('Today\'s uploads',`<p style="margin:0 0 10px">These daily items are still pending for <b>${esc(S.cfg.depot||'your depot')}</b>:</p>${daily.map(x=>`<div class="trnud"><span>${x.ic}</span><b>${esc(x.n)}</b><small>${x.note}</small></div>`).join('')}<p class="hint" style="margin:10px 0 0">Use the <b>Upload tracker</b> on the welcome screen to load the files${daily.some(x=>x.k==='tgt')?', and set today\'s target in <b>Collection Target</b>':''}.</p>`,[{l:'Later'},...(daily.some(x=>x.k==='tgt')?[{l:'🎯 Set target',fn:()=>{CT.date=todayISO();ctOpen('set');return true}}]:[]),{l:'Show tracker',cls:'primary',fn:()=>{$('dmTrack').scrollIntoView({behavior:'smooth',block:'start'});return true}}])}
 
 /* =============== login screen animations (chosen in Settings → Depot & printing) =============== */
 const LG_ANIMS=[
