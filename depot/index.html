@@ -572,7 +572,7 @@ body.locked>*:not(#login):not(.overlay):not(.toast):not(#printArea){display:none
 .tcq{display:flex;align-items:center;gap:8px;flex:1;min-width:220px;height:34px;border:1px solid var(--line2);border-radius:8px;padding:0 10px;background:#fff}.tcq input{border:0;outline:0;flex:1;font:inherit;font-size:13.5px;min-width:0}
 .tctbl th{cursor:pointer;white-space:nowrap;user-select:none}.tctbl th:hover{color:var(--brand)}.tctbl td{font-size:13px;vertical-align:top}.tctbl tfoot td{background:#fdf8f1;border-top:2px solid var(--line)}
 .tcsub{display:block;color:var(--ink3);font-size:11.5px;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tcwrap{overflow:auto}#tcWrap .ctpage{max-width:1440px}
+.tcwrap{overflow:auto}.tctbl td.mono{white-space:nowrap}#tcWrap .ctpage{max-width:1440px}
 @media (max-width:900px){.tccats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
@@ -2454,7 +2454,7 @@ async function tcAdd(codes,deadline){await tcLoad();const X=await tcLookup();con
   await tcSave();return res}
 
 /* bring every target customer up to date with the latest receivable (called on open and after each receivable upload) */
-async function tcSync(force){const d=await tcLoad();const codes=Object.keys(d.list).filter(k=>!d.list[k].removed);if(!codes.length)return d;
+async function tcSync(force){const d=await tcLoad();const codes=Object.keys(d.list).filter(k=>!d.list[k].removed&&!d.list[k].demo);if(!codes.length)return d; /* demo rows are never touched by real receivables */
   const X=await tcLookup();if(!X.L)return d;const at=X.L.rep.uploadedAt||0,day=iso(new Date(at||Date.now()));let ch=false;
   for(const k of codes){const c=d.list[k];if(!force&&c.cur&&c.cur.repAt>=at)continue;
     const o=X.by.get(k);const now=tcInvMap(o&&o.rows);let rem=0,newAmt=0,newN=0;
@@ -2487,17 +2487,18 @@ function tcRender(){const W=$('tcWrap');const n=tcRows().length;
   ({summary:tcSummary,details:tcDetails,add:tcAddPage})[TC.page]()}
 const tcPill=k=>`<span class="ctach ${TC_CAT[k][1]==='n'?'':TC_CAT[k][1]}" ${TC_CAT[k][1]==='n'?'style="background:#eef0f2;color:#5b6270"':''}>${TC_CAT[k][0]}</span>`;
 const tcPct=p=>`${Math.round(p*100)}%`;
-const tcBar=p=>`<span class="ctpb" style="min-width:70px"><i class="${p>=.8?'g':p>=.4?'m':'b'}" style="width:${Math.min(100,p*100).toFixed(0)}%"></i></span>`;
+const tcBar=(p,c)=>`<span class="ctpb" style="min-width:70px"><i class="${c?({cleared:'g',ontrack:'g',slow:'m',critical:'b'}[c]||'g'):p>=.8?'g':p>=.4?'m':'b'}" style="width:${Math.min(100,p*100).toFixed(0)}%"></i></span>`;
 
 /* ---------- summary & insight ---------- */
 async function tcSummary(){const P=$('tcPage');const R=tcRows();
   if(!R.length){P.innerHTML=`<div class="card empty"><div class="big">👁️</div><h3>No target customers yet</h3><div class="hint">Add the customers you want to watch — one by one or a bulk list of Customer Codes. Their dues are captured from the latest receivable report at that moment, and every new receivable upload shows how much has been collected since.</div>
-    <div style="margin-top:14px"><button class="btn primary" id="tcGoAdd">➕ Add customers</button></div></div>`;$('tcGoAdd').onclick=()=>{TC.page='add';tcRender()};return}
+    <div style="margin-top:14px"><button class="btn primary" id="tcGoAdd">➕ Add customers</button> <button class="btn ghost" id="tcDemo">🧪 Load demo data</button></div></div>`;$('tcGoAdd').onclick=()=>{TC.page='add';tcRender()};$('tcDemo').onclick=tcDemoLoad;return}
   const L=await rwLatest().catch(()=>null);
   const A=sum(R,x=>x.amt),C=sum(R,x=>x.col),M=sum(R,x=>x.rem),NW=sum(R,x=>x.newAmt);const cnt=k=>R.filter(x=>x.cat===k).length;
   const avgD=Math.round(sum(R,x=>x.days)/R.length);
   let h=`<div class="ptitle" style="margin:0 0 6px"><div><h2 style="margin:0">Summary &amp; insight</h2><p class="hint" style="margin:2px 0 0">${R.length} target customers · progress from the receivable uploaded ${L?esc(fmtStamp(L.rep.uploadedAt)):'—'}</p></div>
-      <div class="acts"><button class="btn ghost" id="tcRe">↻ Refresh from latest receivable</button></div></div>
+      <div class="acts">${R.some(x=>x.demo)?'<button class="btn danger" id="tcDemoRm">🗑 Remove demo data</button>':'<button class="btn ghost" id="tcDemo2">🧪 Load demo data</button>'}<button class="btn ghost" id="tcRe">↻ Refresh from latest receivable</button></div></div>
+    ${R.some(x=>x.demo)?`<div class="ctv b" style="margin:4px 0 10px">🧪 <b>Demo data</b> — ${R.filter(x=>x.demo).length} sample customers (codes start with DEMO-) to explore the tool. Remove them with “🗑 Remove demo data” when you are done.</div>`:''}
     <div class="kpis">
       <div class="card kpi"><div class="l">Target customers</div><div class="v">${R.length}</div><div class="s">avg ${avgD} day(s) watched</div></div>
       <div class="card kpi k2"><div class="l">Dues when added</div><div class="v">${tk(A)}</div><div class="s">${sum(R,x=>x.snap.n)} open invoices</div></div>
@@ -2507,16 +2508,17 @@ async function tcSummary(){const P=$('tcPage');const R=tcRows();
     <div class="card ic" style="margin-bottom:14px"><div class="ich"><h3>Category</h3><span class="hint">progress &amp; speed</span></div><div class="tccats">
       ${['cleared','ontrack','slow','critical','nodue'].map(k=>`<button class="tccat ${TC_CAT[k][1]}" data-tccat="${k}"><b>${cnt(k)}</b><span>${TC_CAT[k][0]}</span><small>${tk(sum(R.filter(x=>x.cat===k),x=>x.rem))} due</small></button>`).join('')}</div>
       <div class="tcstack">${['cleared','ontrack','slow','critical','nodue'].map(k=>cnt(k)?`<i class="${TC_CAT[k][1]}" style="flex:${cnt(k)}" title="${TC_CAT[k][0]}: ${cnt(k)}"></i>`:'').join('')}</div></div>
-    <div class="hgrid"><div class="card ic"><div class="ich"><h3>Outstanding trend</h3><span class="hint">target customers, by receivable upload</span></div><div id="tcCh"></div></div>
+    <div class="hgrid"><div class="card ic"><div class="ich"><h3>Dues vs. outstanding</h3><span class="hint">by receivable upload</span></div><div id="tcCh"></div></div>
       <div class="card ic"><div class="ich"><h3>Insight &amp; what to do</h3></div><div id="tcIn"></div></div></div>
     <div class="hgrid" style="margin-top:14px">${['route','sa','mio','type'].map(g=>`<div class="card ic"><div class="ich"><h3>By ${{route:'route',sa:'SA',mio:'MIO',type:'customer type'}[g]}</h3></div><div class="tw">${tcGroup(R,g)}</div></div>`).join('')}</div>`;
-  P.innerHTML=h;$('tcRe').onclick=async()=>{await tcSync(true);toast('Updated from the latest receivable');tcRender()};
+  P.innerHTML=h;if($('tcDemoRm'))$('tcDemoRm').onclick=tcDemoRemove;if($('tcDemo2'))$('tcDemo2').onclick=tcDemoLoad;$('tcRe').onclick=async()=>{await tcSync(true);toast('Updated from the latest receivable');tcRender()};
   P.querySelectorAll('[data-tccat]').forEach(b=>b.onclick=()=>{TC.f={route:'',sa:'',mio:'',type:'',status:'',cat:b.dataset.tccat};TC.page='details';tcRender()});
   P.querySelectorAll('[data-tcg]').forEach(b=>b.onclick=()=>{const [g,v]=b.dataset.tcg.split('|');TC.f={route:'',sa:'',mio:'',type:'',status:'',cat:''};TC.f[g]=v;TC.page='details';tcRender()});
   /* trend: sum of outstanding (snapshot invoices) per upload date, carrying each customer's last value forward */
   const dates=[...new Set(R.flatMap(x=>(x.hist||[]).map(hh=>hh.d)))].sort().slice(-30);
-  if(dates.length>1){const rem=[],nw=[];for(const d of dates){let a=0,b=0;for(const x of R){if(x.added>d)continue;const hs=(x.hist||[]).filter(hh=>hh.d<=d);const l=hs[hs.length-1];if(l){a+=l.rem;b+=l.nw||0}}rem.push(Math.round(a));nw.push(Math.round(b))}
-    lineChart($('tcCh'),{labels:dates.map(d=>fmtDate(d).slice(0,6)),series:[{name:'Outstanding (dues when added)',color:'#a1580e',values:rem},{name:'New dues',color:'#8e8ca4',dash:true,values:nw}]})}
+  if(dates.length>1){const due=[],rem=[];for(const d of dates){let a=0,s=0;for(const x of R){if(x.added>d)continue;s+=x.amt;const hs=(x.hist||[]).filter(hh=>hh.d<=d);const l=hs[hs.length-1];a+=l?l.rem:x.amt}due.push(Math.round(s));rem.push(Math.round(a))}
+    lineChart($('tcCh'),{labels:dates.map(d=>fmtDate(d).slice(0,6)),series:[{name:'Dues when added (all target customers so far)',color:'#8e8ca4',dash:true,values:due},{name:'Still outstanding',color:'#a1580e',values:rem}]});
+    $('tcCh').insertAdjacentHTML('beforeend','<div class="hint" style="margin-top:6px">The gap between the two lines is what has been collected.</div>')}
   else $('tcCh').innerHTML='<div class="hint" style="padding:26px;text-align:center">The trend appears after the next receivable upload.</div>';
   $('tcIn').innerHTML=tcInsights(R)}
 function tcGroup(R,g){const m=new Map();for(const x of R){const k=(g==='type'?x.info.type:x.info[g])||'—';const o=m.get(k)||{n:0,a:0,c:0,r:0,crit:0};o.n++;o.a+=x.amt;o.c+=x.col;o.r+=x.rem;if(x.cat==='critical')o.crit++;m.set(k,o)}
@@ -2562,7 +2564,7 @@ function tcDetails(){const P=$('tcPage');const {R,L}=tcFiltered();
         <td>${esc(x.info.route||'—')}<small class="tcsub">SA: ${esc(x.info.sa||'—')}</small><small class="tcsub">MIO: ${esc(x.info.mio||'—')}</small></td>
         <td>${fmtDate(x.added)}<small class="tcsub">${x.days} day(s) ago</small></td>
         <td>${x.deadline?`<span class="${x.late&&x.rem>0?'ctlate':''}">${fmtDate(x.deadline)}</span><small class="tcsub">${x.rem<=0?'':x.late?'passed':x.left+' day(s) left'}</small>`:'<span class="muted">—</span>'}</td>
-        <td class="num">${tk(x.amt)}<small class="tcsub">${x.snap.n} invoice(s)</small></td><td class="num">${tk(x.col)}</td><td class="num"><div style="display:flex;align-items:center;gap:6px;justify-content:flex-end">${tcBar(x.pct)}${tcPct(x.pct)}</div></td>
+        <td class="num">${tk(x.amt)}<small class="tcsub">${x.snap.n} invoice(s)</small></td><td class="num">${tk(x.col)}</td><td class="num"><div style="display:flex;align-items:center;gap:6px;justify-content:flex-end">${tcBar(x.pct,x.cat)}${tcPct(x.pct)}</div></td>
         <td class="num"><b>${tk(x.rem)}</b><small class="tcsub">${x.nNow} open now</small></td><td class="num">${x.newAmt?`${tk(x.newAmt)}<small class="tcsub">${x.newN} new inv.</small>`:'—'}</td><td>${tcPill(x.cat)}<small class="tcsub">${TC_ST[x.status]}</small></td>
         <td><button class="btn ghost sm" data-tcrm="${esc(x.code)}" title="Remove from list">✕</button></tr>`).join('')||`<tr><td colspan="12" class="hint" style="text-align:center;padding:24px">No customers match.</td></tr>`}</tbody>
       <tfoot><tr><td colspan="5"><b>Total · ${L.length}</b></td><td class="num">${tk(T.a)}</td><td class="num">${tk(T.c)}</td><td class="num">${tcPct(T.a?T.c/T.a:0)}</td><td class="num"><b>${tk(T.r)}</b></td><td class="num">${tk(T.n)}</td><td colspan="2"></td></tr></tfoot></table></div>`;
@@ -2600,7 +2602,8 @@ async function tcAddPage(){const P=$('tcPage');const L=await rwLatest().catch(()
       <div class="card ic"><div class="ich"><h3>⬆ Bulk upload</h3><span class="hint">Excel / CSV</span></div>
         <div class="card ctdrop" id="tcDrop" style="box-shadow:none"><div class="big">⬆</div><b>Drop a file here or click to choose</b><span class="hint">Only one column is needed: <b>Customer Code</b> (optional: <b>Deadline</b>)</span><input type="file" id="tcFile" accept=".xlsx,.xls,.csv" hidden></div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:10px;flex-wrap:wrap"><span class="hint">Not sure of the format?</span><button class="btn ghost sm" id="tcFmt">⬇ Sample format</button></div></div></div>
-    <div id="tcRes" style="margin-top:14px"></div>`;
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">${Object.values(TC.data.list).some(c=>c.demo)?'<button class="btn danger sm" id="tcDemoRmA">🗑 Remove demo data</button>':'<button class="btn ghost sm" id="tcDemoA">🧪 Load demo data</button>'}</div>
+    <div id="tcRes" style="margin-top:14px"></div>`;if($('tcDemoA'))$('tcDemoA').onclick=tcDemoLoad;if($('tcDemoRmA'))$('tcDemoRmA').onclick=tcDemoRemove;
   const dl=()=>{let d=$('tcAD').value;const n=+$('tcAN').value;if(!d&&n>0){const x=new Date();x.setDate(x.getDate()+n);d=iso(x)}return d};
   $('tcAddGo').onclick=async()=>{const codes=$('tcCodes').value.split(/[\s,;]+/).filter(Boolean);if(!codes.length){toast('Type at least one Customer Code');return}const r=await tcAdd(codes,dl());tcShowRes(r);if(r.added.length||r.nodue.length)$('tcCodes').value=''};
   const f=$('tcFile'),dz=$('tcDrop');dz.onclick=()=>f.click();f.onchange=e=>{const x=e.target.files[0];e.target.value='';if(x)tcBulk(x,dl())};
@@ -2626,6 +2629,31 @@ async function tcCardStat(){const el=$('dmTcSt');if(!el)return;try{await tcSync(
   if(!R.length){el.innerHTML='<div><b>—</b><small>no target customers yet</small></div>';return}
   const A=sum(R,x=>x.amt),C=sum(R,x=>x.col);
   el.innerHTML=`<div><b>${R.length}</b><small>target customers</small></div><div><b>৳ ${kfmt(sum(R,x=>x.rem))}</b><small>outstanding · ${tcPct(A?C/A:0)} recovered</small></div><div><b>${R.filter(x=>x.cat==='critical').length}</b><small>critical</small></div>`}catch(e){el.innerHTML='<div><b>—</b><small>open to set up</small></div>'}}
+
+/* ---------- demo data (for exploring the tool; removed with one click) ---------- */
+async function tcDemoLoad(){await tcLoad();const rng=(()=>{let s=20261120;return ()=>{s=(s*1103515245+12345)%2147483648;return s/2147483648}})();
+  const R=[['Sadar North','Rafiq Hasan','Karim Uddin'],['Sadar South','Mehedi Islam','Karim Uddin'],['Pirganj','Tanvir Ahmed','Jamal Hossain'],['Mithapukur','Sabbir Rahman','Jamal Hossain'],['Badarganj','Nayeem Khan','Shahin Alam'],['Kaunia','Arif Billah','Shahin Alam']];
+  const NM=['Rahman Pharmacy','Maa Medical Hall','Sonali Drug House','New Popular Pharmacy','Janata Medicine Corner','Bismillah Pharma','Hasan Medical Store','Shifa Pharmacy','Lazz Medicine Point','Al-Amin Drug House','Mukti Medical','Rupali Pharmacy','Bhai Bhai Medicine','Nirapad Pharma','Sheba Medical Hall','Amena Drug Store','Popular Diagnostic Pharmacy','Green Life Pharmacy','Desh Medical','Sathi Pharmacy','Royal Medicine Corner','Ma Babar Doa Pharmacy','City Drug House','Proshanti Medical','Nobin Pharmacy','Alif Medicine','Moumita Medical','Tasnim Pharmacy','Jononi Drug House','Arogya Pharmacy','Mayer Doa Medical','Sufia Pharmacy','Nabil Medicine Corner','Hridoy Pharma','Rangpur Medical Store','Uttara Pharmacy','Shapla Drug House','Kakoli Medical','Momota Pharmacy','Shuvo Medicine Point'];
+  const TY=['Chemist','Chemist','Chemist','Retail','Hospital','Wholesale'];const MK=['Station Road','Kachari Bazar','Jahaj Company More','Lalbag','Shapla Chattar','Medical More','Modern More','Dhap'];
+  /* profiles: share of customers → how their dues move */
+  const P=['cleared','cleared','cleared','ontrack','ontrack','ontrack','ontrack','slow','slow','slow','critical','critical','newdue','nodue'];
+  const today=todayISO();let n=0;
+  NM.forEach((name,i)=>{const r=R[i%R.length],prof=P[Math.floor(rng()*P.length)];const code='DEMO-'+String(1001+i);
+    const ago=prof==='critical'?18+Math.floor(rng()*20):5+Math.floor(rng()*33);const added=iso(new Date(Date.now()-ago*864e5));
+    const nInv=prof==='nodue'?0:1+Math.floor(rng()*4);const inv={};for(let k=0;k<nInv;k++)inv['INV-'+(70000+i*10+k)]=Math.round((4000+rng()*38000)/50)*50;
+    const amt=Object.values(inv).reduce((s,v)=>s+v,0);
+    const hasDl=rng()<.6;const deadline=hasDl?iso(new Date(new Date(added+'T12:00:00').getTime()+(prof==='critical'&&rng()<.5?ago-3:ago+5+Math.floor(rng()*20))*864e5)):'';
+    /* history every ~3 days */
+    const goal={cleared:1,ontrack:Math.min(.95,ago/(hasDl?Math.max(ago,tcDays(added,deadline)):30)+.05+rng()*.15),slow:.1+rng()*.25,critical:0,newdue:.2+rng()*.3,nodue:0}[prof];
+    const hist=[];let nw=0;for(let d=0;d<=ago;d+=3){const f=Math.min(1,d/Math.max(1,ago));const rem=Math.round(amt*(1-goal*Math.pow(f,.8))/50)*50;if(prof==='newdue'&&f>.5)nw=Math.round((6000+i*500)/50)*50;hist.push({d:iso(new Date(new Date(added+'T12:00:00').getTime()+d*864e5)),rem:Math.max(0,rem),nw})}
+    const last=hist[hist.length-1];if(prof==='cleared')last.rem=0;
+    const left=Object.keys(inv).length?Math.max(prof==='cleared'?0:1,Math.round(Object.keys(inv).length*(amt?last.rem/amt:0)+.4)):0;
+    TC.data.list[code]={code,demo:true,added,addedAt:Date.parse(added+'T10:00:00'),deadline,
+      info:{name,type:TY[i%TY.length],market:MK[i%MK.length],address:`${10+i} ${MK[i%MK.length]}, Rangpur`,mobile:'0171'+String(2000000+i*7919).slice(0,7),terr:'T-'+String(i%R.length+1).padStart(2,'0'),route:r[0],sa:r[1],mio:r[2]},
+      snap:{repAt:0,rep:'demo',amt,inv,n:Object.keys(inv).length,maxDays:20+Math.floor(rng()*70)},cur:{repAt:Date.now(),rem:last.rem,newAmt:last.nw,newN:last.nw?1:0,n:left+(last.nw?1:0)},hist};n++});
+  await tcSave();toast(`🧪 ${n} demo customers loaded`);TC.page='summary';tcRender()}
+async function tcDemoRemove(){const ok=await choice('Remove demo data','Delete all demo customers (codes starting with DEMO-)? Your real target customers stay.',[{l:'Cancel'},{l:'Remove demo',v:1,cls:'danger'}]);if(!ok)return;
+  await tcLoad();let n=0;for(const k of Object.keys(TC.data.list))if(TC.data.list[k].demo){delete TC.data.list[k];n++}await tcSave();toast(`${n} demo customers removed`);tcRender()}
 
 /* =============== welcome-card animations (line-art, same style as Route Wise login) =============== */
 const CA_K='#2b2b2b',CA_G='#9a9a9a';
