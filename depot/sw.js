@@ -1,5 +1,5 @@
 /* Depot Management service worker — works offline; updates when you replace files on the server */
-const VERSION = '26d95e4c97';
+const VERSION = '7179a1d7be';
 const CACHE = 'depotmgmt-' + VERSION;
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'];
 /* updates are mandatory: a new version installs fresh files (never the browser's HTTP cache) and takes over at once */
