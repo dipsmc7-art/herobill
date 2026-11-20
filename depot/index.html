@@ -572,7 +572,7 @@ body.locked>*:not(#login):not(.overlay):not(.toast):not(#printArea){display:none
 .tcq{display:flex;align-items:center;gap:8px;flex:1;min-width:220px;height:34px;border:1px solid var(--line2);border-radius:8px;padding:0 10px;background:#fff}.tcq input{border:0;outline:0;flex:1;font:inherit;font-size:13.5px;min-width:0}
 .tctbl th{cursor:pointer;white-space:nowrap;user-select:none}.tctbl th:hover{color:var(--brand)}.tctbl td{font-size:13px;vertical-align:top}.tctbl tfoot td{background:#fdf8f1;border-top:2px solid var(--line)}
 .tcsub{display:block;color:var(--ink3);font-size:11.5px;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tcwrap{overflow:auto}.tctbl td.mono{white-space:nowrap}#tcWrap .ctpage{max-width:1440px}
+.tcwrap{overflow:auto}.tcgrp{cursor:pointer}.tcgrp td{background:#fbefe1!important;border-top:2px solid #f0d9bd;font-size:13.5px}.tcgrp:hover td{background:#f8e4cc!important}.tcchev{display:inline-block;width:14px;color:#a1580e}.tctbl td.mono{white-space:nowrap}#tcWrap .ctpage{max-width:1440px}
 @media (max-width:900px){.tccats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
@@ -2422,7 +2422,7 @@ async function ctRecon(){const P=$('ctPage');const days=Object.keys(S.ctColl).so
   $('rcSel').onchange=e=>{CT.rsel=e.target.value;ctRecon()}}
 
 /* ================= TARGET CUSTOMER MONITORING (watch-list of customers: dues at adding vs. receivable since) ================= */
-const TC={page:'summary',q:'',f:{route:'',sa:'',mio:'',type:'',status:'',cat:''},sort:{k:'rem',d:-1},data:null};
+const TC={closed:new Set(),page:'summary',q:'',f:{route:'',sa:'',mio:'',type:'',status:'',cat:''},sort:{k:'rem',d:-1},data:null};
 const tcCode=s=>String(s??'').replace(/[\s ]+/g,'').toUpperCase();
 const TC_CAT={cleared:['Cleared','g'],ontrack:['On track','g'],slow:['Slow','m'],critical:['Critical','b'],nodue:['No dues','n']};
 const TC_ST={full:'Fully collected',part:'Partly collected',none:'Not collected',nodue:'No dues at adding'};
@@ -2493,7 +2493,7 @@ const tcBar=(p,c)=>`<span class="ctpb" style="min-width:70px"><i class="${c?({cl
 async function tcSummary(){const P=$('tcPage');const R=tcRows();
   if(!R.length){P.innerHTML=`<div class="card empty"><div class="big">👁️</div><h3>No target customers yet</h3><div class="hint">Add the customers you want to watch — one by one or a bulk list of Customer Codes. Their dues are captured from the latest receivable report at that moment, and every new receivable upload shows how much has been collected since.</div>
     <div style="margin-top:14px"><button class="btn primary" id="tcGoAdd">➕ Add customers</button> <button class="btn ghost" id="tcDemo">🧪 Load demo data</button></div></div>`;$('tcGoAdd').onclick=()=>{TC.page='add';tcRender()};$('tcDemo').onclick=tcDemoLoad;return}
-  const L=await rwLatest().catch(()=>null);
+  const L=await rwLatest().catch(()=>null);if(!P.isConnected)return; /* user switched tab while loading */
   const A=sum(R,x=>x.amt),C=sum(R,x=>x.col),M=sum(R,x=>x.rem),NW=sum(R,x=>x.newAmt);const cnt=k=>R.filter(x=>x.cat===k).length;
   const avgD=Math.round(sum(R,x=>x.days)/R.length);
   let h=`<div class="ptitle" style="margin:0 0 6px"><div><h2 style="margin:0">Summary &amp; insight</h2><p class="hint" style="margin:2px 0 0">${R.length} target customers · progress from the receivable uploaded ${L?esc(fmtStamp(L.rep.uploadedAt)):'—'}</p></div>
@@ -2557,33 +2557,43 @@ function tcDetails(){const P=$('tcPage');const {R,L}=tcFiltered();
       ${opt('route',uniq(x=>x.info.route||'—'),'Route')}${opt('sa',uniq(x=>x.info.sa||'—'),'SA')}${opt('mio',uniq(x=>x.info.mio||'—'),'MIO')}${opt('type',uniq(x=>x.info.type||'—'),'Type')}
       ${opt('status',Object.entries(TC_ST),'Status')}${opt('cat',Object.entries(TC_CAT).map(([k,v])=>[k,v[0]]),'Category')}
       ${Object.values(TC.f).some(Boolean)||TC.q?'<button class="btn ghost sm" id="tcClr">✕ Clear</button>':''}
-      <span style="flex:1"></span><button class="btn ghost sm" id="tcDl">⬇ Excel</button><button class="btn ghost sm" id="tcPr">🖨 Print</button><button class="btn ghost sm" id="tcDead">📅 Deadline…</button></div>
+      <span style="flex:1"></span><button class="btn ghost sm" id="tcTog">${TC.closed.size?'▾ Expand all':'▸ Collapse all'}</button><button class="btn ghost sm" id="tcDl">⬇ Excel</button><button class="btn ghost sm" id="tcPr">🖨 Print</button><button class="btn ghost sm" id="tcDead">📅 Deadline…</button></div>
     <div class="hint" style="margin:6px 2px 8px">${L.length} of ${R.length} customers · click a column to sort · ${tk(T.r)} outstanding</div>
     <div class="card tcwrap"><table class="tbl tctbl"><thead><tr>${TC_COLS.map(([k,l])=>`<th data-tcs="${k}" class="${['amt','col','pct','rem','newAmt'].includes(k)?'num':''}">${l}${TC.sort.k===k?(TC.sort.d>0?' ▲':' ▼'):''}</th>`).join('')}<th></th></tr></thead>
-      <tbody>${L.map(x=>`<tr><td class="mono">${esc(x.code)}</td><td><b>${esc(x.info.name||'—')}</b><small class="tcsub">${esc([x.info.type,x.info.market,x.info.mobile].filter(Boolean).join(' · '))}</small><small class="tcsub">${esc(x.info.address||'')}</small></td>
-        <td>${esc(x.info.route||'—')}<small class="tcsub">SA: ${esc(x.info.sa||'—')}</small><small class="tcsub">MIO: ${esc(x.info.mio||'—')}</small></td>
-        <td>${fmtDate(x.added)}<small class="tcsub">${x.days} day(s) ago</small></td>
-        <td>${x.deadline?`<span class="${x.late&&x.rem>0?'ctlate':''}">${fmtDate(x.deadline)}</span><small class="tcsub">${x.rem<=0?'':x.late?'passed':x.left+' day(s) left'}</small>`:'<span class="muted">—</span>'}</td>
-        <td class="num">${tk(x.amt)}<small class="tcsub">${x.snap.n} invoice(s)</small></td><td class="num">${tk(x.col)}</td><td class="num"><div style="display:flex;align-items:center;gap:6px;justify-content:flex-end">${tcBar(x.pct,x.cat)}${tcPct(x.pct)}</div></td>
-        <td class="num"><b>${tk(x.rem)}</b><small class="tcsub">${x.nNow} open now</small></td><td class="num">${x.newAmt?`${tk(x.newAmt)}<small class="tcsub">${x.newN} new inv.</small>`:'—'}</td><td>${tcPill(x.cat)}<small class="tcsub">${TC_ST[x.status]}</small></td>
-        <td><button class="btn ghost sm" data-tcrm="${esc(x.code)}" title="Remove from list">✕</button></tr>`).join('')||`<tr><td colspan="12" class="hint" style="text-align:center;padding:24px">No customers match.</td></tr>`}</tbody>
+      <tbody>${tcGroups(L).map(g=>tcGrpHead(g)+g.rows.map(x=>tcRowHtml(x,g.key)).join('')).join('')||`<tr><td colspan="12" class="hint" style="text-align:center;padding:24px">No customers match.</td></tr>`}</tbody>
       <tfoot><tr><td colspan="5"><b>Total · ${L.length}</b></td><td class="num">${tk(T.a)}</td><td class="num">${tk(T.c)}</td><td class="num">${tcPct(T.a?T.c/T.a:0)}</td><td class="num"><b>${tk(T.r)}</b></td><td class="num">${tk(T.n)}</td><td colspan="2"></td></tr></tfoot></table></div>`;
   let tq;$('tcQ').oninput=e=>{TC.q=e.target.value;clearTimeout(tq);tq=setTimeout(()=>{tcDetails();const n=$('tcQ');n.focus();n.setSelectionRange(n.value.length,n.value.length)},250)};
   P.querySelectorAll('[data-tcf]').forEach(s=>s.onchange=()=>{TC.f[s.dataset.tcf]=s.value;tcDetails()});
   if($('tcClr'))$('tcClr').onclick=()=>{TC.q='';TC.f={route:'',sa:'',mio:'',type:'',status:'',cat:''};tcDetails()};
   P.querySelectorAll('[data-tcs]').forEach(th=>th.onclick=()=>{const k=th.dataset.tcs;TC.sort=TC.sort.k===k?{k,d:-TC.sort.d}:{k,d:['code','name','type','route','sa','mio','market','status','deadline','added'].includes(k)?1:-1};tcDetails()});
   P.querySelectorAll('[data-tcrm]').forEach(b=>b.onclick=async()=>{const k=b.dataset.tcrm;const ok=await choice('Remove target customer',`Stop watching <b>${esc(k)}</b>? Its history is deleted.`,[{l:'Cancel'},{l:'Remove',v:1,cls:'danger'}]);if(ok){delete TC.data.list[k];await tcSave();toast('Removed');tcRender()}});
+  P.querySelectorAll('[data-tcgrp]').forEach(r=>r.onclick=()=>{const k=r.dataset.tcgrp;TC.closed.has(k)?TC.closed.delete(k):TC.closed.add(k);const o=!TC.closed.has(k);r.querySelector('.tcchev').textContent=o?'▾':'▸';$('tcTog').textContent=TC.closed.size?'▾ Expand all':'▸ Collapse all';P.querySelectorAll('tr[data-g]').forEach(x=>{if(x.dataset.g===k)x.hidden=!o})});
+  $('tcTog').onclick=()=>{if(TC.closed.size)TC.closed.clear();else tcGroups(L).forEach(g=>TC.closed.add(g.key));tcDetails()};
   $('tcDl').onclick=()=>tcExport(L);$('tcPr').onclick=()=>tcPrint(L);$('tcDead').onclick=()=>tcDeadline(L)}
+
+/* one detail row */
+function tcRowHtml(x,g){return `<tr data-g="${esc(g)}" ${TC.closed.has(g)?'hidden':''}><td class="mono">${esc(x.code)}</td><td><b>${esc(x.info.name||'—')}</b><small class="tcsub">${esc([x.info.type,x.info.market,x.info.mobile].filter(Boolean).join(' · '))}</small><small class="tcsub">${esc(x.info.address||'')}</small></td>
+        <td>${esc(x.info.route||'—')}<small class="tcsub">SA: ${esc(x.info.sa||'—')}</small><small class="tcsub">MIO: ${esc(x.info.mio||'—')}</small></td>
+        <td>${fmtDate(x.added)}<small class="tcsub">${x.days} day(s) ago</small></td>
+        <td>${x.deadline?`<span class="${x.late&&x.rem>0?'ctlate':''}">${fmtDate(x.deadline)}</span><small class="tcsub">${x.rem<=0?'':x.late?'passed':x.left+' day(s) left'}</small>`:'<span class="muted">—</span>'}</td>
+        <td class="num">${tk(x.amt)}<small class="tcsub">${x.snap.n} invoice(s)</small></td><td class="num">${tk(x.col)}</td><td class="num"><div style="display:flex;align-items:center;gap:6px;justify-content:flex-end">${tcBar(x.pct,x.cat)}${tcPct(x.pct)}</div></td>
+        <td class="num"><b>${tk(x.rem)}</b><small class="tcsub">${x.nNow} open now</small></td><td class="num">${x.newAmt?`${tk(x.newAmt)}<small class="tcsub">${x.newN} new inv.</small>`:'—'}</td><td>${tcPill(x.cat)}<small class="tcsub">${TC_ST[x.status]}</small></td>
+        <td><button class="btn ghost sm" data-tcrm="${esc(x.code)}" title="Remove from list">✕</button></tr>`}
+/* route groups, biggest outstanding first; rows keep the chosen column sort inside each group */
+function tcGroups(L){const m=new Map();for(const x of L){const k=x.info.route||'—';(m.get(k)||m.set(k,[]).get(k)).push(x)}
+  return [...m.entries()].map(([key,rows])=>({key,rows,a:sum(rows,x=>x.amt),c:sum(rows,x=>x.col),r:sum(rows,x=>x.rem),n:sum(rows,x=>x.newAmt),crit:rows.filter(x=>x.cat==='critical').length,sa:[...new Set(rows.map(x=>x.info.sa).filter(Boolean))].join(', ')})).sort((p,q)=>q.r-p.r)}
+function tcGrpHead(g){const o=!TC.closed.has(g.key);return `<tr class="tcgrp" data-tcgrp="${esc(g.key)}"><td colspan="5"><span class="tcchev">${o?'▾':'▸'}</span> <b>${esc(g.key)}</b> <span class="muted">· ${g.rows.length} customer(s)${g.sa?' · SA: '+esc(g.sa):''}${g.crit?` · <span class="ctlate">${g.crit} critical</span>`:''}</span></td>
+  <td class="num">${tk(g.a)}</td><td class="num">${tk(g.c)}</td><td class="num">${tcPct(g.a?g.c/g.a:0)}</td><td class="num"><b>${tk(g.r)}</b></td><td class="num">${g.n?tk(g.n):'—'}</td><td colspan="2"></td></tr>`}
 function tcExport(L){const w=XLSX.utils.book_new();
   const head=['Customer Code','Customer Name','Customer Type','Route','Territory','SA','MIO','Market','Address','Mobile','Added','Days','Deadline','Dues when added','Open invoices (then)','Open invoices (now)','Collected','Collected %','Outstanding','New dues','New invoices','Status','Category'];
   const rows=L.map(x=>[x.code,x.info.name,x.info.type,x.info.route,x.info.terr,x.info.sa,x.info.mio,x.info.market,x.info.address,x.info.mobile,x.added,x.days,x.deadline,Math.round(x.amt),x.snap.n,x.nNow,Math.round(x.col),Math.round(x.pct*1000)/10,Math.round(x.rem),Math.round(x.newAmt),x.newN,TC_ST[x.status],TC_CAT[x.cat][0]]);
   const ws=XLSX.utils.aoa_to_sheet([head,...rows]);ws['!cols']=head.map((h,i)=>({wch:[12,28,14,14,10,16,18,16,30,14,11,6,11,14,10,10,12,9,12,10,8,16,10][i]}));
   XLSX.utils.book_append_sheet(w,ws,'Target customers');XLSX.writeFile(w,`Target_Customers_${(S.cfg.depot||'Depot').replace(/\W+/g,'_')}_${todayISO()}.xlsx`)}
 function tcPrint(L){const T={a:sum(L,x=>x.amt),c:sum(L,x=>x.col),r:sum(L,x=>x.rem)};
-  $('printArea').innerHTML=`<style>@page{size:A4 landscape;margin:10mm}.tcp{font:11px Ubuntu,Arial,sans-serif;color:#111}.tcp h2{margin:0 0 2px;font-size:16px}.tcp .s{color:#555;margin-bottom:8px}.tcp table{width:100%;border-collapse:collapse}.tcp th,.tcp td{border:1px solid #bbb;padding:3px 5px;text-align:left;vertical-align:top}.tcp th{background:#f1f1f1}.tcp .n{text-align:right;white-space:nowrap}.tcp tfoot td{font-weight:700;background:#f7f7f7}</style>
+  $('printArea').innerHTML=`<style>@page{size:A4 landscape;margin:10mm}.tcp{font:11px Ubuntu,Arial,sans-serif;color:#111}.tcp h2{margin:0 0 2px;font-size:16px}.tcp .s{color:#555;margin-bottom:8px}.tcp table{width:100%;border-collapse:collapse}.tcp th,.tcp td{border:1px solid #bbb;padding:3px 5px;text-align:left;vertical-align:top}.tcp th{background:#f1f1f1}.tcp .n{text-align:right;white-space:nowrap}.tcp tfoot td{font-weight:700;background:#f7f7f7}.tcp tr.g td{font-weight:700;background:#fbefe1}</style>
     <div class="tcp"><h2>Target Customer Monitoring · ${esc(S.cfg.depot||'')}</h2><div class="s">${fmtDate(todayISO())} · ${L.length} customers · dues when added ${tk(T.a)} · collected ${tk(T.c)} (${tcPct(T.a?T.c/T.a:0)}) · outstanding ${tk(T.r)}</div>
     <table><thead><tr><th>#</th><th>Code</th><th>Customer / address</th><th>Route · SA · MIO</th><th>Added</th><th class="n">Days</th><th>Deadline</th><th class="n">Dues when added</th><th class="n">Collected</th><th class="n">%</th><th class="n">Outstanding</th><th class="n">New dues</th><th>Category</th></tr></thead>
-    <tbody>${L.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.code)}</td><td><b>${esc(x.info.name)}</b><br>${esc([x.info.market,x.info.address,x.info.mobile].filter(Boolean).join(' · '))}</td><td>${esc([x.info.route,x.info.sa,x.info.mio].filter(Boolean).join(' · '))}</td><td>${fmtDate(x.added)}</td><td class="n">${x.days}</td><td>${x.deadline?fmtDate(x.deadline):''}</td><td class="n">${fmt(x.amt)}</td><td class="n">${fmt(x.col)}</td><td class="n">${tcPct(x.pct)}</td><td class="n">${fmt(x.rem)}</td><td class="n">${x.newAmt?fmt(x.newAmt):''}</td><td>${TC_CAT[x.cat][0]}</td></tr>`).join('')}</tbody>
+    <tbody>${tcGroups(L).map(g=>`<tr class="g"><td colspan="7">${esc(g.key)} · ${g.rows.length} customer(s)${g.sa?' · SA: '+esc(g.sa):''}</td><td class="n">${fmt(g.a)}</td><td class="n">${fmt(g.c)}</td><td class="n">${tcPct(g.a?g.c/g.a:0)}</td><td class="n">${fmt(g.r)}</td><td class="n">${g.n?fmt(g.n):''}</td><td></td></tr>`+g.rows.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.code)}</td><td><b>${esc(x.info.name)}</b><br>${esc([x.info.market,x.info.address,x.info.mobile].filter(Boolean).join(' · '))}</td><td>${esc([x.info.route,x.info.sa,x.info.mio].filter(Boolean).join(' · '))}</td><td>${fmtDate(x.added)}</td><td class="n">${x.days}</td><td>${x.deadline?fmtDate(x.deadline):''}</td><td class="n">${fmt(x.amt)}</td><td class="n">${fmt(x.col)}</td><td class="n">${tcPct(x.pct)}</td><td class="n">${fmt(x.rem)}</td><td class="n">${x.newAmt?fmt(x.newAmt):''}</td><td>${TC_CAT[x.cat][0]}</td></tr>`).join('')).join('')}</tbody>
     <tfoot><tr><td colspan="7">Total</td><td class="n">${fmt(T.a)}</td><td class="n">${fmt(T.c)}</td><td class="n">${tcPct(T.a?T.c/T.a:0)}</td><td class="n">${fmt(T.r)}</td><td colspan="2"></td></tr></tfoot></table></div>`;
   setTimeout(()=>window.print(),120)}
 function tcDeadline(L){const open=L.filter(x=>x.rem>0);
@@ -2593,7 +2603,7 @@ function tcDeadline(L){const open=L.filter(x=>x.rem>0);
       for(const x of open)TC.data.list[x.code].deadline=d||'';await tcSave();toast(d?`Deadline ${fmtDate(d)} set for ${open.length}`:'Deadline removed');tcDetails();return true}}])}
 
 /* ---------- add one / bulk ---------- */
-async function tcAddPage(){const P=$('tcPage');const L=await rwLatest().catch(()=>null);
+async function tcAddPage(){const P=$('tcPage');const L=await rwLatest().catch(()=>null);if(!P.isConnected)return;
   P.innerHTML=`${L?`<div class="ctv g">Dues are captured from the latest receivable: <b>${esc(L.rep.fileName||'')}</b> · uploaded ${esc(fmtStamp(L.rep.uploadedAt))}. Upload today's receivable in Route Wise first for exact amounts.</div>`:`<div class="ctv b">No receivable report yet — upload one in <b>Route Wise Receivable</b> first, so the dues can be captured.</div>`}
     <div class="hgrid"><div class="card ic"><div class="ich"><h3>➕ Add customers</h3><span class="hint">one or many</span></div>
         <div class="field"><label>Customer Code(s) — one per line, or separated by comma / space</label><textarea id="tcCodes" rows="5" placeholder="e.g. C-10021&#10;C-10044" style="width:100%;font:inherit;border:1px solid var(--line2);border-radius:10px;padding:10px"></textarea></div>
