@@ -2616,13 +2616,22 @@ async function loadAll(){S.cfg={...DEF,...(await getKV('cfg')||{})};S.cfg.mgrPho
   if(!('serviceWorker' in navigator)||!/^https?:/.test(location.protocol))return;
   const bar=(html,onGo,id)=>{if(document.getElementById(id))return;const d=document.createElement('div');d.className='pwabar';d.id=id;d.innerHTML=html;document.body.appendChild(d);
     d.querySelector('.go').onclick=()=>{onGo();d.remove()};d.querySelector('.x').onclick=()=>{d.remove();try{localStorage.setItem(id+'_x',Date.now())}catch(e){}}};
-  navigator.serviceWorker.register('sw.js').then(reg=>{
-    const ask=w=>bar(`<div class="t">🔄 A new version is ready<br><small>Your data stays on this PC</small></div><button class="go">Update now</button><button class="x">×</button>`,()=>w.postMessage('skipWaiting'),'pwaUpd');
-    if(reg.waiting&&navigator.serviceWorker.controller)ask(reg.waiting);
-    reg.addEventListener('updatefound',()=>{const w=reg.installing;if(w)w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)ask(w)})});
-    setInterval(()=>reg.update().catch(()=>{}),60*60*1000);
+  /* MANDATORY UPDATES: when a new version is published, the app locks, updates itself and restarts. */
+  const hadCtrl=!!navigator.serviceWorker.controller;
+  const lock=()=>{if(document.getElementById('pwaLock'))return;const d=document.createElement('div');d.id='pwaLock';
+    d.style.cssText='position:fixed;inset:0;z-index:2147483647;background:rgba(20,18,60,.92);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:24px;font-family:\'Hind Siliguri\',\'Ubuntu\',sans-serif';
+    d.innerHTML='<div style="font-size:44px">🔄</div><div style="font-size:19px;font-weight:700">নতুন ভার্সন ইনস্টল হচ্ছে…</div><div style="opacity:.85;font-size:14px">Updating to the new version — the app restarts in a moment.<br>আপনার ডেটা নিরাপদ আছে (Your data is safe).</div><button id="pwaLockGo" style="margin-top:8px;border:0;border-radius:10px;padding:10px 18px;font:inherit;font-weight:700;background:#fff;color:#2e2a8f;display:none">আবার চেষ্টা (Restart now)</button>';
+    document.body.appendChild(d);setTimeout(()=>{const b=document.getElementById('pwaLockGo');if(b){b.style.display='';b.onclick=()=>location.reload()}},8000)};
+  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
+    const force=w=>{if(!navigator.serviceWorker.controller)return;lock();w.postMessage('skipWaiting')};
+    if(reg.waiting)force(reg.waiting);
+    reg.addEventListener('updatefound',()=>{const w=reg.installing;if(w){if(navigator.serviceWorker.controller)lock();w.addEventListener('statechange',()=>{if(w.state==='installed')force(w);if(w.state==='redundant'){const l=document.getElementById('pwaLock');if(l&&!reg.waiting&&!reg.installing)l.remove()}})}});
+    const check=()=>reg.update().catch(()=>{});
+    check();setInterval(check,15*60*1000);
+    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')check()});
+    window.addEventListener('online',check);
   }).catch(()=>{});
-  let reloading=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloading)return;reloading=true;location.reload()});
+  let reloading=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloading||!hadCtrl)return;reloading=true;lock();setTimeout(()=>location.reload(),600)});
   /* install button (Android Chrome) */
   let ev=null;const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
   window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();ev=e;if(standalone)return;

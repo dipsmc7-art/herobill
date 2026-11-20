@@ -1,8 +1,9 @@
 /* Hero Bill service worker — works offline; updates when you replace files on the server */
-const VERSION = '7caf2988ae';
+const VERSION = '39a8967ad8';
 const CACHE = 'herobill-' + VERSION;
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'];
-self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL))); });
+/* updates are mandatory: a new version installs fresh files (never the browser's HTTP cache) and takes over at once */
+self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('herobill-') && k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
