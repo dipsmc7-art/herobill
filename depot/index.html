@@ -2113,7 +2113,7 @@ async function gdRun(manual){
   GD.busy=true;gdChip();const seq=GD.seq;
   try{let archOK=true;try{await gdArchive()}catch(e){archOK=false;console.warn('archive skipped',e.message)}const snap=await gdSnapshot(false,!archOK);const json=JSON.stringify(snap);const nb=snap.bills.length;
     const body={date:todayISO(),meta:{bills:S.bills.length,pending:snap.bills.filter(b=>b.status==='pending').length,heroes:snap.heroes.length,fares:snap.fares.length,
-      lastBill:snap.bills.reduce((m,b)=>b.date>m?b.date:m,''),mgrPhone:S.cfg.mgrPhone||'',tr:snap.tracker?Object.fromEntries(snap.tracker.map(x=>[x.k,x.s+(x.note?' · '+x.note:'')])):null,pending:snap.tracker?snap.tracker.filter(x=>x.s==='due'||x.s==='late').length:null}};
+      lastBill:snap.bills.reduce((m,b)=>b.date>m?b.date:m,''),mgrPhone:S.cfg.mgrPhone||'',tr:snap.tracker?Object.fromEntries(snap.tracker.map(x=>[x.k,x.s+(x.note?' · '+x.note:'')])):null,upPending:snap.tracker?snap.tracker.filter(x=>x.s==='due'||x.s==='late').length:null}};
     /* nothing changed since the last backup → only refresh the status sheet */
     const h=sha256(JSON.stringify({...snap,at:0,tracker:0,ct:snap.ct?{...snap.ct,generatedAt:0}:null}));
     const trSig=JSON.stringify(body.meta.tr||{});if(h===GD.hash&&GD.last&&!manual){if(iso(new Date(GD.last.t))!==todayISO()||trSig!==GD.trSig){GD.trSig=trSig;try{await gdApi('touch',{meta:body.meta,size:GD.last.size})}catch(e){}GD.last={...GD.last,t:Date.now()}}GD.err='';
