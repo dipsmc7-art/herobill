@@ -2122,14 +2122,14 @@ function gdPanelHtml(){
     <div class="hint" style="margin-top:6px">This PC: <b>${esc(GD.pc)}</b> · Depot: <b>${esc(S.cfg.depot||'— set in Depot & printing —')}</b></div>
     ${gdReady()?`<div style="margin-top:10px"><button class="btn ghost sm" id="gdLink">🔗 Copy connection link for depots</button> <span class="hint">for the Depot Management web app</span></div>`
       :`<div style="display:flex;gap:6px;margin-top:10px"><input id="gdCode" placeholder="Paste the connection link from head office" style="flex:1;height:34px;border:1px solid var(--line2);border-radius:8px;padding:0 10px;font:inherit"><button class="btn primary sm" id="gdConnect">Connect</button></div>`}
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn soft" id="gdNow" ${gdReady()?'':'disabled'}>Back up now</button><button class="btn ghost" id="gdRest" ${gdReady()?'':'disabled'}>Restore from head office</button></div></div>`}
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn soft" id="gdNow" ${gdReady()?'':'disabled'}>Back up now</button><button class="btn ghost" id="gdRest" ${gdReady()?'':'disabled'}>Restore from head office</button><button class="btn ghost" id="gdCtSum" ${gdReady()?'':'disabled'}>📊 Collection target summary</button></div></div>`}
 function gdPanelStatus(){const el=$('gdStat');if(!el)return;const s=gdState();
   el.innerHTML=`<span class="pill ${s.c==='ok'?'ok':s.c==='bad'?'bad':s.c==='warn'?'warn':'pending'}">${s.i} ${esc(s.t)}</span>${GD.err?` <span style="color:var(--bad)">${esc(GD.err)}</span>`:''}${GD.last?` <span>· ${(GD.last.size/1024).toFixed(0)} KB · ${GD.last.bills} bills</span>`:''}`}
 function gdBind(){gdPanelStatus();
   if($('gdLink'))$('gdLink').onclick=async()=>{const l=DM_WEB_URL+'#connect='+gdConnCode();try{await navigator.clipboard.writeText(l);toast('Connection link copied')}catch(e){prompt('Copy this link',l)}};
   if($('gdConnect'))$('gdConnect').onclick=()=>{if(gdConnApply($('gdCode').value)){toast('✅ Connected to the head office');closeModal();gdRun(true)}else toast('That is not a valid connection link')};
   $('gdNow').onclick=async()=>{const b=$('gdNow');b.disabled=true;b.textContent='Backing up…';await gdRun(true);b.disabled=false;b.textContent='Back up now'};
-  $('gdRest').onclick=()=>gdRestoreDlg()}
+  $('gdRest').onclick=()=>gdRestoreDlg();$('gdCtSum').onclick=()=>gdCtSumDlg()}
 async function gdRestoreDlg(){GD._deps=null;
   modal('Restore from head office',`<p class="hint" style="margin:0 0 10px">Backups can only be opened with the head-office owner key.</p>
     <div class="field"><label>Owner key</label><input type="password" id="gdOK" autocomplete="off"></div><div id="gdRL" style="margin-top:12px"></div>`,
@@ -2171,6 +2171,34 @@ async function gdRestoreArchives(key,depot){try{const j=await gdApi('archives',{
 
 /* upload-tracker status for the central team (in every backup + the status sheet) */
 async function gdTracker(){try{if(typeof trItems!=='function')return null;return (await trItems()).map(x=>({k:x.k,n:x.n,s:x.s,last:String(x.last||''),note:String(x.note||'').replace(/<[^>]+>/g,'')}))}catch(e){return null}}
+
+/* ===== Head office: consolidated collection targets from all depots, ready for the WhatsApp group ===== */
+const gdLac=v=>{v=+v||0;if(v>=1e5){const x=Math.round(v/1e5*100)/100;return x+' Lac'}if(v>=1e3){const x=Math.round(v/1e3*10)/10;return x+'K'}return String(Math.round(v))};
+const gdDepName=s=>String(s||'').replace(/_/g,' ');
+function gdCtSumDlg(){let k='';try{k=sessionStorage.getItem('hq_ok')||''}catch(e){}
+  modal('Collection target summary',`<p class="hint" style="margin:0 0 10px">Totals of the targets every depot has shared for one date, with the average per SA and the depots that have not shared yet.</p>
+    <div class="fgrid"><div class="field"><label>Owner key</label><input type="password" id="ctsK" autocomplete="off" value="${esc(k)}"></div><div class="field"><label>Date</label><input type="date" id="ctsD" value="${todayISO()}"></div></div>
+    <div id="ctsOut" style="margin-top:12px"></div>`,[{l:'Close'},{l:'Show summary',cls:'primary',fn:async()=>{await gdCtSumLoad();return false}}]);
+  $('ctsD').onchange=()=>{if($('ctsK').value)gdCtSumLoad()};if(k)gdCtSumLoad()}
+async function gdCtSumLoad(){const key=$('ctsK').value,date=$('ctsD').value,box=$('ctsOut');if(!key){toast('Enter the owner key');return}
+  box.innerHTML='<div class="hint">Loading…</div>';
+  let rows,deps;try{[rows,deps]=await Promise.all([gdApi('ct_rows',{},key),gdApi('depots',{},key)]);try{sessionStorage.setItem('hq_ok',key)}catch(e){}}
+  catch(e){box.innerHTML=`<div class="ctnote" style="background:#fff3e6;color:#9a4b00">${esc(e.message)}${/Unknown action/i.test(e.message)?' — update the head-office script to v5.':''}</div>`;return}
+  const by=new Map();for(const r of rows.rows||[]){if(r.Date!==date||!(+r.Target>0))continue;const d=r.Depot;const o=by.get(d)||{t:0,sa:new Set(),routes:0};o.t+=+r.Target;o.routes++;if(r['SA / DA'])o.sa.add(String(r['SA / DA']).trim().toLowerCase());by.set(d,o)}
+  const shared=[...by.entries()].map(([d,o])=>({d,t:o.t,n:o.sa.size||o.routes})).sort((a,b)=>b.t-a.t);
+  const all=(deps.depots||[]).filter(d=>!/^(Collection_Targets|Collection Targets|Archive)$/i.test(d));
+  const pending=all.filter(d=>!by.has(d)).sort();
+  const T=shared.reduce((s,x)=>s+x.t,0),N=shared.reduce((s,x)=>s+x.n,0),total=Math.max(all.length,shared.length);
+  const line=x=>`${gdDepName(x.d)} - ${gdLac(x.t)} (average ${gdLac(x.n?x.t/x.n:0)} for ${x.n} SA)`;
+  const msg=[`*Collection Target (${fmtDate(date)})*`,'',...(shared.length?shared.map((x,i)=>`${i+1}. ${line(x)}`):['No depot has shared a target for this date yet.']),
+    ...(shared.length?['',`*Total (${shared.length} of ${total} depots) - ${gdLac(T)} (average ${gdLac(N?T/N:0)} for ${N} SA)*`]:[]),
+    ...(pending.length?['',`Not shared yet (${pending.length}): ${pending.map(gdDepName).join(', ')}`]:[])].join('\n');
+  box.innerHTML=`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px"><span class="pill ok">✅ ${shared.length} shared</span><span class="pill ${pending.length?'warn':'ok'}">⏳ ${pending.length} not shared</span><span class="pill pending">${esc(gdLac(T))} total</span></div>
+    <textarea id="ctsMsg" rows="${Math.min(18,msg.split('\n').length+1)}" style="width:100%;font:14px/1.5 Ubuntu,Arial,sans-serif;border:1px solid var(--line2);border-radius:10px;padding:10px">${esc(msg)}</textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="btn ghost sm" id="ctsCopy">📋 Copy</button><button class="btn primary sm" id="ctsWa">💬 Send to WhatsApp group</button></div>
+    <p class="hint" style="margin:6px 0 0">WhatsApp opens with the message ready: choose the group and press Send. You can edit the text above first.</p>`;
+  $('ctsCopy').onclick=async()=>{try{await navigator.clipboard.writeText($('ctsMsg').value);toast('Copied')}catch(e){$('ctsMsg').select()}};
+  $('ctsWa').onclick=()=>window.open('https://wa.me/?text='+encodeURIComponent($('ctsMsg').value),'_blank')}
 
 /* ================= COLLECTION TARGET tool (route / SA-wise daily targets vs DA Collection report) ================= */
 const CT={page:'overview',date:null,inputs:{},pct:'',sel:null};
