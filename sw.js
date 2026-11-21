@@ -1,11 +1,13 @@
 /* Hero Bill service worker — works offline; updates when you replace files on the server */
 const VERSION = 'b8d86aa32d';
-const CACHE = 'herobill-' + VERSION;
+const SCOPE = new URL(self.registration.scope).pathname;
+const PREFIX = 'herobill-' + SCOPE + '@';   /* each app (hero, depot, demos) keeps its own offline copy */
+const CACHE = PREFIX + VERSION;
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'];
 /* updates are mandatory: a new version installs fresh files (never the browser's HTTP cache) and takes over at once */
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('herobill-') && k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE && (k.startsWith(PREFIX) || /^herobill-(?!fonts$)[^/]+$/.test(k))).map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
 self.addEventListener('message', e => { if (e.data === 'skipWaiting') self.skipWaiting(); });
 self.addEventListener('fetch', e => {
