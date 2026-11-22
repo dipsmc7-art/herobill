@@ -268,7 +268,7 @@ const pinHash=(heroId,pin)=>sha256('PIN|'+heroId+'|'+pin+'|'+HB_SECRET).slice(0,
 /* base64url */
 function b64u(bytes){let s='';for(let i=0;i<bytes.length;i+=0x8000)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 function unb64u(str){str=str.replace(/-/g,'+').replace(/_/g,'/');while(str.length%4)str+='=';const s=atob(str),b=new Uint8Array(s.length);for(let i=0;i<s.length;i++)b[i]=s.charCodeAt(i);return b}
-async function streamBytes(bytes,ctor,fmt){const cs=new ctor(fmt);const w=cs.writable.getWriter();w.write(bytes);w.close();return new Uint8Array(await new Response(cs.readable).arrayBuffer())}
+async function streamBytes(bytes,ctor,fmt){const cs=new ctor(fmt);const w=cs.writable.getWriter();w.write(bytes).catch(()=>{});w.close().catch(()=>{});return new Uint8Array(await new Response(cs.readable).arrayBuffer())}
 /* compact code: HB1.<deflate-raw base64url> (fallback HB0.<base64url json>) */
 async function packCode(obj,prefix){
   prefix=prefix||'HB';const raw=new TextEncoder().encode(JSON.stringify(obj));
@@ -281,6 +281,19 @@ async function unpackCode(code){
   if(m[2]==='1'){if(typeof DecompressionStream==='undefined')throw new Error('This browser cannot read compressed codes');bytes=await streamBytes(bytes,DecompressionStream,'deflate-raw')}
   return JSON.parse(new TextDecoder().decode(bytes));
 }
+/* tolerant paste decoder: survives line breaks, spaces, invisible chars, a lost prefix/version, either code type */
+function cleanCodeText(t){return String(t||'').replace(/[\s\u00A0\u200B-\u200F\u2028\u2029\u2060\uFEFF\u00AD]+/g,'')}
+async function decodeAnyCode(text,prefixes){
+  const P=prefixes||['HS','HT'],raw=String(text||''),seen=new Set(),cands=[];
+  const add=c=>{if(c&&!seen.has(c)){seen.add(c);cands.push(c)}};
+  const strict=raw.match(new RegExp('('+P.join('|')+')[01]\\.[A-Za-z0-9_-]{8,}','g'))||[];strict.sort((a,b)=>b.length-a.length).forEach(add);
+  const t=cleanCodeText(raw);let m;const re=new RegExp('('+P.join('|')+')([01])?\\.?([A-Za-z0-9_-]{8,})','gi');
+  while((m=re.exec(t))){const pf=m[1].toUpperCase(),b=m[3];if(m[2])add(pf+m[2]+'.'+b);add(pf+'1.'+b);add(pf+'0.'+b)}
+  const runs=(t.match(/[A-Za-z0-9_-]{60,}/g)||[]).sort((a,b)=>b.length-a.length).slice(0,3);
+  for(const b of runs){add(P[0]+'1.'+b);add(P[0]+'0.'+b)}
+  let partial=false;
+  for(const c of cands){try{const o=await unpackCode(c);if(o&&typeof o==='object'){const kind=o.t==='HBTGT'?'HT':Array.isArray(o.heroes)?'HS':c.slice(0,2);return {kind,obj:o}}}catch(e){partial=true}}
+  return partial&&cands.length?{error:'bad'}:null}
 function findCodes(text,prefix){const re=new RegExp('\\b'+(prefix||'HB')+'[01]\\.[A-Za-z0-9_-]{8,}','g');return String(text||'').match(re)||[]}
 /* misc */
 const MODES=[
@@ -393,11 +406,11 @@ function viewWelcome(){
   <div class="foottxt">Hero Bill v1.0 · Designed by: ABM Shafiquzzaman</div>`;
   $('bFile').onclick=()=>$('fSetup').click();$('bCode').onclick=pasteSetup;
 }
-$('fSetup').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const t=await f.text();const c=findCodes(t,'HS');await applySetup(c.length?await unpackCode(c[0]):JSON.parse(t))}catch(err){setErr('ফাইলটি পড়া যায়নি (Could not read the file)')}};
+$('fSetup').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const t=await f.text();const r=await decodeAnyCode(t,['HS','HT']);if(r&&r.kind==='HT'){await applyTarget(r.obj);return}await applySetup(r&&r.obj?r.obj:JSON.parse(t))}catch(err){setErr('ফাইলটি পড়া যায়নি (Could not read the file)')}};
 function setErr(m){const e=$('wErr');if(e)e.textContent=m;else toast(m)}
 function pasteSetup(){openSheet(L('কোড পেস্ট করুন','Paste code'),`<p class="bn" style="margin:0;color:var(--ink2)">হোয়াটসঅ্যাপ মেসেজটি কপি করে নিচে পেস্ট করুন। <span class="en">(Copy the WhatsApp message and paste it below.)</span></p><textarea class="code" id="pc" placeholder="HS1.…"></textarea><div class="err" id="pcErr"></div>`,
   `<button class="btn primary" id="pcGo">${L('ঠিক আছে','OK')}</button>`);
-  $('pcGo').onclick=async()=>{const c=findCodes($('pc').value,'HS');if(!c.length){$('pcErr').textContent='কোড পাওয়া যায়নি (No code found)';return}try{await applySetup(await unpackCode(c[0]));closeSheet()}catch(e){$('pcErr').textContent='কোডটি সঠিক নয় (Invalid code)'}}}
+  $('pcGo').onclick=async()=>{const r=await decodeAnyCode($('pc').value,['HS','HT']);if(!r||r.error){$('pcErr').textContent=r?'কোডটি অসম্পূর্ণ — পুরো মেসেজটি আবার কপি করুন (Code is incomplete — copy the whole message again: tap and hold the message → Copy)':'কোড পাওয়া যায়নি — পুরো মেসেজটি কপি করে পেস্ট করুন (No code found — copy the whole WhatsApp message and paste it)';return}try{if(r.kind==='HT'){closeSheet();await applyTarget(r.obj);return}await applySetup(r.obj);closeSheet()}catch(e){$('pcErr').textContent='কোডটি সঠিক নয় (Invalid code)'}}}
 async function applySetup(s){
   if(!s||s.t!=='HBSETUP'||!verifyObj(s)){setErr('এটি সঠিক সেটআপ নয় (Not a valid setup file)');return}
   const had=!!D.setup;D.setup=s;if(D.heroId&&!s.heroes.some(h=>h.id===D.heroId))D.heroId=null;save();indexFares();
@@ -514,7 +527,7 @@ function viewTarget(){
   bind()}
 function pasteTarget(){openSheet(L('টার্গেট কোড পেস্ট করুন','Paste target code'),`<textarea class="code" id="tc" placeholder="HT1.…"></textarea><div class="err" id="tcErr"></div>`,
   `<button class="btn primary" id="tcGo">${L('ঠিক আছে','OK')}</button>`);
-  $('tcGo').onclick=async()=>{const c=findCodes($('tc').value,'HT');if(!c.length){$('tcErr').textContent='কোড পাওয়া যায়নি (No code found)';return}try{closeSheet();await applyTarget(await unpackCode(c[0]))}catch(e){toast('কোডটি সঠিক নয় (Invalid code)')}}}
+  $('tcGo').onclick=async()=>{const r=await decodeAnyCode($('tc').value,['HT','HS']);if(!r||r.error){$('tcErr').textContent=r?'কোডটি অসম্পূর্ণ — পুরো মেসেজটি আবার কপি করুন (Code is incomplete — copy the whole message again)':'কোড পাওয়া যায়নি — পুরো মেসেজটি কপি করে পেস্ট করুন (No code found — copy the whole WhatsApp message and paste it)';return}try{closeSheet();if(r.kind==='HS'){await applySetup(r.obj);return}await applyTarget(r.obj)}catch(e){toast('কোডটি সঠিক নয় (Invalid code)')}}}
 
 /* ===== home ===== */
 function greetWord(){const h=new Date().getHours();return h<12?'শুভ সকাল':h<17?'শুভ দুপুর':h<20?'শুভ সন্ধ্যা':'শুভ রাত্রি'}

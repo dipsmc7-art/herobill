@@ -703,7 +703,7 @@ const pinHash=(heroId,pin)=>sha256('PIN|'+heroId+'|'+pin+'|'+HB_SECRET).slice(0,
 /* base64url */
 function b64u(bytes){let s='';for(let i=0;i<bytes.length;i+=0x8000)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 function unb64u(str){str=str.replace(/-/g,'+').replace(/_/g,'/');while(str.length%4)str+='=';const s=atob(str),b=new Uint8Array(s.length);for(let i=0;i<s.length;i++)b[i]=s.charCodeAt(i);return b}
-async function streamBytes(bytes,ctor,fmt){const cs=new ctor(fmt);const w=cs.writable.getWriter();w.write(bytes);w.close();return new Uint8Array(await new Response(cs.readable).arrayBuffer())}
+async function streamBytes(bytes,ctor,fmt){const cs=new ctor(fmt);const w=cs.writable.getWriter();w.write(bytes).catch(()=>{});w.close().catch(()=>{});return new Uint8Array(await new Response(cs.readable).arrayBuffer())}
 /* compact code: HB1.<deflate-raw base64url> (fallback HB0.<base64url json>) */
 async function packCode(obj,prefix){
   prefix=prefix||'HB';const raw=new TextEncoder().encode(JSON.stringify(obj));
@@ -716,6 +716,19 @@ async function unpackCode(code){
   if(m[2]==='1'){if(typeof DecompressionStream==='undefined')throw new Error('This browser cannot read compressed codes');bytes=await streamBytes(bytes,DecompressionStream,'deflate-raw')}
   return JSON.parse(new TextDecoder().decode(bytes));
 }
+/* tolerant paste decoder: survives line breaks, spaces, invisible chars, a lost prefix/version, either code type */
+function cleanCodeText(t){return String(t||'').replace(/[\s\u00A0\u200B-\u200F\u2028\u2029\u2060\uFEFF\u00AD]+/g,'')}
+async function decodeAnyCode(text,prefixes){
+  const P=prefixes||['HS','HT'],raw=String(text||''),seen=new Set(),cands=[];
+  const add=c=>{if(c&&!seen.has(c)){seen.add(c);cands.push(c)}};
+  const strict=raw.match(new RegExp('('+P.join('|')+')[01]\\.[A-Za-z0-9_-]{8,}','g'))||[];strict.sort((a,b)=>b.length-a.length).forEach(add);
+  const t=cleanCodeText(raw);let m;const re=new RegExp('('+P.join('|')+')([01])?\\.?([A-Za-z0-9_-]{8,})','gi');
+  while((m=re.exec(t))){const pf=m[1].toUpperCase(),b=m[3];if(m[2])add(pf+m[2]+'.'+b);add(pf+'1.'+b);add(pf+'0.'+b)}
+  const runs=(t.match(/[A-Za-z0-9_-]{60,}/g)||[]).sort((a,b)=>b.length-a.length).slice(0,3);
+  for(const b of runs){add(P[0]+'1.'+b);add(P[0]+'0.'+b)}
+  let partial=false;
+  for(const c of cands){try{const o=await unpackCode(c);if(o&&typeof o==='object'){const kind=o.t==='HBTGT'?'HT':Array.isArray(o.heroes)?'HS':c.slice(0,2);return {kind,obj:o}}}catch(e){partial=true}}
+  return partial&&cands.length?{error:'bad'}:null}
 function findCodes(text,prefix){const re=new RegExp('\\b'+(prefix||'HB')+'[01]\\.[A-Za-z0-9_-]{8,}','g');return String(text||'').match(re)||[]}
 /* misc */
 const MODES=[
