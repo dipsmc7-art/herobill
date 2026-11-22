@@ -1,8 +1,939 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Demo removed</title>
-<style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F7F6FB;color:#1B1850;font:18px/1.5 Arial,sans-serif;text-align:center;padding:24px}</style></head>
-<body><div><h1 style="margin:0 0 8px;font-size:26px">This demo has been removed</h1><p style="margin:0;color:#4A4870">The demo data on this device has been deleted.</p></div>
+<!doctype html>
+<html lang="bn">
+<head><script>/* DEMO copy: keep browser storage apart from the real app */(()=>{const P='demo:';const sp=Storage.prototype,g=sp.getItem,s=sp.setItem,r=sp.removeItem;sp.getItem=function(k){return g.call(this,P+k)};sp.setItem=function(k,v){return s.call(this,P+k,v)};sp.removeItem=function(k){return r.call(this,P+k)}})();</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#2e2a8f">
+<title>Hero Bill (Demo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f3f8;--card:#fff;--ink:#1d1b3a;--ink2:#55536e;--ink3:#8e8ca4;--line:#e6e4ef;--line2:#d6d3e4;
+  --brand:#2e2a8f;--brand2:#4b46b8;--brandSoft:#eeedfb;--ok:#2f7d5b;--okSoft:#e7f4ee;--warn:#9a6a12;--warnSoft:#fdf4e2;--warnLine:#f0d9a8;--bad:#a63d3d;--badSoft:#fbecec;--wa:#1fa855}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none !important}
+html,body{margin:0;height:100%}
+body{font-family:'Ubuntu','Hind Siliguri','Noto Sans Bengali',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;overscroll-behavior-y:contain}
+button,input,select,textarea{font:inherit;color:inherit}
+.bn{font-family:'Hind Siliguri','Noto Sans Bengali','Ubuntu',sans-serif}
+.en{font-size:.82em;color:var(--ink3);font-weight:400}
+.num{font-variant-numeric:tabular-nums}
+.app{max-width:560px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;background:var(--bg)}
+@media (min-width:600px){body{background:#e9e8f1}.app{box-shadow:0 0 40px rgba(29,27,58,.08)}}
+/* header */
+.hdr{position:sticky;top:0;z-index:20;background:var(--brand);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 14px 12px;display:flex;align-items:center;gap:10px}
+.hdr .lg{width:36px;height:36px;border-radius:10px;background:#fff;padding:4px;flex:none}
+.hdr .lg img{width:100%;height:100%;object-fit:contain}
+.hdr .tt{flex:1;min-width:0;line-height:1.2}
+.hdr .tt b{font-size:16.5px;display:block}
+.hdr .tt small{font-size:12px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.hbtn{width:40px;height:40px;border-radius:12px;border:0;background:rgba(255,255,255,.12);color:#fff;display:grid;place-items:center;cursor:pointer;flex:none}
+.hbtn:active{background:rgba(255,255,255,.25)}
+.body{flex:1;padding:14px 14px 120px}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 1px 2px rgba(29,27,58,.04),0 6px 18px rgba(29,27,58,.05)}
+.sec-t{font-size:13px;color:var(--ink3);margin:18px 4px 8px;font-weight:500}
+/* buttons */
+.btn{border:0;border-radius:14px;min-height:50px;padding:0 18px;cursor:pointer;font-weight:600;font-size:16px;display:inline-flex;align-items:center;justify-content:center;gap:9px;width:100%;transition:transform .08s,filter .15s}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--brand);color:#fff}
+.btn.ghost{background:#fff;border:1.5px solid var(--line2);color:var(--ink)}
+.btn.soft{background:var(--brandSoft);color:var(--brand)}
+.btn.okb{background:var(--ok);color:#fff}
+.btn.wa{background:var(--wa);color:#fff}
+.btn.danger{background:#fff;border:1.5px solid #e9c3c3;color:var(--bad)}
+.btn.sm{min-height:40px;font-size:14px;border-radius:11px;padding:0 12px;width:auto}
+.btn:disabled{opacity:.45}
+.btn .en{color:inherit;opacity:.8}
+.btn{flex-wrap:wrap;column-gap:6px;row-gap:0;line-height:1.2;text-align:center}
+.btn .bn,.btn .en{white-space:nowrap}
+.link{background:none;border:0;color:var(--brand);font-weight:500;cursor:pointer;padding:6px;font-size:14px}
+/* welcome / setup */
+.hero-top{background:var(--brand);color:#fff;padding:calc(36px + env(safe-area-inset-top)) 22px 70px;text-align:center;position:relative;overflow:hidden}
+.hero-top:after{content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;border:30px solid rgba(255,255,255,.06)}
+.hero-top .lg{width:76px;height:76px;margin:0 auto;border-radius:20px;background:#fff;padding:8px}
+.hero-top .lg img{width:100%;height:100%;object-fit:contain}
+.hero-top h1{margin:14px 0 2px;font-size:25px}
+.hero-top p{margin:0;opacity:.85;font-size:14px}
+.float{margin:-46px 14px 0;position:relative;z-index:2;padding:20px}
+.float h2{margin:0 0 4px;font-size:18px}
+.float .lead{margin:0 0 16px;color:var(--ink2);font-size:14px}
+.stack{display:flex;flex-direction:column;gap:10px}
+.err{color:var(--bad);font-size:13.5px;min-height:18px}
+textarea.code{width:100%;min-height:120px;border:1.5px solid var(--line2);border-radius:12px;padding:10px;font-size:13px;font-family:ui-monospace,monospace}
+/* hero picker */
+.plist{display:flex;flex-direction:column;gap:8px}
+.pitem{display:flex;align-items:center;gap:12px;padding:12px;border:1.5px solid var(--line);border-radius:14px;background:#fff;cursor:pointer;text-align:left;width:100%}
+.pitem:active{background:#f6f5fb}
+.av{width:44px;height:44px;border-radius:14px;background:var(--brandSoft);color:var(--brand);display:grid;place-items:center;font-weight:700;font-size:16px;flex:none}
+.pitem b{display:block;font-size:15.5px}.pitem small{color:var(--ink3)}
+/* pin */
+.pinwrap{text-align:center;padding:24px 18px}
+.pinwrap .av{width:64px;height:64px;font-size:22px;margin:0 auto 8px;border-radius:20px}
+.dots{display:flex;gap:14px;justify-content:center;margin:20px 0 6px}
+.dots i{width:16px;height:16px;border-radius:50%;border:2px solid var(--brand2);transition:.15s}
+.dots i.f{background:var(--brand);border-color:var(--brand);transform:scale(1.1)}
+.dots.shake{animation:shake .35s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:300px;margin:16px auto 0}
+.pad button{height:62px;border-radius:18px;border:0;background:#fff;box-shadow:0 1px 0 var(--line2),0 2px 8px rgba(29,27,58,.06);font-size:24px;font-weight:500;cursor:pointer}
+.pad button:active{background:var(--brandSoft)}
+.pad button.fn{background:none;box-shadow:none;font-size:15px;color:var(--ink2)}
+/* home */
+.greet{padding:18px;display:flex;align-items:center;gap:14px}
+.greet .av{width:52px;height:52px;font-size:19px;border-radius:16px}
+.greet h2{margin:0;font-size:18px}.greet p{margin:2px 0 0;color:var(--ink3);font-size:13.5px}
+.today{margin-top:12px;padding:18px;position:relative;overflow:hidden}
+.today .lbl{font-size:13px;color:var(--ink3)}
+.today .big{font-size:20px;font-weight:700;margin:2px 0 12px}
+.today.sent{background:linear-gradient(0deg,#fff,#fff) padding-box;border-color:#c5e4d4}
+.today .st{position:absolute;right:16px;top:16px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;padding:3px 10px;border-radius:999px;font-weight:500;white-space:nowrap}
+.chip.draft{background:var(--warnSoft);color:var(--warn)}.chip.sent{background:var(--okSoft);color:var(--ok)}.chip.changed{background:var(--badSoft);color:var(--bad)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.stat{padding:14px}.stat .v{font-size:20px;font-weight:700}.stat .l{font-size:12.5px;color:var(--ink3)}
+.hist{display:flex;flex-direction:column;gap:8px}
+.hitem{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:14px}
+.hitem:active{background:#f8f7fc}
+.hitem .dt{width:46px;text-align:center;flex:none;line-height:1.1}
+.hitem .dt b{font-size:19px;display:block}.hitem .dt small{font-size:11px;color:var(--ink3)}
+.hitem .mid{flex:1;min-width:0}.hitem .mid b{font-size:14.5px}.hitem .mid small{display:block;color:var(--ink3);font-size:12.5px}
+.hitem .amt{text-align:right;font-weight:700}
+/* editor */
+.ebar{padding:14px;display:flex;flex-direction:column;gap:12px}
+.row2{display:flex;gap:10px;align-items:center}
+.lab{font-size:13px;color:var(--ink2);font-weight:500;margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.c{border:1.5px solid var(--line2);background:#fff;border-radius:12px;min-height:44px;padding:6px 14px;cursor:pointer;font-size:15px;text-align:left;line-height:1.2}
+.c small{display:block;font-size:11.5px;color:var(--ink3)}
+.c.on{border-color:var(--brand);background:var(--brandSoft);color:var(--brand);font-weight:600}
+.c.on small{color:var(--brand2)}
+.c.dashed{border-style:dashed;color:var(--ink2)}
+.dinput{height:46px;border:1.5px solid var(--line2);border-radius:12px;padding:0 12px;background:#fff;flex:1;min-width:0}
+.trips{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.trip{padding:12px 14px;display:flex;gap:12px;align-items:flex-start}
+.trip .ic{width:42px;height:42px;border-radius:12px;background:#f4f3fa;display:grid;place-items:center;font-size:22px;flex:none}
+.trip .mid{flex:1;min-width:0}
+.trip .route{font-weight:600;font-size:15.5px;line-height:1.3}
+.trip .meta{font-size:12.5px;color:var(--ink3);margin-top:1px}
+.trip .why{font-size:12.5px;color:var(--warn);margin-top:3px}
+.trip .r{text-align:right;flex:none}
+.trip .amt{font-weight:700;font-size:17px}
+.trip .ch{font-size:12px;color:#a8a6ba}
+.trip .over{display:inline-block;font-size:11.5px;color:var(--bad);background:var(--badSoft);border-radius:6px;padding:1px 6px;margin-top:3px}
+.trip.warn{border-color:var(--warnLine)}
+.tacts{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.tacts button{border:1px solid var(--line2);background:#fff;border-radius:9px;height:32px;padding:0 10px;font-size:13px;cursor:pointer;color:var(--ink2)}
+.tacts button:active{background:var(--brandSoft)}
+.emptyt{text-align:center;padding:30px 16px;color:var(--ink3)}
+.emptyt .e{font-size:44px}
+.addrow{display:grid;grid-template-columns:1.5fr 1fr;gap:10px;margin-top:14px}
+.addrow .btn{min-height:58px;font-size:15.5px;flex-direction:column;gap:0;line-height:1.2}
+.foot{position:fixed;left:0;right:0;bottom:0;z-index:25;pointer-events:none}
+.foot .in{max-width:560px;margin:0 auto;background:#fff;border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:12px;pointer-events:auto;box-shadow:0 -8px 24px rgba(29,27,58,.06)}
+.foot .tot{flex:none;line-height:1.15}.foot .tot small{display:block;font-size:12px;color:var(--ink3)}.foot .tot b{font-size:22px}
+.foot .btn{flex:1}
+/* sheet */
+.sheet-bg{position:fixed;inset:0;background:rgba(29,27,58,.38);z-index:50;opacity:0;pointer-events:none;transition:opacity .2s}
+.sheet-bg.show{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:51;max-width:560px;margin:0 auto;background:#fff;border-radius:22px 22px 0 0;max-height:94vh;display:flex;flex-direction:column;transform:translateY(105%);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.sheet.show{transform:translateY(0)}
+.sheet .sh{display:flex;align-items:center;gap:10px;padding:14px 16px 10px;border-bottom:1px solid var(--line)}
+.sheet .sh:before{content:"";position:absolute;left:50%;top:6px;width:40px;height:4px;border-radius:4px;background:var(--line2);transform:translateX(-50%)}
+.sheet .sh h3{margin:0;font-size:17px;flex:1}
+.sheet .sx{border:0;background:#f1f0f7;width:36px;height:36px;border-radius:11px;font-size:20px;cursor:pointer;color:var(--ink2)}
+.sheet .sb{padding:14px 16px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:16px}
+.sheet .sf{padding:10px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;gap:10px}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mode{border:1.5px solid var(--line2);background:#fff;border-radius:14px;padding:10px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:14px;line-height:1.15}
+.mode .e{font-size:26px}.mode small{font-size:11px;color:var(--ink3)}
+.mode.on{border-color:var(--brand);background:var(--brandSoft);color:var(--brand);font-weight:600}
+.wz{display:flex;gap:4px;margin:-2px 0 2px}
+.wzs{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:0;cursor:pointer;color:var(--ink3);font-size:11.5px;min-width:0}
+.wzs i{font-style:normal;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#f1f0f7;color:var(--ink3);font-weight:700;font-size:13px;position:relative}
+.wzs:not(:first-child) i:before{content:"";position:absolute;right:calc(100% + 2px);top:50%;width:calc(100vw);max-width:60px;height:2px;background:var(--line);z-index:-1}
+.wzs.done i{background:var(--okSoft);color:var(--ok)}.wzs.cur i{background:var(--brand);color:#fff;box-shadow:0 0 0 4px var(--brandSoft)}.wzs.cur{color:var(--brand);font-weight:600}
+.wzs:disabled{opacity:.5;cursor:default}
+.wzsum{background:#f8f7fc;border-radius:12px;padding:9px 12px;font-size:14.5px;text-align:center;line-height:1.35}
+.plist2{display:flex;flex-direction:column;gap:6px}
+.pl{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1.5px solid var(--line2);background:#fff;border-radius:12px;min-height:50px;padding:6px 14px;cursor:pointer;font-size:15.5px;text-align:left;width:100%}
+.pl:active{background:#f6f5fb}.pl b{font-size:14px;color:var(--ink2);flex:none}.pl small{flex:none}
+.pl.on{border-color:var(--brand);background:var(--brandSoft);color:var(--brand);font-weight:600}.pl.on b{color:var(--brand)}
+.pl.dashed{border-style:dashed;color:var(--ink2);justify-content:flex-start;margin-top:4px}
+.srch{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line2);border-radius:12px;padding:0 12px;background:#fff;position:sticky;top:-14px;z-index:2}
+.srch input{border:0;outline:0;height:46px;flex:1;min-width:0;font-size:15px;background:none}
+.srch:focus-within{border-color:var(--brand2)}
+.otherbox{display:flex;gap:8px;margin-top:4px}.otherbox .txt{flex:1}
+.sheet .sf .btn{width:auto;flex:1}
+.fare{display:flex;align-items:stretch;gap:10px}
+.fare .in{flex:1;display:flex;align-items:center;border:2px solid var(--line2);border-radius:14px;padding:0 14px;background:#fff}
+.fare .in:focus-within{border-color:var(--brand2)}
+.fare .in span{font-size:22px;color:var(--ink3);margin-right:6px}
+.fare input{border:0;outline:0;font-size:28px;font-weight:700;width:100%;height:60px;background:none}
+.fare .chartbox{flex:none;width:118px;border-radius:14px;background:#f4f3f7;display:flex;flex-direction:column;justify-content:center;align-items:center;color:#9d9bb0;text-align:center;padding:6px}
+.fare .chartbox b{font-size:21px;color:#8e8ca4}.fare .chartbox small{font-size:11.5px}
+.fwarn{border-radius:12px;padding:10px 12px;font-size:13.5px;display:flex;gap:8px;align-items:flex-start}
+.fwarn.over{background:var(--badSoft);color:#7a2a2a}.fwarn.none{background:var(--warnSoft);color:#5d4206}.fwarn.ok{background:var(--okSoft);color:#1f5a40}
+.txt{width:100%;height:48px;border:1.5px solid var(--line2);border-radius:12px;padding:0 12px;background:#fff;font-size:15px}
+.txt:focus,.dinput:focus{outline:none;border-color:var(--brand2)}
+/* share */
+.done{text-align:center;padding:6px 0 4px}
+.tick{width:74px;height:74px;border-radius:50%;background:var(--ok);margin:0 auto;display:grid;place-items:center;animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
+.tick svg{stroke-dasharray:30;stroke-dashoffset:30;animation:draw .4s .25s forwards}
+@keyframes pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes draw{to{stroke-dashoffset:0}}
+.conf{position:relative;height:0}
+.conf i{position:absolute;left:50%;top:-40px;width:7px;height:7px;border-radius:2px;opacity:0;animation:conf 1s ease-out forwards}
+@keyframes conf{0%{opacity:1;transform:translate(0,0) rotate(0)}100%{opacity:0;transform:translate(var(--x),var(--y)) rotate(320deg)}}
+.done h3{margin:12px 0 2px;font-size:20px}.done p{margin:0;color:var(--ink2);font-size:14px}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sgrid .btn{min-height:64px;flex-direction:column;gap:2px;font-size:15px;line-height:1.15}
+.sgrid .btn .e{font-size:22px}
+.sgrid .full{grid-column:1/-1}
+.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:12px;font-size:14px;opacity:0;transition:.2s;z-index:90;pointer-events:none;max-width:calc(100% - 30px);text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.menu{position:absolute;right:12px;top:calc(56px + env(safe-area-inset-top));background:#fff;color:var(--ink);border-radius:14px;box-shadow:0 12px 36px rgba(29,27,58,.2);padding:6px;min-width:230px;z-index:40}
+.menu button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:11px 12px;border-radius:10px;cursor:pointer;text-align:left;font-size:14.5px}
+.menu button:active{background:#f4f3fa}
+.foottxt{text-align:center;font-size:11px;color:var(--ink3);margin-top:22px}
+.mhead{display:flex;justify-content:space-between;align-items:baseline;padding:10px 4px 2px;font-size:13.5px;color:var(--ink2)}
+.mhead b{color:var(--ink)}
+.hint2{font-size:12.5px;color:var(--ink3);text-align:center;margin-top:8px}
+.fabw{position:fixed;left:0;right:0;bottom:0;pointer-events:none;z-index:24}
+.fabw .fab2{pointer-events:auto;position:absolute;right:max(16px,calc((100vw - 560px)/2 + 16px));bottom:calc(18px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:10px;border:0;border-radius:20px;background:var(--brand);color:#fff;padding:10px 18px 10px 12px;box-shadow:0 10px 26px rgba(46,42,143,.38);cursor:pointer}
+.fab2:active{transform:scale(.97)}
+.fab2 .pl2{width:34px;height:34px;border-radius:12px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:22px;font-weight:700}
+.fab2 .fl{display:flex;flex-direction:column;align-items:flex-start;line-height:1.15}.fab2 .fl .bn{font-size:15.5px;font-weight:600}.fab2 small{font-size:11px;opacity:.8}
+.sumrow{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+.sumrow:last-child{border:0}
+.kmrow .req{color:#d23c3c}.kmrow.need{border:1.5px solid #d23c3c;background:#fff5f5}.kmrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:10px 12px;border:1px dashed var(--line2,#dcdbe8);border-radius:12px;font-size:14px}
+.kmin{display:flex;align-items:center;gap:6px}.kmin input{width:90px;height:40px;border:1px solid var(--line2,#dcdbe8);border-radius:10px;padding:0 10px;font:inherit;font-size:16px;text-align:right}
+.xmbar{margin:2px 0 10px}.xml{font-size:13px;color:var(--ink2,#4a4766)}.xmchips{display:flex;gap:6px;overflow-x:auto;padding:6px 0 2px;scrollbar-width:none}
+.xmc{flex:none;border:1px solid var(--line2,#dcdbe8);background:#fff;border-radius:20px;padding:7px 12px;font:inherit;font-size:13.5px;white-space:nowrap}.xmc.on{background:var(--brand,#2e2a8f);color:#fff;border-color:var(--brand,#2e2a8f)}.xmc small{opacity:.75}
+.xmh{margin:12px 2px 6px;font-size:13px;color:var(--ink2,#4a4766)}.xmk{display:block;font-size:11.5px;color:var(--ink3,#8e8ca4);font-weight:400}
+.bigopt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:18px 16px;margin-top:12px;border:1.5px solid transparent;cursor:pointer;font:inherit;position:relative;overflow:hidden}
+.bigopt:active{transform:scale(.99)}.bigopt.tg{background:linear-gradient(135deg,#fff,#eefaf3);border-color:#cdebdc}.bigopt.bl{background:linear-gradient(135deg,#fff,#efeefb);border-color:#dddbf3}
+.boi{font-size:30px;width:58px;height:58px;border-radius:16px;display:grid;place-items:center;background:#fff;box-shadow:0 2px 10px #0000000f;flex:none}
+.bot{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.bot b{font-size:19px}.bot small{color:var(--ink3,#8e8ca4);font-size:12.5px}
+.bos{font-size:13.5px;color:var(--ink2,#4a4766);margin-top:6px}.bos2{font-size:12.5px;color:var(--ink2,#4a4766);margin-top:4px}.boa{font-size:26px;color:var(--ink3,#8e8ca4)}
+.bar{display:block;height:7px;border-radius:4px;background:#e7e6f0;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;background:#1baf7a;border-radius:4px}
+.old{color:#c2410c;font-weight:600}.ok{color:#15803d}.late{color:#c2410c;font-weight:600}
+.tsum{padding:14px 16px}.tsr{display:flex;justify-content:space-between;gap:10px}.tsr small{display:block;color:var(--ink3,#8e8ca4);font-size:12px}.tsr b{font-size:22px}.tsm{font-size:12px;color:var(--ink3,#8e8ca4);margin-top:8px}
+.tmk{padding:0;margin-top:10px;overflow:hidden}.tmh{display:flex;align-items:center;gap:10px;width:100%;padding:14px 14px;border:0;background:none;font:inherit;text-align:left;cursor:pointer}
+.tmn{flex:1;min-width:0;display:flex;flex-direction:column}.tmn b{font-size:16px}.tmn small{color:var(--ink3,#8e8ca4);font-size:12.5px}.chev{color:var(--ink3,#8e8ca4)}
+.tmk.open .tmh{border-bottom:1px solid #efeef5;background:#faf9fd}
+.tshop{padding:12px 14px;border-bottom:1px solid #f1f0f6}.tshop:last-child{border:0}.tshop.done{background:#f1fbf5}.tshop.part{background:#fffaf0}
+.tsh1{display:flex;gap:10px}.tsn{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.tsn b{font-size:15px}.tsn small{font-size:12px;color:var(--ink3,#8e8ca4)}
+.tsa{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px}.tsa b{font-size:16px}.call{text-decoration:none;font-size:18px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#e8f7ef}
+.tsh2{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}.tin{display:flex;align-items:center;gap:6px;border:1px solid var(--line2,#dcdbe8);border-radius:10px;padding:0 10px;background:#fff;flex:1;min-width:150px}
+.tin span{color:var(--ink3,#8e8ca4);font-size:13px}.tin input{border:0;outline:0;height:40px;font:inherit;font-size:16px;width:100%;min-width:60px;text-align:right}
+.tgb{font-style:normal;display:inline-block;margin-left:6px;font-size:12px;font-weight:600;color:#0f7a4f;background:#e3f6ec;border-radius:10px;padding:1px 7px}.tgb small{font-weight:400;opacity:.8}
+.pl.tgt{border-color:#9fd9bd}.xmc.on .tgb{background:#ffffff33;color:#fff}
+</style>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Hero Bill">
+</head>
+<body>
+<div class="app" id="app"></div>
+<div class="sheet-bg" id="sheetBg"></div>
+<div class="sheet" id="sheet"><div class="sh"><h3 id="shT"></h3><button class="sx" id="shX">&times;</button></div><div class="sb" id="shB"></div><div class="sf" id="shF"></div></div>
+<div class="toast" id="toast"></div>
+<input type="file" id="fSetup" accept=".json,.txt,application/json,text/plain" hidden>
+
+<script>/* ===== Hero Bill shared core (hashing, signing, compact codes) ===== */
+const HB_SECRET='HB-SMC-CONVEYANCE-2026-v1';
+function sha256Bytes(bytes){
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  let H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const l=bytes.length,bitLen=l*8,withPad=((l+9+63)>>6)<<6,m=new Uint8Array(withPad);m.set(bytes);m[l]=0x80;
+  const dv=new DataView(m.buffer);dv.setUint32(withPad-4,bitLen>>>0);dv.setUint32(withPad-8,Math.floor(bitLen/4294967296));
+  const W=new Uint32Array(64);const r=(x,n)=>(x>>>n)|(x<<(32-n));
+  for(let o=0;o<withPad;o+=64){
+    for(let i=0;i<16;i++)W[i]=dv.getUint32(o+i*4);
+    for(let i=16;i<64;i++){const s0=r(W[i-15],7)^r(W[i-15],18)^(W[i-15]>>>3),s1=r(W[i-2],17)^r(W[i-2],19)^(W[i-2]>>>10);W[i]=(W[i-16]+s0+W[i-7]+s1)>>>0}
+    let [a,b,c,d,e,f,g,h]=H;
+    for(let i=0;i<64;i++){const S1=r(e,6)^r(e,11)^r(e,25),ch=(e&f)^(~e&g),t1=(h+S1+ch+K[i]+W[i])>>>0,S0=r(a,2)^r(a,13)^r(a,22),mj=(a&b)^(a&c)^(b&c),t2=(S0+mj)>>>0;h=g;g=f;f=e;e=(d+t1)>>>0;d=c;c=b;b=a;a=(t1+t2)>>>0}
+    H=[H[0]+a,H[1]+b,H[2]+c,H[3]+d,H[4]+e,H[5]+f,H[6]+g,H[7]+h].map(x=>x>>>0);
+  }
+  return H.map(x=>x.toString(16).padStart(8,'0')).join('');
+}
+const sha256=s=>sha256Bytes(new TextEncoder().encode(String(s)));
+function canon(o){if(Array.isArray(o))return '['+o.map(canon).join(',')+']';if(o&&typeof o==='object')return '{'+Object.keys(o).sort().map(k=>JSON.stringify(k)+':'+canon(o[k])).join(',')+'}';return JSON.stringify(o===undefined?null:o)}
+function signObj(o){const c={...o};delete c.sig;return sha256(canon(c)+HB_SECRET).slice(0,24)}
+function verifyObj(o){return !!o&&o.sig===signObj(o)}
+const pinHash=(heroId,pin)=>sha256('PIN|'+heroId+'|'+pin+'|'+HB_SECRET).slice(0,32);
+/* base64url */
+function b64u(bytes){let s='';for(let i=0;i<bytes.length;i+=0x8000)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function unb64u(str){str=str.replace(/-/g,'+').replace(/_/g,'/');while(str.length%4)str+='=';const s=atob(str),b=new Uint8Array(s.length);for(let i=0;i<s.length;i++)b[i]=s.charCodeAt(i);return b}
+async function streamBytes(bytes,ctor,fmt){const cs=new ctor(fmt);const w=cs.writable.getWriter();w.write(bytes);w.close();return new Uint8Array(await new Response(cs.readable).arrayBuffer())}
+/* compact code: HB1.<deflate-raw base64url> (fallback HB0.<base64url json>) */
+async function packCode(obj,prefix){
+  prefix=prefix||'HB';const raw=new TextEncoder().encode(JSON.stringify(obj));
+  try{if(typeof CompressionStream!=='undefined'){const z=await streamBytes(raw,CompressionStream,'deflate-raw');return prefix+'1.'+b64u(z)}}catch(e){}
+  return prefix+'0.'+b64u(raw);
+}
+async function unpackCode(code){
+  const m=String(code).trim().match(/^([A-Z]{2,3})([01])\.([A-Za-z0-9_-]+)$/);if(!m)throw new Error('Not a valid code');
+  let bytes=unb64u(m[3]);
+  if(m[2]==='1'){if(typeof DecompressionStream==='undefined')throw new Error('This browser cannot read compressed codes');bytes=await streamBytes(bytes,DecompressionStream,'deflate-raw')}
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+function findCodes(text,prefix){const re=new RegExp('\\b'+(prefix||'HB')+'[01]\\.[A-Za-z0-9_-]{8,}','g');return String(text||'').match(re)||[]}
+/* misc */
+const MODES=[
+  {k:'cng',bn:'সিএনজি',en:'CNG',ic:'🛺'},{k:'rickshaw',bn:'রিকশা',en:'Rickshaw',ic:'🚲'},{k:'easybike',bn:'ইজিবাইক',en:'Easy Bike',ic:'🛵'},
+  {k:'bus',bn:'বাস',en:'Bus',ic:'🚌'},{k:'van',bn:'ভ্যান',en:'Van',ic:'🚚'},{k:'bike',bn:'মোটরসাইকেল',en:'Motorbike',ic:'🏍️'},
+  {k:'boat',bn:'নৌকা',en:'Boat',ic:'⛵'},{k:'walk',bn:'হেঁটে',en:'Walk',ic:'🚶'},{k:'other',bn:'অন্যান্য',en:'Other',ic:'➕'}];
+const OTHER_CATS=[
+  {k:'labour',bn:'লেবার / কুলি',en:'Labour'},{k:'food',bn:'খাবার',en:'Food'},{k:'toll',bn:'টোল / পার্কিং',en:'Toll / Parking'},
+  {k:'phone',bn:'মোবাইল',en:'Mobile'},{k:'misc',bn:'অন্যান্য',en:'Other'}];
+const modeOf=k=>MODES.find(m=>m.k===k)||MODES[MODES.length-1];
+const catOf=k=>OTHER_CATS.find(m=>m.k===k)||OTHER_CATS[OTHER_CATS.length-1];
+const normKey=s=>String(s??'').toLowerCase().replace(/\s+/g,' ').trim();
+const fareKey=(route,market,from,to)=>[route,market,from,to].map(normKey).join('|');
+
+/* phone: stored as +8801XXXXXXXXX */
+function normPhone(p){let d=String(p||'').replace(/\D/g,'');if(!d)return '';if(d.startsWith('880'))d=d.slice(2);else if(d.startsWith('88'))d=d.slice(2);if(d.length===10&&d[0]==='1')d='0'+d;return d.length===11?'+88'+d:String(p||'').trim()}
+const validPhone=p=>/^\+8801[3-9]\d{8}$/.test(p);
+const waDigits=p=>String(normPhone(p)).replace(/\D/g,'');
+</script>
+<script>/* ===== Demo / sample features were removed. This only deletes old demo & sample data left on a device. ===== */
+const OLD_DEMO_HEROES=['hd01','hd02','hd03','hd04','hd05','hd06'];
+const OLD_DEMO_NAMES=['Md. Rahim Uddin','Karim Hossain','Jamal Sheikh','Shafiul Alam','Abdul Kader','Rafiqul Islam'];
+const OLD_DEMO_FARES=[["Bakerganj","Bakerganj Bazar","Kalashkathi","Padri Shibpur",30,"2026-11-05"],["Bakerganj","Bakerganj Bazar","Padri Shibpur","Bakerganj Bazar",95,"2026-11-12"],["Bakerganj","Bakerganj Bazar","Kalashkathi","Depot",350,"2026-10-20"],["Bakerganj","Bakerganj Bazar","Depot","Kalashkathi",360,"2026-11-05"],["Bakerganj","Bakerganj Bazar","Padri Shibpur","Depot",365,"2026-11-05"],["Bakerganj","Bakerganj Bazar","Bakerganj Bazar","Padri Shibpur",100,"2026-10-20"],["Bakerganj","Bakerganj Bazar","Depot","Bakerganj Bazar",320,"2026-10-20"],["Bakerganj","Bakerganj Bazar","Depot","Padri Shibpur",330,"2026-11-05"],["Bakerganj","Bakerganj Bazar","Padri Shibpur","Kalashkathi",30,"2026-11-12"],["Bakerganj","Bakerganj Bazar","Bakerganj Bazar","Depot",300,"2026-11-12"],["Bakerganj","Dudhal","Charadi","Depot",375,"2026-10-20"],["Bakerganj","Dudhal","Depot","Dudhal Bazar",385,"2026-10-20"],["Bakerganj","Dudhal","Charadi","Dudhal Bazar",70,"2026-11-01"],["Bakerganj","Dudhal","Dudhal Bazar","Depot",380,"2026-11-05"],["Bakerganj","Dudhal","Dudhal Bazar","Charadi",75,"2026-11-12"],["Bakerganj","Dudhal","Depot","Charadi",420,"2026-11-01"],["Bakerganj","Dudhal","Depot","Charadi",395,"2026-10-01"],["Gournadi","Agailjhara","Agailjhara Bazar","Depot",380,"2026-09-15"],["Gournadi","Agailjhara","Depot","Agailjhara Bazar",415,"2026-10-20"],["Gournadi","Agailjhara","Gaila","Agailjhara Bazar",75,"2026-10-20"],["Gournadi","Agailjhara","Agailjhara Bazar","Gaila",70,"2026-11-01"],["Gournadi","Agailjhara","Gaila","Depot",455,"2026-10-20"],["Gournadi","Agailjhara","Agailjhara Bazar","Depot",405,"2026-10-10"],["Gournadi","Agailjhara","Depot","Gaila",450,"2026-11-01"],["Gournadi","Gournadi Bazar","Depot","Tarki Bandar",410,"2026-09-15"],["Gournadi","Gournadi Bazar","Gournadi Bazar","Depot",400,"2026-10-20"],["Gournadi","Gournadi Bazar","Tarki Bandar","Gournadi Bazar",50,"2026-09-15"],["Gournadi","Gournadi Bazar","Tarki Bandar","Depot",455,"2026-11-05"],["Gournadi","Gournadi Bazar","Depot","Tarki Bandar",430,"2026-10-20"],["Gournadi","Gournadi Bazar","Batajor","Depot",425,"2026-11-01"],["Gournadi","Gournadi Bazar","Tarki Bandar","Gournadi Bazar",75,"2026-11-05"],["Gournadi","Gournadi Bazar","Batajor","Tarki Bandar",125,"2026-11-01"],["Gournadi","Gournadi Bazar","Tarki Bandar","Batajor",130,"2026-10-10"],["Gournadi","Gournadi Bazar","Depot","Gournadi Bazar",420,"2026-11-05"],["Gournadi","Gournadi Bazar","Gournadi Bazar","Tarki Bandar",75,"2026-10-10"],["Gournadi","Gournadi Bazar","Depot","Gournadi Bazar",405,"2026-09-01"],["Gournadi","Gournadi Bazar","Depot","Batajor",405,"2026-11-05"],["Sadar","Alamdanga","Alamdanga Bazar","Hospital More",30,"2026-10-20"],["Sadar","Alamdanga","College Road","Depot",110,"2026-11-05"],["Sadar","Alamdanga","Alamdanga Bazar","Depot",85,"2026-11-12"],["Sadar","Alamdanga","Hospital More","Depot",95,"2026-11-12"],["Sadar","Alamdanga","Depot","Hospital More",100,"2026-11-05"],["Sadar","Alamdanga","Depot","College Road",105,"2026-11-01"],["Sadar","Alamdanga","Alamdanga Bus Stand","Depot",115,"2026-11-05"],["Sadar","Alamdanga","Depot","Alamdanga Bus Stand",120,"2026-11-01"],["Sadar","Alamdanga","Hospital More","College Road",30,"2026-11-01"],["Sadar","Alamdanga","Hospital More","Alamdanga Bazar",30,"2026-11-05"],["Sadar","Alamdanga","College Road","Hospital More",30,"2026-11-01"],["Sadar","Alamdanga","Depot","Alamdanga Bazar",85,"2026-11-12"],["Sadar","Alamdanga","Alamdanga Bus Stand","College Road",30,"2026-11-05"],["Sadar","Alamdanga","College Road","Alamdanga Bus Stand",30,"2026-10-20"],["Sadar","Chowk Bazar","Depot","Bazar Road",85,"2026-11-05"],["Sadar","Chowk Bazar","Bazar Road","Depot",90,"2026-11-01"],["Sadar","Chowk Bazar","Chowk Bazar","Depot",55,"2026-09-15"],["Sadar","Chowk Bazar","Chowk Bazar","Depot",75,"2026-11-12"],["Sadar","Chowk Bazar","Chowk Bazar","Sadar Road",30,"2026-11-12"],["Sadar","Chowk Bazar","Launch Ghat","Bazar Road",30,"2026-11-05"],["Sadar","Chowk Bazar","Depot","Launch Ghat",95,"2026-11-01"],["Sadar","Chowk Bazar","Depot","Sadar Road",75,"2026-11-12"],["Sadar","Chowk Bazar","Bazar Road","Sadar Road",30,"2026-11-05"],["Sadar","Chowk Bazar","Bazar Road","Launch Ghat",30,"2026-11-05"],["Sadar","Chowk Bazar","Depot","Chowk Bazar",75,"2026-11-05"],["Sadar","Chowk Bazar","Sadar Road","Bazar Road",30,"2026-10-10"],["Sadar","Chowk Bazar","Sadar Road","Depot",85,"2026-10-10"],["Sadar","Chowk Bazar","Sadar Road","Chowk Bazar",30,"2026-10-20"],["Sadar","Chowk Bazar","Launch Ghat","Depot",95,"2026-11-01"],["Sadar","Nathullabad","Depot","Rupatoli",130,"2026-10-10"],["Sadar","Nathullabad","Depot","Rupatoli",115,"2026-09-01"],["Sadar","Nathullabad","Depot","Nathullabad Bus Stand",105,"2026-10-20"],["Sadar","Nathullabad","Medical College Gate","Amtala More",30,"2026-11-01"],["Sadar","Nathullabad","Rupatoli","Nathullabad Bus Stand",30,"2026-10-10"],["Sadar","Nathullabad","Rupatoli","Amtala More",25,"2026-09-01"],["Sadar","Nathullabad","Rupatoli","Amtala More",30,"2026-10-10"],["Sadar","Nathullabad","Nathullabad Bus Stand","Rupatoli",30,"2026-10-20"],["Sadar","Nathullabad","Medical College Gate","Depot",115,"2026-11-12"],["Sadar","Nathullabad","Amtala More","Rupatoli",30,"2026-10-10"],["Sadar","Nathullabad","Depot","Medical College Gate",115,"2026-11-01"],["Sadar","Nathullabad","Rupatoli","Depot",95,"2026-09-15"],["Sadar","Nathullabad","Rupatoli","Depot",120,"2026-10-20"],["Sadar","Nathullabad","Depot","Amtala More",105,"2026-11-05"],["Sadar","Nathullabad","Amtala More","Depot",105,"2026-11-01"],["Sadar","Nathullabad","Amtala More","Medical College Gate",30,"2026-11-01"],["Sadar","Nathullabad","Nathullabad Bus Stand","Depot",95,"2026-11-01"],["Sadar","Nathullabad","Depot","Amtala More",90,"2026-09-15"],["Sadar ex","Babuganj","Depot","Babuganj Bazar",245,"2026-11-12"],["Sadar ex","Babuganj","Rahmatpur","Depot",205,"2026-10-20"],["Sadar ex","Babuganj","Madhabpasha","Rahmatpur",130,"2026-11-01"],["Sadar ex","Babuganj","Depot","Madhabpasha",280,"2026-11-05"],["Sadar ex","Babuganj","Depot","Rahmatpur",195,"2026-11-05"],["Sadar ex","Babuganj","Rahmatpur","Madhabpasha",140,"2026-10-10"],["Sadar ex","Babuganj","Babuganj Bazar","Depot",265,"2026-11-01"],["Sadar ex","Babuganj","Rahmatpur","Babuganj Bazar",105,"2026-11-12"],["Sadar ex","Babuganj","Babuganj Bazar","Rahmatpur",100,"2026-11-05"],["Sadar ex","Babuganj","Madhabpasha","Depot",285,"2026-11-05"],["Sadar ex","Ex Alamdanga","Kashipur","Bottola",30,"2026-11-01"],["Sadar ex","Ex Alamdanga","Kashipur","Depot",165,"2026-10-10"],["Sadar ex","Ex Alamdanga","Char Kawa","Depot",210,"2026-11-05"],["Sadar ex","Ex Alamdanga","Bottola","Kashipur",30,"2026-11-12"],["Sadar ex","Ex Alamdanga","Bottola","Depot",195,"2026-11-12"],["Sadar ex","Ex Alamdanga","Bottola","Char Kawa",75,"2026-11-05"],["Sadar ex","Ex Alamdanga","Depot","Kashipur",170,"2026-11-05"],["Sadar ex","Ex Alamdanga","Depot","Bottola",175,"2026-11-12"],["Sadar ex","Ex Alamdanga","Kashipur","Bottola",25,"2026-10-01"],["Sadar ex","Ex Alamdanga","Bottola","Char Kawa",65,"2026-09-15"],["Sadar ex","Ex Alamdanga","Depot","Char Kawa",205,"2026-10-10"],["Sadar ex","Ex Alamdanga","Char Kawa","Bottola",75,"2026-11-01"],["Ujirpur","Banaripara","Chakhar","Banaripara Bazar",105,"2026-10-10"],["Ujirpur","Banaripara","Depot","Chakhar",350,"2026-11-12"],["Ujirpur","Banaripara","Chakhar","Depot",345,"2026-10-20"],["Ujirpur","Banaripara","Banaripara Bazar","Depot",305,"2026-11-01"],["Ujirpur","Banaripara","Banaripara Bazar","Chakhar",120,"2026-10-10"],["Ujirpur","Banaripara","Depot","Banaripara Bazar",285,"2026-11-12"],["Ujirpur","Ujirpur Bazar","Depot","Ujirpur Bazar",380,"2026-10-20"],["Ujirpur","Ujirpur Bazar","Depot","Shikarpur",335,"2026-11-12"],["Ujirpur","Ujirpur Bazar","Depot","Guthia",300,"2026-11-01"],["Ujirpur","Ujirpur Bazar","Ujirpur Bazar","Shikarpur",85,"2026-11-05"],["Ujirpur","Ujirpur Bazar","Ujirpur Bazar","Depot",365,"2026-11-05"],["Ujirpur","Ujirpur Bazar","Shikarpur","Ujirpur Bazar",80,"2026-10-01"],["Ujirpur","Ujirpur Bazar","Guthia","Shikarpur",105,"2026-10-20"],["Ujirpur","Ujirpur Bazar","Guthia","Depot",295,"2026-10-20"],["Ujirpur","Ujirpur Bazar","Shikarpur","Depot",355,"2026-11-12"],["Ujirpur","Ujirpur Bazar","Shikarpur","Guthia",105,"2026-10-10"],["Ujirpur","Ujirpur Bazar","Shikarpur","Ujirpur Bazar",90,"2026-10-20"],["Ujirpur","Ujirpur Bazar","Ujirpur Bazar","Shikarpur",65,"2026-09-01"]]; /* [route, market, from, to, fare, lastUpdated] of the old built-in demo chart */
+/* Hero app: clears demo mode and sample bills (localStorage) */
+function purgeDemoHero(d){if(!d)return d;let ch=false;
+  const demoSetup=d.setup&&(d.setup.demo||(d.setup.heroes||[]).some(h=>OLD_DEMO_HEROES.includes(h.id)||/^DH-0[1-6]$/.test(h.code||'')&&OLD_DEMO_NAMES.includes(h.name)));
+  if(d.demo||demoSetup){d={bills:[]};ch=true}
+  /* a collection target made from the old "Sample receivable (test)" report */
+  if(d.tgt&&(/sample/i.test(d.tgt.rep||'')||Object.values(d.tgt.routes||{}).some(rs=>(rs||[]).some(r=>/^SMP-/.test(r[4]||'')||/^SMP-/.test(r[3]||''))))){delete d.tgt;delete d.col;ch=true}
+  const n=(d.bills||[]).length;d.bills=(d.bills||[]).filter(b=>!b.sample&&!OLD_DEMO_HEROES.includes(b.heroId));if(d.bills.length!==n)ch=true;
+  d._purged=ch;return d}
+/* Manager: sample bills, demo heroes + their fare chart, sample collection-target history, sample receivable */
+async function purgeDemoManager(){let n=0;
+  const sb=S.bills.filter(b=>b.sample||OLD_DEMO_HEROES.includes(b.heroId));
+  if(sb.length){await delMany('bills',sb.map(b=>b.id));const ids=new Set(sb.map(b=>b.id));S.bills=S.bills.filter(b=>!ids.has(b.id));n+=sb.length}
+  const dh=S.heroes.filter(h=>OLD_DEMO_HEROES.includes(h.id));
+  if(dh.length){await delMany('heroes',dh.map(h=>h.id));S.heroes=S.heroes.filter(h=>!OLD_DEMO_HEROES.includes(h.id));n+=dh.length;
+    const keys=new Set(OLD_DEMO_FARES.map(f=>f.join('|')));const df=S.fares.filter(f=>keys.has([f.route,f.market,f.from,f.to,f.fare,f.updated].join('|')));
+    if(df.length){await delMany('fares',df.map(f=>f.id));const ids=new Set(df.map(f=>f.id));S.fares=S.fares.filter(f=>!ids.has(f.id));n+=df.length}
+    if(S.cfg.mgrPhone==='+8801700000000'){S.cfg.mgrPhone='';await setKV('cfg',S.cfg)}}
+  try{const T=await getKV('ctTargets')||{},C=await getKV('ctColl')||{};let c=0;
+    for(const [d,x] of Object.entries(T))if(x&&x.sample){delete T[d];delete C[d];c++}
+    if(c){await setKV('ctTargets',T);await setKV('ctColl',C);n+=c}}catch(e){}
+  try{const reps=await rwAll('reports');const bad=reps.filter(r=>r.sample);
+    if(bad.length){const d=await rwDB();await new Promise((res,rej)=>{const t=d.transaction('reports','readwrite');bad.forEach(r=>t.objectStore('reports').delete(r.id));t.oncomplete=res;t.onerror=()=>rej(t.error)});d.close();n+=bad.length}}catch(e){}
+  return n}
+</script>
 <script>
-try{for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&k.indexOf('demo:')===0)localStorage.removeItem(k)}}catch(e){}
-try{['HeroBillManagerDB_demo','RouteCollectionDB_demo'].forEach(n=>indexedDB.deleteDatabase(n))}catch(e){}
-if('serviceWorker' in navigator)navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>{if(new URL(r.scope).pathname===location.pathname.replace(/[^/]*$/,''))r.update().catch(()=>{})}));
-</script></body></html>
+"use strict";
+const LOGO='data:image/png;base64,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';
+/* ===== storage ===== */
+const KEY='herobill_app_v1';let MEM=null,STORE_OK=true;
+function load(){try{const s=localStorage.getItem(KEY);return s?JSON.parse(s):{}}catch(e){STORE_OK=false;return MEM||{}}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){STORE_OK=false;MEM=D}}
+let D=purgeDemoHero(load());D.bills=D.bills||[];if(D._purged){delete D._purged;save()}else delete D._purged;
+/* ===== helpers ===== */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const L=(bn,en)=>`<span class="bn">${bn}</span> <span class="en">(${en})</span>`;
+const fmt=n=>(n||0).toLocaleString('en-US');const tk=n=>'৳ '+fmt(n);
+const iso=d=>{const x=new Date(d);return new Date(x-x.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+const todayISO=()=>iso(new Date());
+const bnDate=s=>new Date(s+'T00:00:00').toLocaleDateString('bn-BD',{day:'numeric',month:'long'});
+const enDate=s=>new Date(s+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+const dayNum=s=>new Date(s+'T00:00:00').getDate();
+const monShort=s=>new Date(s+'T00:00:00').toLocaleDateString('en-GB',{month:'short'});
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const natCmp=(a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true,sensitivity:'base'});
+const firstName=n=>{const w=String(n||'').replace(/^(md\.?|mohammad|mohammed|mst\.?|mr\.?)\s+/i,'').trim().split(/\s+/);return w[0]||n};
+const initials=n=>String(n||'?').replace(/^(md\.?|mohammad|mohammed|mst\.?)\s+/i,'').split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+function toast(m){const t=$('toast');t.innerHTML=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600)}
+function vibe(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
+const ME=()=>D.setup&&D.setup.heroes.find(h=>h.id===D.heroId);
+/* ===== fare chart ===== */
+let FIDX=new Map();
+function indexFares(){FIDX=new Map();FRT=new Map();if(!D.setup)return;for(const [r,m,f,t,a] of D.setup.fares){FIDX.set(fareKey(r,m,f,t),a);FRT.set(fareKey(r,'',f,t),a)}}
+let FRT=new Map(); /* route|from|to in any market (trips between markets) */
+const chart=(r,m,f,t)=>{let v=FIDX.get(fareKey(r,m,f,t));if(v==null)v=FRT.get(fareKey(r,'',f,t));return v==null?null:v};
+/* distance memory: what this hero typed last time, else the manager's value from setup */
+const kmKey=(r,f,t)=>[r,f,t].map(normKey).join('|');
+function kmGuess(r,f,t){if(!f||!t)return null;const k=kmKey(r,f,t);const mem=(D.kmMem||{})[k];if(mem>0)return mem;
+  const s=(D.setup&&D.setup.km||[]).find(x=>kmKey(x[0],x[1],x[2])===k);return s&&s[3]>0?s[3]:null}
+function myRoutes(){const me=ME();const all=[...new Set(D.setup.fares.map(x=>x[0]))].sort(natCmp);return me&&me.routes&&me.routes.length?all.filter(r=>me.routes.includes(r)):all}
+function markets(route){return [...new Set(D.setup.fares.filter(x=>x[0]===route).map(x=>x[1]))].sort(natCmp)}
+function locs(route,market){const s=new Set();D.setup.fares.forEach(x=>{if(x[0]===route&&x[1]===market){s.add(x[2]);s.add(x[3])}});return [...s].sort((a,b)=>a==='Depot'?-1:b==='Depot'?1:natCmp(a,b))}
+const billTotal=b=>b.items.reduce((s,i)=>s+(+i.amount||0),0);
+const overCount=b=>b.items.filter(i=>i.type==='trip'&&i.chart!=null&&i.amount>i.chart).length;
+
+/* ===== sheet ===== */
+function openSheet(title,body,foot,onClose){$('shT').innerHTML=title;$('shB').innerHTML=body;$('shF').innerHTML=foot||'';$('shF').hidden=!foot;$('sheet').classList.add('show');$('sheetBg').classList.add('show');S.onClose=onClose;$('shB').scrollTop=0}
+function closeSheet(){$('sheet').classList.remove('show');$('sheetBg').classList.remove('show');const f=S.onClose;S.onClose=null;if(f)f()}
+$('shX').onclick=closeSheet;$('sheetBg').onclick=closeSheet;
+const S={view:'start',bill:null,onClose:null};
+
+/* ===== routing ===== */
+function render(){indexFares();
+  if(!D.setup)return viewWelcome();
+  if(!D.heroId||!ME())return viewPick();
+  if(S.view==='edit'&&S.bill)return viewEdit();
+  if(S.view==='target')return viewTarget();
+  if(S.view==='home')return viewHome();
+  return viewStart()}
+
+/* ===== welcome / setup ===== */
+function viewWelcome(){
+  $('app').innerHTML=`<div class="hero-top"><div class="lg"><img src="${LOGO}"></div><h1 class="bn">হিরো বিল</h1><p>Hero Bill · ডেলিভারি হিরোদের যাতায়াত বিল</p></div>
+  <div class="card float"><h2>${L('শুরু করুন','Get started')}</h2><p class="lead bn">ম্যানেজার আপনাকে যে সেটআপ ফাইল বা কোড পাঠিয়েছেন, সেটি এখানে খুলুন।<br><span class="en">Open the setup file or code your manager sent you.</span></p>
+    <div class="stack"><button class="btn primary" id="bFile">📂 ${L('সেটআপ ফাইল খুলুন','Open setup file')}</button>
+    <button class="btn ghost" id="bCode">📋 ${L('কোড পেস্ট করুন','Paste code')}</button><div class="err" id="wErr"></div></div></div>
+  <div class="foottxt">Hero Bill v1.0 · Designed by: ABM Shafiquzzaman</div>`;
+  $('bFile').onclick=()=>$('fSetup').click();$('bCode').onclick=pasteSetup;
+}
+$('fSetup').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const t=await f.text();const c=findCodes(t,'HS');await applySetup(c.length?await unpackCode(c[0]):JSON.parse(t))}catch(err){setErr('ফাইলটি পড়া যায়নি (Could not read the file)')}};
+function setErr(m){const e=$('wErr');if(e)e.textContent=m;else toast(m)}
+function pasteSetup(){openSheet(L('কোড পেস্ট করুন','Paste code'),`<p class="bn" style="margin:0;color:var(--ink2)">হোয়াটসঅ্যাপ মেসেজটি কপি করে নিচে পেস্ট করুন। <span class="en">(Copy the WhatsApp message and paste it below.)</span></p><textarea class="code" id="pc" placeholder="HS1.…"></textarea><div class="err" id="pcErr"></div>`,
+  `<button class="btn primary" id="pcGo">${L('ঠিক আছে','OK')}</button>`);
+  $('pcGo').onclick=async()=>{const c=findCodes($('pc').value,'HS');if(!c.length){$('pcErr').textContent='কোড পাওয়া যায়নি (No code found)';return}try{await applySetup(await unpackCode(c[0]));closeSheet()}catch(e){$('pcErr').textContent='কোডটি সঠিক নয় (Invalid code)'}}}
+async function applySetup(s){
+  if(!s||s.t!=='HBSETUP'||!verifyObj(s)){setErr('এটি সঠিক সেটআপ নয় (Not a valid setup file)');return}
+  const had=!!D.setup;D.setup=s;if(D.heroId&&!s.heroes.some(h=>h.id===D.heroId))D.heroId=null;save();indexFares();
+  toast(had?'✅ সেটআপ আপডেট হয়েছে (Setup updated)':'✅ সেটআপ সম্পন্ন (Setup done)');S.view='start';render()}
+
+/* ===== pick hero + PIN ===== */
+function viewPick(){
+  const hs=D.setup.heroes.slice().sort((a,b)=>natCmp(a.name,b.name));
+  $('app').innerHTML=`<div class="hero-top" style="padding-bottom:64px"><div class="lg"><img src="${LOGO}"></div><h1 class="bn">স্বাগতম!</h1><p>${esc(D.setup.depot)} · Welcome</p></div>
+  <div class="card float">${demoBar()}<h2>${L('আপনার নাম বাছুন','Choose your name')}</h2><p class="lead"></p>
+    <div class="plist">${hs.map(h=>`<button class="pitem" data-h="${h.id}"><span class="av">${esc(initials(h.name))}</span><span><b>${esc(h.name)}</b><small>${esc(h.code)}</small></span></button>`).join('')}</div></div>
+  <div class="foottxt"><button class="link" id="bUpd">🔄 ${L('সেটআপ আপডেট','Update setup')}</button></div>`;
+  document.querySelectorAll('[data-h]').forEach(b=>b.onclick=()=>viewPin(D.setup.heroes.find(h=>h.id===b.dataset.h)));
+  $('bUpd').onclick=updateSetupMenu;bindDemoBar()}
+function viewPin(h){let pin='';
+  $('app').innerHTML=`<div class="hdr"><button class="hbtn" id="pBack">‹</button><div class="tt"><b class="bn">পিন দিন</b><small>Enter your PIN</small></div></div>
+  <div class="pinwrap"><div class="av">${esc(initials(h.name))}</div><b style="font-size:17px">${esc(h.name)}</b><div class="en">${esc(h.code)}</div>
+  <div class="dots" id="dots"><i></i><i></i><i></i><i></i></div><div class="err" id="pErr" style="text-align:center"></div>
+  <div class="pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-n="${n}">${n}</button>`).join('')}<button class="fn" id="pForgot"><span class="bn">ভুলে গেছি</span></button><button data-n="0">0</button><button class="fn" data-n="del">⌫</button></div></div>`;
+  const draw=()=>document.querySelectorAll('#dots i').forEach((d,i)=>d.classList.toggle('f',i<pin.length));
+  document.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{const n=b.dataset.n;if(n==='del')pin=pin.slice(0,-1);else if(pin.length<4)pin+=n;draw();vibe(8);
+    if(pin.length===4){if(pinHash(h.id,pin)===h.pin){D.heroId=h.id;save();vibe(30);S.view='start';render();toast(`👋 ${esc(firstName(h.name))}, স্বাগতম!`)}
+      else{$('dots').classList.add('shake');$('pErr').innerHTML='ভুল পিন (Wrong PIN)';vibe([60,40,60]);setTimeout(()=>{$('dots').classList.remove('shake');pin='';draw()},400)}}});
+  $('pBack').onclick=()=>viewPick();
+  $('pForgot').onclick=()=>{const p=D.setup.mgrPhone;openSheet(L('পিন ভুলে গেছেন?','Forgot PIN?'),`<p class="bn" style="margin:0;font-size:15px">আপনার ম্যানেজারকে বলুন। তিনি নতুন পিন দিয়ে আবার সেটআপ পাঠাবেন।<br><span class="en">Ask your manager. They will set a new PIN and send the setup again.</span></p>`,
+    p?`<a class="btn primary" href="tel:${esc(normPhone(p))}" style="text-decoration:none">📞 ${L('ম্যানেজারকে কল','Call manager')}</a>`:`<button class="btn ghost" onclick="closeSheet()">${L('ঠিক আছে','OK')}</button>`)}}
+
+function demoBar(){return ''}
+function bindDemoBar(){}
+/* ===== header ===== */
+function header(title,sub,back){return `<div class="hdr">${back?`<button class="hbtn" id="hBack" aria-label="Back">‹</button>`:`<div class="lg"><img src="${LOGO}"></div>`}<div class="tt"><b>${title}</b><small>${sub}</small></div><button class="hbtn" id="hMenu" aria-label="Menu">⋮</button></div>`}
+function bindHeader(){if($('hBack'))$('hBack').onclick=()=>{S.view=S.view==='edit'?'home':'start';S.bill=null;render()};
+  $('hMenu').onclick=e=>{e.stopPropagation();let m=document.querySelector('.menu');if(m){m.remove();return}
+    m=document.createElement('div');m.className='menu';m.innerHTML=`<button data-m="tgt">🎯 ${L('টার্গেট কোড পেস্ট','Paste target code')}</button><button data-m="upd">🔄 ${L('সেটআপ আপডেট','Update setup')}</button><button data-m="help">❓ ${L('কীভাবে ব্যবহার করবেন','How to use')}</button><button data-m="out">🚪 ${L('লগ আউট','Log out')}</button>`;
+    $('app').appendChild(m);m.querySelector('[data-m=tgt]').onclick=()=>{m.remove();pasteTarget()};m.querySelector('[data-m=upd]').onclick=()=>{m.remove();updateSetupMenu()};m.querySelector('[data-m=help]').onclick=()=>{m.remove();helpSheet()};
+    m.querySelector('[data-m=out]').onclick=()=>{m.remove();D.heroId=null;save();render()};
+    setTimeout(()=>document.addEventListener('click',function c(){m.remove();document.removeEventListener('click',c)}),0)}}
+function updateSetupMenu(){openSheet(L('সেটআপ আপডেট','Update setup'),`<p class="bn" style="margin:0;color:var(--ink2)">ম্যানেজার নতুন ভাড়ার চার্ট বা পিন পাঠালে এখানে খুলুন। আপনার বিলগুলো থাকবে। <span class="en">(Your bills stay safe.)</span></p>`,
+  `<button class="btn ghost" id="uCode">📋 ${L('কোড','Code')}</button><button class="btn primary" id="uFile">📂 ${L('ফাইল','File')}</button>`);
+  $('uFile').onclick=()=>{closeSheet();$('fSetup').click()};$('uCode').onclick=()=>{closeSheet();setTimeout(pasteSetup,250)}}
+function helpSheet(){openSheet(L('কীভাবে ব্যবহার করবেন','How to use'),`<div class="bn" style="font-size:15px;line-height:1.7">
+  <b>১.</b> “আজকের বিল” চাপুন। <span class="en">(Tap Today's bill)</span><br><b>২.</b> রুট বাছুন। <span class="en">(Choose route)</span><br>
+  <b>৩.</b> “যাত্রা যোগ করুন” চাপুন — বাজার, কোথা থেকে, কোথায়, যানবাহন বাছুন। ভাড়া চার্ট থেকে আসবে। <span class="en">(Add each trip; fare comes from the chart)</span><br>
+  <b>৪.</b> চার্টের চেয়ে বেশি দিলে কারণ লিখুন। <span class="en">(Give a reason if more than chart)</span><br>
+  <b>৫.</b> “সেভ ও পাঠান” চেপে হোয়াটসঅ্যাপে পাঠান। <span class="en">(Save & send on WhatsApp)</span></div>`,`<button class="btn primary" onclick="closeSheet()">${L('বুঝেছি','Got it')}</button>`)}
+
+/* ===== collection target (from manager's receivable) ===== */
+const tgN=s=>String(s||'').toLowerCase().replace(/\b(bazar|bazaar|market|hat|haat|road|more|mor)\b/g,' ').replace(/[^a-z0-9ঀ-৿]+/g,' ').replace(/\s+/g,' ').trim();
+function myTarget(){const me=ME();const T=D.tgt;if(!T||!me||T.depot&&D.setup&&normKey(T.depot)!==normKey(D.setup.depot))return null;
+  const rs=(T.heroes&&T.heroes[me.id])||(me.routes||[]).filter(r=>T.routes[r]);const rows=[];
+  for(const r of rs)for(const x of (T.routes[r]||[]))rows.push({route:r,code:x[0],name:x[1],phone:x[2],mk:x[3]||x[4]||'—',hbMk:x[3],rwMk:x[4],amt:x[5],inv:x[6],days:x[7],addr:x[8],invNo:x[9]});
+  const age=Math.round((new Date(todayISO())-new Date(T.date))/864e5);return {T,rows,age,old:age>3}}
+function colMap(d){D.col=D.col||{};return D.col[d||todayISO()]||{}}
+function colTotal(d){return Object.values(colMap(d)).reduce((s,v)=>s+(+v||0),0)}
+function setCol(code,amt){const d=todayISO();D.col=D.col||{};const m=D.col[d]=D.col[d]||{};if(amt>0)m[code]=Math.round(amt);else delete m[code];
+  const b=D.bills.find(x=>x.heroId===D.heroId&&x.date===d);if(b&&b.status==='sent')b.changed=true;
+  for(const k of Object.keys(D.col))if(k<iso(new Date(Date.now()-45*864e5)))delete D.col[k];save()}
+/* market → target, for highlighting inside the billing steps */
+function tgtIndex(route){const t=myTarget();const m=new Map();if(!t||t.old)return m;
+  for(const r of t.rows){if(route&&r.route!==route)continue;for(const k of new Set([tgN(r.hbMk),tgN(r.rwMk)]))if(k){const o=m.get(k)||{amt:0,n:0};o.amt+=r.amt;o.n++;m.set(k,o)}}return m}
+const kfmtB=v=>v>=1e5?(v/1e5).toFixed(1).replace(/\.0$/,'')+'L':v>=1e3?(v/1e3).toFixed(1).replace(/\.0$/,'')+'k':String(Math.round(v));
+function tgtBadge(idx,name){const o=idx.get(tgN(name));return o?`<em class="tgb">🎯 ৳${kfmtB(o.amt)}<small> · ${o.n}</small></em>`:''}
+async function applyTarget(o){if(!o||o.t!=='HBTGT'||!verifyObj(o)){toast('টার্গেট সঠিক নয় (Not a valid target)');return}
+  if(D.setup&&o.depot&&normKey(o.depot)!==normKey(D.setup.depot)){toast('অন্য ডিপোর টার্গেট (Target is for another depot)');return}
+  D.tgt=o;save();const t=myTarget();toast(t&&t.rows.length?`🎯 টার্গেট এসেছে · ${t.rows.length} দোকান (Target received)`:'🎯 টার্গেট এসেছে — আপনার রুটে কিছু নেই (No shops on your routes)');
+  if(D.heroId&&ME()){S.view='target';S.tq='';render()}}
+async function tgtFromLink(){const m=location.hash.match(/tgt=([A-Za-z0-9_.\-]+)/);if(!m)return;history.replaceState(null,'',location.pathname+location.search);
+  try{await applyTarget(await unpackCode(m[1]))}catch(e){toast('টার্গেট লিংক সঠিক নয় (Target link not valid)')}}
+
+function viewStart(){
+  const me=ME();const t=todayISO();const tb=D.bills.find(b=>b.heroId===me.id&&b.date===t);const tg=myTarget();
+  const tot=tg?tg.rows.reduce((s,r)=>s+r.amt,0):0,got=colTotal(),mks=tg?new Set(tg.rows.map(r=>r.mk)).size:0;
+  const st=tb?(tb.status==='sent'?(tb.changed?'✎ পরিবর্তিত (Changed)':'✅ পাঠানো (Sent)'):'📝 খসড়া (Draft)'):'';
+  $('app').innerHTML=header('হিরো বিল <span style="font-weight:400;opacity:.8;font-size:13px">Hero Bill</span>',esc(D.setup.depot)+' · '+esc(me.code))+`<div class="body">
+    ${demoBar()}<div class="card greet"><span class="av">${esc(initials(me.name))}</span><div><h2><span class="bn">${greetWord()}</span>, ${esc(firstName(me.name))} 👋</h2><p class="bn">আজ কী করবেন? <span class="en">(What would you like to do?)</span></p></div></div>
+    <button class="card bigopt tg" id="oTgt"><span class="boi">🎯</span><span class="bot"><b class="bn">কালেকশন টার্গেট</b><small>Collection target</small>
+      ${tg&&tg.rows.length?`<span class="bos"><b class="num">${tk(tot)}</b> · ${tg.rows.length} <span class="bn">দোকান</span> · ${mks} <span class="bn">বাজার</span>${tg.old?` · <span class="old bn">পুরনো (old)</span>`:''}</span>
+        <span class="bar"><i style="width:${Math.min(100,tot?got/tot*100:0)}%"></i></span><span class="bos2 bn">আজ আদায় <b class="num">${tk(got)}</b> <span class="en">(Collected today)</span></span>`
+        :`<span class="bos bn">এখনো টার্গেট আসেনি <span class="en">(No target yet — your manager will send it)</span></span>`}</span><span class="boa">›</span></button>
+    <button class="card bigopt bl" id="oBill"><span class="boi">🧾</span><span class="bot"><b class="bn">বিল</b><small>Billing — conveyance</small>
+      <span class="bos">${tb?`<span class="bn">আজকের বিল</span> <b class="num">${tk(billTotal(tb))}</b> · ${st}`:'<span class="bn">আজকের বিল এখনো লেখা হয়নি</span> <span class="en">(Today\'s bill not written yet)</span>'}</span></span><span class="boa">›</span></button>
+    <div class="foottxt">Hero Bill v1.0 · Designed by: ABM Shafiquzzaman</div></div>`;
+  bindHeader();bindDemoBar();
+  $('oTgt').onclick=()=>{S.view='target';S.tq='';render()};$('oBill').onclick=()=>{S.view='home';render()}}
+
+function viewTarget(){
+  const me=ME();const tg=myTarget();S.tOpen=S.tOpen||{};
+  const body=()=>{if(!tg||!tg.rows.length)return `<div class="card emptyt" style="padding:28px 16px"><div class="e">🎯</div><div class="bn">${tg?'আপনার রুটে কোনো বকেয়া নেই':'এখনো টার্গেট আসেনি'}</div><div class="en">${tg?'No dues on your routes in this target':'No target yet. Your manager sends it on WhatsApp — tap the link.'}</div>
+      <button class="btn ghost" id="tPaste" style="margin-top:14px">📋 ${L('কোড পেস্ট করুন','Paste target code')}</button></div>`;
+    const cm=colMap();const q=tgN(S.tq);const rows=tg.rows.filter(r=>!q||tgN(r.name+' '+r.mk+' '+r.addr+' '+r.code).includes(q));
+    const byM=new Map();rows.forEach(r=>{const a=byM.get(r.mk)||[];a.push(r);byM.set(r.mk,a)});
+    const tot=tg.rows.reduce((s,r)=>s+r.amt,0),got=colTotal(),done=tg.rows.filter(r=>cm[r.code]>0).length;
+    return `<div class="card tsum"><div class="tsr"><div><small class="bn">মোট টার্গেট <span class="en">(Target)</span></small><b class="num">${tk(tot)}</b></div><div><small class="bn">আজ আদায় <span class="en">(Collected)</span></small><b class="num ok">${tk(got)}</b></div></div>
+      <span class="bar"><i style="width:${Math.min(100,tot?got/tot*100:0)}%"></i></span>
+      <div class="tsm">${done}/${tg.rows.length} <span class="bn">দোকান</span> · <span class="en">${tg.T.rep?esc(tg.T.rep)+' · ':''}${enDate(tg.T.date)}</span>${tg.old?` · <span class="old bn">পুরনো টার্গেট (${tg.age} দিন আগের)</span>`:''}</div></div>
+      <div class="srch" style="margin:12px 0"><span>🔍</span><input id="tq" placeholder="দোকান / বাজার খুঁজুন (Search shop or market)" value="${esc(S.tq||'')}" autocomplete="off"></div>
+      ${[...byM.entries()].sort((a,b)=>b[1].reduce((s,r)=>s+r.amt,0)-a[1].reduce((s,r)=>s+r.amt,0)).map(([mk,rs])=>{const amt=rs.reduce((s,r)=>s+r.amt,0),g=rs.reduce((s,r)=>s+(+cm[r.code]||0),0);const open=q||S.tOpen[mk];
+        return `<div class="card tmk ${open?'open':''}"><button class="tmh" data-tmk="${esc(mk)}"><span class="tmn"><b>${esc(mk)}</b><small>${rs.length} <span class="bn">দোকান</span>${g?` · <span class="ok">✔ ${tk(g)}</span>`:''}</small></span><b class="num">${tk(amt)}</b><span class="chev">${open?'▾':'▸'}</span></button>
+        ${open?rs.sort((a,b)=>b.amt-a.amt).map(r=>{const c=+cm[r.code]||0;return `<div class="tshop ${c>=r.amt?'done':c>0?'part':''}"><div class="tsh1"><div class="tsn"><b>${esc(r.name)}</b><small>${esc(r.code)}${r.addr?' · '+esc(r.addr):''}</small>
+            <small>${r.inv} <span class="en">invoice${r.inv>1?'s':''}</span>${r.invNo?' ('+esc(r.invNo)+')':''}${r.days?` · <span class="${r.days>44?'late':''}">${r.days} <span class="bn">দিন</span></span>`:''}</small></div>
+            <div class="tsa"><b class="num">${tk(r.amt)}</b>${r.phone?`<a class="call" href="tel:${esc(r.phone)}">📞</a>`:''}</div></div>
+          <div class="tsh2"><label class="tin"><span class="bn">আদায়</span><span>৳</span><input type="number" inputmode="numeric" min="0" data-col="${esc(r.code)}" value="${c||''}" placeholder="0"></label>
+            <button class="btn ${c>=r.amt?'soft':'ghost'} sm" data-full="${esc(r.code)}" data-amt="${r.amt}">✔ ${L('পুরো','Full')}</button>${c?`<button class="btn ghost sm" data-clr="${esc(r.code)}">✕</button>`:''}</div></div>`}).join(''):''}</div>`}).join('')||'<div class="emptyt" style="padding:16px"><span class="bn">পাওয়া যায়নি</span> <span class="en">(Not found)</span></div>'}
+      <div class="hint2 bn" style="margin-top:12px">আদায়ের হিসাব আজকের বিলের সাথে ম্যানেজারের কাছে যাবে। <span class="en">(Collections go to the manager with today's bill.)</span></div>`};
+  $('app').innerHTML=header('কালেকশন টার্গেট <span style="font-weight:400;opacity:.8;font-size:13px">Collection target</span>',esc(me.name),true)+`<div class="body" id="tBody">${body()}</div>`;
+  bindHeader();
+  const bind=()=>{
+    if($('tPaste'))$('tPaste').onclick=pasteTarget;
+    if($('tq'))$('tq').oninput=e=>{S.tq=e.target.value;$('tBody').innerHTML=body();bind();const n=$('tq');n.focus();n.setSelectionRange(n.value.length,n.value.length)};
+    document.querySelectorAll('[data-tmk]').forEach(b=>b.onclick=()=>{S.tOpen[b.dataset.tmk]=!S.tOpen[b.dataset.tmk];$('tBody').innerHTML=body();bind()});
+    document.querySelectorAll('[data-col]').forEach(i=>i.onchange=()=>{setCol(i.dataset.col,+i.value||0);$('tBody').innerHTML=body();bind();vibe(10)});
+    document.querySelectorAll('[data-full]').forEach(b=>b.onclick=()=>{setCol(b.dataset.full,+b.dataset.amt);$('tBody').innerHTML=body();bind();vibe(15);toast('✔ পুরো আদায় (Fully collected)')});
+    document.querySelectorAll('[data-clr]').forEach(b=>b.onclick=()=>{setCol(b.dataset.clr,0);$('tBody').innerHTML=body();bind()})};
+  bind()}
+function pasteTarget(){openSheet(L('টার্গেট কোড পেস্ট করুন','Paste target code'),`<textarea class="code" id="tc" placeholder="HT1.…"></textarea><div class="err" id="tcErr"></div>`,
+  `<button class="btn primary" id="tcGo">${L('ঠিক আছে','OK')}</button>`);
+  $('tcGo').onclick=async()=>{const c=findCodes($('tc').value,'HT');if(!c.length){$('tcErr').textContent='কোড পাওয়া যায়নি (No code found)';return}try{closeSheet();await applyTarget(await unpackCode(c[0]))}catch(e){toast('কোডটি সঠিক নয় (Invalid code)')}}}
+
+/* ===== home ===== */
+function greetWord(){const h=new Date().getHours();return h<12?'শুভ সকাল':h<17?'শুভ দুপুর':h<20?'শুভ সন্ধ্যা':'শুভ রাত্রি'}
+function viewHome(){
+  const me=ME();const mine=D.bills.filter(b=>b.heroId===me.id).sort((a,b)=>a.date<b.date?1:-1);
+  const t=todayISO();const tb=mine.find(b=>b.date===t);const mon=t.slice(0,7);const mb=mine.filter(b=>b.date.startsWith(mon));
+  let todayCard;
+  if(!tb)todayCard=`<div class="card today"><div class="lbl">${L('আজ','Today')} · ${bnDate(t)}</div><div class="big bn">আজকের বিল এখনো লেখা হয়নি</div>
+    <button class="btn primary" id="bNew" style="min-height:58px;font-size:17px">➕ ${L('আজকের বিল লিখুন','Write today\'s bill')}</button></div>`;
+  else{const st=tb.status==='sent'?(tb.changed?'changed':'sent'):'draft';
+    todayCard=`<div class="card today ${st==='sent'?'sent':''}"><span class="st chip ${st}">${st==='sent'?'✅ পাঠানো (Sent)':st==='changed'?'✎ পরিবর্তিত (Changed)':'📝 খসড়া (Draft)'}</span>
+    <div class="lbl">${L('আজ','Today')} · ${bnDate(t)}</div><div class="big num">${tk(billTotal(tb))} <span class="en" style="font-size:13px">· ${tb.items.length} ${tb.items.length===1?'item':'items'}</span></div>
+    <button class="btn primary" data-addtrip="${tb.id}" style="min-height:56px;font-size:17px;margin-bottom:10px">➕ ${L('যাত্রা যোগ করুন','Add trip')}</button>
+    <div class="row2"><button class="btn ghost" data-open="${tb.id}">${st==='draft'?'✏️ '+L('বিল দেখুন','Open bill'):'👁 '+L('দেখুন','View')}</button>${st!=='draft'?`<button class="btn wa" data-share="${tb.id}">📤 ${L(st==='changed'?'পাঠান':'আবার পাঠান',st==='changed'?'Send':'Send again')}</button>`:`<button class="btn okb" data-open="${tb.id}" ${tb.items.length?'':'disabled'}>✅ ${L('পাঠান','Send')}</button>`}</div>
+    ${st==='sent'?`<div class="hint2 bn">নতুন যাত্রা যোগ করলে বিলটি আবার পাঠাতে হবে <span class="en">(After adding, send the bill again)</span></div>`:''}</div>`}
+  $('app').innerHTML=header('বিল <span style="font-weight:400;opacity:.8;font-size:13px">Billing</span>',esc(D.setup.depot)+' · '+esc(me.code),true)+`<div class="body">
+    ${demoBar()}<div class="card greet"><span class="av">${esc(initials(me.name))}</span><div><h2><span class="bn">${greetWord()}</span>, ${esc(firstName(me.name))} 👋</h2><p>${esc(me.name)} · ${esc(me.code)}</p></div></div>
+    ${todayCard}
+    <div class="stats"><div class="card stat"><div class="l">${L('এই মাসে বিল','Bills this month')}</div><div class="v num">${mb.length}</div></div><div class="card stat"><div class="l">${L('এই মাসে মোট','Total this month')}</div><div class="v num">${tk(mb.reduce((s,b)=>s+billTotal(b),0))}</div></div></div>
+    <button class="btn ghost" id="bOther" style="margin-top:12px">📅 ${L('অন্য দিনের বিল','Bill for another day')}</button>
+    <div class="sec-t">${L('আগের বিল','Previous bills')}</div>
+    <div class="hist">${histHtml(mine.filter(b=>b!==tb))}</div>
+    ${STORE_OK?'':'<div class="fwarn none" style="margin-top:12px">⚠ এই ব্রাউজারে ডেটা সেভ হচ্ছে না। Chrome-এ খুলুন। (Data is not being saved in this browser. Open in Chrome.)</div>'}
+    <div class="foottxt">Hero Bill v1.0 · Designed by: ABM Shafiquzzaman</div></div>
+    <div class="fabw"><button class="fab2" id="fabAdd" aria-label="Add"><span class="pl2">＋</span><span class="fl"><span class="bn">${tb?'যাত্রা যোগ':'বিল লিখুন'}</span><small>${tb?'Add trip':'Add bill'}</small></span></button></div>`;
+  bindHeader();bindDemoBar();
+  if($('bNew'))$('bNew').onclick=()=>newBill(t,true);
+  document.querySelectorAll('[data-addtrip]').forEach(x=>x.onclick=()=>openBill(x.dataset.addtrip,true));
+  $('fabAdd').onclick=()=>{const tb2=mine.find(b=>b.date===t);tb2?openBill(tb2.id,true):newBill(t,true)};
+  $('bOther').onclick=()=>openSheet(L('তারিখ বাছুন','Choose date'),`<input type="date" class="txt" id="od" value="${iso(new Date(Date.now()-864e5))}" max="${t}">`,`<button class="btn primary" id="odGo">${L('ঠিক আছে','OK')}</button>`)||($('odGo').onclick=()=>{const d=$('od').value;if(!d)return;closeSheet();const ex=mine.find(b=>b.date===d);ex?openBill(ex.id):newBill(d)});
+  document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openBill(b.dataset.open));
+  document.querySelectorAll('[data-share]').forEach(b=>b.onclick=()=>shareSheet(D.bills.find(x=>x.id===b.dataset.share)))}
+function histHtml(list){if(!list.length)return `<div class="emptyt"><div class="e">🧾</div><div class="bn">এখনো কোনো বিল নেই</div><div class="en">No bills yet</div></div>`;
+  const g=new Map();for(const b of list){const k=b.date.slice(0,7);if(!g.has(k))g.set(k,[]);g.get(k).push(b)}
+  return [...g.entries()].map(([k,bs])=>{const lbl=new Date(k+'-01T00:00:00');const tot=bs.reduce((s,b)=>s+billTotal(b),0);
+    return `<div class="mhead"><span><b class="bn">${lbl.toLocaleDateString('bn-BD',{month:'long'})}</b> <span class="en">${lbl.toLocaleDateString('en-GB',{month:'short',year:'numeric'})}</span></span><span class="num">${bs.length} · <b>${tk(tot)}</b></span></div>`+
+      bs.map(b=>{const st=b.status==='sent'?(b.changed?'changed':'sent'):'draft';const oc=overCount(b);return `<button class="hitem" data-open="${b.id}"><span class="dt"><b>${dayNum(b.date)}</b><small>${monShort(b.date)}</small></span>
+      <span class="mid"><b>${esc(b.route)}</b><small>${b.sample?'🧪 ':''}${b.items.length} items${oc?` · <span style="color:var(--bad)">⚠ ${oc}</span>`:''} · <span class="chip ${st}" style="padding:0 7px;font-size:11px">${st==='sent'?'Sent':st==='changed'?'Changed':'Draft'}</span></small></span><span class="amt num">${tk(billTotal(b))}</span></button>`}).join('')}).join('')}
+function newBill(date,addTrip){const rs=myRoutes();const b={id:uid(),heroId:D.heroId,date,route:rs.length===1?rs[0]:'',items:[],status:'draft',updatedAt:Date.now()};D.bills.push(b);save();S.bill=b;S.view='edit';render();if(addTrip&&b.route)setTimeout(()=>tripSheet(),220)}
+function openBill(id,addTrip){S.bill=D.bills.find(b=>b.id===id);S.view='edit';render();if(addTrip){if(S.bill.route)setTimeout(()=>tripSheet(),220);else toast('আগে রুট বাছুন (Choose a route first)')}}
+
+/* ===== editor ===== */
+function viewEdit(){
+  const b=S.bill;const rs=myRoutes();const tot=billTotal(b);const oc=overCount(b);
+  $('app').innerHTML=header(`${L('বিল','Bill')}`,`${bnDate(b.date)} · ${enDate(b.date)}`,true)+`<div class="body">
+    <div class="card ebar">
+      <div><div class="lab">${L('রুট','Route')}</div><div class="chips">${rs.map(r=>`<button class="c ${b.route===r?'on':''}" data-route="${esc(r)}">${esc(r)}</button>`).join('')}</div></div>
+    </div>
+    <div class="trips">${b.items.map((it,i)=>tripCard(it,i)).join('')||`<div class="card emptyt"><div class="e">🛺</div><div class="bn" style="font-size:16px;color:var(--ink2)">এখনো কোনো যাত্রা নেই</div><div class="en">No trips yet — add your first trip</div></div>`}</div>
+    <div class="addrow"><button class="btn primary" id="bAdd">🛺 ${L('যাত্রা যোগ করুন','Add trip')}</button><button class="btn soft" id="bExp">➕ ${L('অন্যান্য খরচ','Other cost')}</button></div>
+    ${oc?`<div class="fwarn over" style="margin-top:12px">⚠ <span>${oc}টি যাত্রা চার্টের চেয়ে বেশি। <span class="en">(${oc} trip(s) above the fare chart — the manager will check the reason.)</span></span></div>`:''}
+    <div style="display:flex;justify-content:center;margin-top:16px"><button class="link" id="bDel" style="color:var(--bad)">🗑 ${L('এই বিল মুছুন','Delete this bill')}</button></div>
+  </div>
+  <div class="foot"><div class="in"><div class="tot"><small>${L('মোট','Total')}</small><b class="num">${tk(tot)}</b></div><button class="btn okb" id="bSend" ${b.items.length&&b.route?'':'disabled'}>✅ ${L('সেভ ও পাঠান','Save & Send')}</button></div></div>`;
+  bindHeader();
+  document.querySelectorAll('[data-route]').forEach(x=>x.onclick=()=>{if(b.items.some(i=>i.type==='trip')&&b.route!==x.dataset.route){toast('রুট বদলাতে আগে যাত্রা মুছুন (Remove trips to change route)');return}b.route=x.dataset.route;touchBill();render()});
+  $('bAdd').onclick=()=>{if(!b.route){toast('আগে রুট বাছুন (Choose a route first)');vibe(40);return}tripSheet()};
+  $('bExp').onclick=()=>expenseSheet();
+  $('bSend').onclick=()=>confirmSend();
+  $('bDel').onclick=()=>openSheet(L('বিল মুছবেন?','Delete bill?'),`<p class="bn" style="margin:0">${bnDate(b.date)} তারিখের বিলটি মুছে যাবে। <span class="en">(This bill will be deleted from your phone.)</span></p>`,`<button class="btn ghost" onclick="closeSheet()">${L('না','No')}</button><button class="btn danger" id="dYes">${L('মুছুন','Delete')}</button>`)||($('dYes').onclick=()=>{D.bills=D.bills.filter(x=>x!==b);save();closeSheet();S.view='home';S.bill=null;render();toast('বিল মুছে ফেলা হয়েছে (Deleted)')});
+  document.querySelectorAll('[data-edit]').forEach(x=>x.onclick=()=>{const it=b.items[+x.dataset.edit];it.type==='trip'?tripSheet(+x.dataset.edit):expenseSheet(+x.dataset.edit)});
+  document.querySelectorAll('[data-del]').forEach(x=>x.onclick=()=>{b.items.splice(+x.dataset.del,1);touchBill();render();toast('মুছে ফেলা হয়েছে (Removed)')});
+  document.querySelectorAll('[data-ret]').forEach(x=>x.onclick=()=>{const it=b.items[+x.dataset.ret];const c=chart(b.route,it.market,it.to,it.from);tripSheet(null,{market:it.fromMarket||it.market,...(it.fromMarket?{fromMarket:it.market}:{}),from:it.to,to:it.from,mode:it.mode,amount:c!=null?c:it.amount,km:kmGuess(b.route,it.to,it.from)||it.km})})}
+function tripCard(it,i){
+  if(it.type!=='trip'){const c=catOf(it.cat);return `<div class="card trip"><div class="ic">🧾</div><div class="mid"><div class="route bn">${esc(c.bn)} <span class="en">(${esc(c.en)})</span></div><div class="meta">${esc(it.note||'')}</div>
+    <div class="tacts"><button data-edit="${i}">✏️ বদলান</button><button data-del="${i}">🗑</button></div></div><div class="r"><div class="amt num">${tk(it.amount)}</div><div class="ch">চার্টে নেই</div></div></div>`}
+  const m=modeOf(it.mode);const over=it.chart!=null&&it.amount>it.chart;const none=it.chart==null;
+  return `<div class="card trip ${over||none?'warn':''}"><div class="ic">${m.ic}</div><div class="mid"><div class="route">${esc(it.from)} → ${esc(it.to)}</div><div class="meta">${it.fromMarket?`${esc(it.fromMarket)} → `:''}${esc(it.market)}${it.fromMarket?' 🔀':''} · <span class="bn">${m.bn}</span>${it.km>0?` · ${fmt(it.km,1)} km`:''}</div>
+    ${it.reason?`<div class="why">💬 ${esc(it.reason)}</div>`:''}
+    <div class="tacts"><button data-ret="${i}">↩ <span class="bn">ফিরতি</span></button><button data-edit="${i}">✏️ <span class="bn">বদলান</span></button><button data-del="${i}">🗑</button></div></div>
+    <div class="r"><div class="amt num">${tk(it.amount)}</div><div class="ch">${none?'চার্টে নেই':'চার্ট '+tk(it.chart)}</div>${over?`<div class="over">+${fmt(it.amount-it.chart)} বেশি</div>`:''}</div></div>`}
+function touchBill(){const b=S.bill;b.updatedAt=Date.now();if(b.status==='sent')b.changed=true;save()}
+
+/* ===== trip sheet ===== */
+function tripSheet(idx,preset,startStep){
+  const b=S.bill;const ed=idx!=null?b.items[idx]:null;
+  const last=b.items.filter(i=>i.type==='trip').slice(-1)[0];
+  const ms=markets(b.route);const src=ed||preset||{};
+  const st={market:src.market||(last&&last.market)||ms[0]||'',from:src.from||(last?last.to:'')||'',to:src.to||'',mode:src.mode||(last&&last.mode)||'cng',amount:src.amount,km:src.km,q:'',other:false};
+  st.toMk=src.market&&src.fromMarket?src.market:st.market; if(src.fromMarket)st.market=src.fromMarket;
+  const toMk=()=>st.toMk||st.market;
+  if(!st.from){const d=locs(b.route,st.market).find(x=>/depot|ডিপো/i.test(x));if(d)st.from=d}
+  const steps=[...(ms.length>1?['market']:[]),'from','to','mode','fare'];
+  const NAMES={market:['বাজার','Market'],from:['কোথা থেকে','From'],to:['কোথায়','To'],mode:['যানবাহন','Transport'],fare:['ভাড়া','Fare']};
+  let si=startStep?steps.indexOf(startStep):ed||src.to?steps.indexOf('fare'):(!last&&ms.length>1?0:st.from?steps.indexOf('to'):steps.indexOf('from'));
+  if(si<0)si=0;
+  const bnNum=n=>String(n).replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[d]);
+  const chartNow=()=>st.from&&st.to?chart(b.route,toMk(),st.from,st.to):null;
+  const valid=k=>k==='market'?!!st.market:k==='from'?!!st.from:k==='to'?!!st.to&&st.to!==st.from:k==='mode'?!!st.mode:true;
+  const go=n=>{si=Math.max(0,Math.min(steps.length-1,n));st.q='';st.other=false;if(steps[si]==='fare'&&(st.amount==null||st.amount==='')){const c=chartNow();if(c!=null)st.amount=c}if(steps[si]==='fare'&&(st.km==null||st.km===''))st.km=kmGuess(b.route,st.from,st.to);draw()};
+  const next=()=>{if(!valid(steps[si])){toast(`${NAMES[steps[si]][0]} বাছুন (Choose ${NAMES[steps[si]][1]})`);vibe(40);return}go(si+1)};
+  const progress=()=>`<div class="wz">${steps.map((k,i)=>`<button class="wzs ${i<si?'done':i===si?'cur':''}" data-step="${i}" ${i>si&&!steps.slice(0,i).every(valid)?'disabled':''}><i>${i<si?'✓':bnNum(i+1)}</i><span class="bn">${NAMES[k][0]}</span></button>`).join('')}</div>
+    <div class="wzsum">${st.from?`<b>${esc(st.from)}</b>`:'<span class="en">From?</span>'} → ${st.to?`<b>${esc(st.to)}</b>`:'<span class="en">To?</span>'} <span class="en">· ${esc(st.market)}${toMk()!==st.market?' → '+esc(toMk()):''}${steps[si]==='fare'||si>steps.indexOf('mode')?' · '+modeOf(st.mode).en:''}</span></div>`;
+  const placeList=kind=>{const mk=kind==='to'?toMk():st.market;const all=locs(b.route,mk).filter(l=>kind==='from'||l!==st.from);const q=normKey(st.q);
+    let list=all.filter(l=>!q||normKey(l).includes(q));
+    if(kind==='to'){list=list.map(l=>({l,f:chart(b.route,mk,st.from,l)}));list.sort((x,y)=>(x.f==null)-(y.f==null)||natCmp(x.l,y.l))}else list=list.map(l=>({l,f:null}));
+    const cur=kind==='from'?st.from:st.to;
+    const TI=tgtIndex(b.route);
+    let out=list.map(x=>`<button class="pl ${cur===x.l?'on':''} ${TI.has(tgN(x.l))?'tgt':''}" data-pick="${esc(x.l)}"><span>${esc(x.l)}${tgtBadge(TI,x.l)}</span>${x.f!=null?`<b class="num">${tk(x.f)}</b>`:kind==='to'?'<small class="en">no chart</small>':''}</button>`).join('');
+    /* while searching "to", also show matching places in the route's other markets */
+    let extra=[];if(kind==='to'&&q)for(const m2 of ms)if(m2!==mk)for(const l of locs(b.route,m2))if(l!==st.from&&normKey(l).includes(q)&&!list.some(x=>x.l===l))extra.push({l,m2,f:chart(b.route,m2,st.from,l)});
+    if(extra.length)out+=`<div class="xmh">🔀 <span class="bn">অন্য বাজারে পাওয়া গেছে</span> <small class="en">(Found in other markets)</small></div>`+extra.map(x=>`<button class="pl" data-pick="${esc(x.l)}" data-pmk="${esc(x.m2)}"><span>${esc(x.l)}<small class="xmk">${esc(x.m2)}</small></span>${x.f!=null?`<b class="num">${tk(x.f)}</b>`:'<small class="en">no chart</small>'}</button>`).join('');
+    return out+(list.length||extra.length?'':`<div class="emptyt" style="padding:16px"><span class="bn">পাওয়া যায়নি</span> <span class="en">(Not found)</span></div>`)};
+  const draw=()=>{const k=steps[si];let body=progress();
+    const TI=tgtIndex(b.route);
+    if(k==='market')body+=`<div class="lab">${L('বাজার বাছুন','Choose market')}</div><div class="plist2">${ms.map(m=>`<button class="pl ${st.market===m?'on':''} ${TI.has(tgN(m))?'tgt':''}" data-mk="${esc(m)}"><span>${esc(m)}${tgtBadge(TI,m)}</span><small class="en">${locs(b.route,m).length} places</small></button>`).join('')}</div>`;
+    if(k==='from'||k==='to'){const n=locs(b.route,k==='to'?toMk():st.market).length;
+      body+=`<div class="lab">${k==='from'?L('কোথা থেকে যাত্রা শুরু?','Where did the trip start?'):L('কোথায় গেলেন?','Where did you go?')}</div>
+      ${k==='to'&&ms.length>1?`<div class="xmbar"><span class="xml">🏪 <span class="bn">কোন বাজারে?</span> <small class="en">(Which market?)</small></span><div class="xmchips">${ms.map(m2=>`<button class="xmc ${toMk()===m2?'on':''}" data-tomk="${esc(m2)}">${m2===st.market?'📍 ':'🔀 '}${esc(m2)}${m2===st.market?' <small class="en">(this)</small>':''}${tgtBadge(TI,m2)}</button>`).join('')}</div></div>`:''}
+      ${n>6?`<div class="srch"><span>🔍</span><input id="wq" placeholder="খুঁজুন (Search) — ${n} places" value="${esc(st.q)}" autocomplete="off"></div>`:''}
+      <div class="plist2" id="wList">${placeList(k)}</div>
+      ${st.other?`<div class="otherbox"><input class="txt" id="wOther" placeholder="জায়গার নাম লিখুন (Type place name)"><button class="btn primary sm" id="wOtherOk">${L('ঠিক','OK')}</button></div>`
+        :`<button class="pl dashed" id="wOtherBtn">✍ <span class="bn">তালিকায় নেই — অন্য জায়গা</span> <small class="en">(Not in list)</small></button>`}`}
+    if(k==='mode')body+=`<div class="lab">${L('কিসে গেলেন?','How did you travel?')}</div><div class="modes">${MODES.map(m=>`<button class="mode ${st.mode===m.k?'on':''}" data-md="${m.k}"><span class="e">${m.ic}</span><span class="bn">${m.bn}</span><small>${m.en}</small></button>`).join('')}</div>`;
+    if(k==='fare'){const c=chartNow();const amt=st.amount==null?'':st.amount;
+      body+=`<div class="lab">${L('কত টাকা ভাড়া দিলেন?','How much was the fare?')}</div>
+      <div class="fare"><label class="in"><span>৳</span><input id="fAmt" type="number" inputmode="numeric" min="0" value="${amt}" placeholder="0"></label>
+      <div class="chartbox"><small class="bn">চার্ট (Chart)</small><b class="num">${c==null?'—':fmt(c)}</b></div></div><div id="fMsg">${fareMsg(c,amt)}</div>
+      <div class="kmrow" id="kmRow"><span>📏 <span class="bn">দূরত্ব</span> <small class="en">(Distance)</small> <b class="req">*</b></span><label class="kmin"><input id="fKm" type="number" inputmode="decimal" step="0.1" min="0" value="${st.km==null?'':st.km}" placeholder="0.0"><span>km</span></label></div>`}
+    $('shB').innerHTML=body;
+    const isNew=!ed;
+    $('shF').innerHTML=k==='fare'
+      ?`<button class="btn ghost" id="wBack" style="flex:0 0 auto;width:auto">‹</button>${isNew?`<button class="btn soft" id="wAddNext">➕ ${L('যোগ করে পরের যাত্রা','Add & next trip')}</button>`:''}<button class="btn primary" id="wSave">✔ ${isNew?L('যোগ করুন','Add'):L('সেভ','Save')}</button>`
+      :`${si>0?`<button class="btn ghost" id="wBack">‹ ${L('পেছনে','Back')}</button>`:''}<button class="btn primary" id="wNext" ${valid(k)?'':'disabled'}>${L('পরের ধাপ','Next')} ›</button>`;
+    $('shF').hidden=false;$('shB').scrollTop=0;
+    $('shB').querySelectorAll('[data-step]').forEach(x=>x.onclick=()=>go(+x.dataset.step));
+    $('shB').querySelectorAll('[data-mk]').forEach(x=>x.onclick=()=>{if(st.market!==x.dataset.mk){st.market=x.dataset.mk;st.toMk=st.market;st.to='';st.amount=null;if(!locs(b.route,st.market).includes(st.from)){const d=locs(b.route,st.market).find(l=>/depot|ডিপো/i.test(l));st.from=d||''}}vibe(8);go(si+1)});
+    const bindPicks=()=>$('shB').querySelectorAll('[data-pick]').forEach(x=>x.onclick=()=>{const v=x.dataset.pick;if(k==='from'){st.from=v;if(st.to===v)st.to=''}else{st.to=v;if(x.dataset.pmk)st.toMk=x.dataset.pmk}st.amount=null;st.km=null;vibe(8);go(si+1)});
+    $('shB').querySelectorAll('[data-tomk]').forEach(x=>x.onclick=()=>{st.toMk=x.dataset.tomk;st.to='';st.q='';st.amount=null;vibe(8);draw()});
+    bindPicks();
+    if($('wq'))$('wq').oninput=e=>{st.q=e.target.value;$('wList').innerHTML=placeList(k);bindPicks()};
+    if($('wOtherBtn'))$('wOtherBtn').onclick=()=>{st.other=true;draw();setTimeout(()=>$('wOther').focus(),50)};
+    if($('wOtherOk')){const ok=()=>{const v=$('wOther').value.trim();if(v.length<2){toast('জায়গার নাম লিখুন (Type the place)');return}if(k==='from')st.from=v;else st.to=v;st.amount=null;go(si+1)};$('wOtherOk').onclick=ok;$('wOther').onkeydown=e=>{if(e.key==='Enter')ok()}}
+    $('shB').querySelectorAll('[data-md]').forEach(x=>x.onclick=()=>{st.mode=x.dataset.md;vibe(8);go(si+1)});
+    if($('fKm'))$('fKm').oninput=e=>{st.km=e.target.value;$('kmRow').classList.toggle('need',!(+e.target.value>0))};
+    if($('fAmt')){const c=chartNow();$('fAmt').oninput=e=>{st.amount=e.target.value;$('fMsg').innerHTML=fareMsg(c,e.target.value)};setTimeout(()=>{try{$('fAmt').focus();$('fAmt').select()}catch(e){}},80)}
+    if($('wBack'))$('wBack').onclick=()=>go(si-1);
+    if($('wNext'))$('wNext').onclick=next;
+    if($('wSave'))$('wSave').onclick=()=>save(false);
+    if($('wAddNext'))$('wAddNext').onclick=()=>save(true);
+  };
+  const save=chain=>{
+    const from=(st.from||'').trim(),to=(st.to||'').trim(),amount=Math.round(+st.amount);
+    if(!from||!to){toast('কোথা থেকে ও কোথায় বাছুন (Choose From and To)');go(steps.indexOf(!from?'from':'to'));return}
+    if(from===to){toast('দুটি জায়গা আলাদা হতে হবে (Places must differ)');go(steps.indexOf('to'));return}
+    if(st.amount===''||st.amount==null||!(amount>=0)){toast('ভাড়া লিখুন (Enter fare)');$('fAmt').focus();return}
+    const kmv=+st.km;if(!(kmv>0)||kmv>300){toast(kmv>300?'দূরত্ব ঠিক করুন — ৩০০ কিমি এর বেশি (Check distance — over 300 km)':'দূরত্ব লিখুন — কত কিমি? (Enter distance in km)');vibe(40);const r=$('kmRow');if(r){r.classList.add('need');r.scrollIntoView({block:'center'})}const f=$('fKm');if(f)f.focus();return}
+    const dm=toMk();const c=chart(b.route,dm,from,to);
+    const km=Math.round((+st.km||0)*10)/10;
+    const item={type:'trip',market:dm,from,to,mode:st.mode,amount,chart:c,reason:''};if(dm!==st.market)item.fromMarket=st.market;if(km>0){item.km=km;D.kmMem=D.kmMem||{};D.kmMem[kmKey(b.route,from,to)]=km}
+    const commit=reason=>{item.reason=reason||'';if(ed)b.items[idx]=item;else b.items.push(item);touchBill();closeSheet();render();vibe(15);
+      toast(ed?'✔ সেভ হয়েছে (Saved)':`✔ যাত্রা ${bnNum(b.items.filter(i=>i.type==='trip').length)} যোগ হয়েছে (Trip added)`);
+      if(chain)setTimeout(()=>tripSheet(null,{market:item.market,from:item.to,mode:item.mode},'to'),280)};
+    if(c==null)return reasonSheet('none',null,amount,commit,ed&&ed.reason);
+    if(amount>c)return reasonSheet('over',c,amount,commit,ed&&ed.reason);
+    commit('')};
+  openSheet(ed?L('যাত্রা বদলান','Edit trip'):L('যাত্রা যোগ করুন','Add trip'),'','x');draw();
+}
+function fareMsg(c,a){a=+a;if(c==null)return `<div class="fwarn none">ℹ️ <span><span class="bn">এই যাত্রা চার্টে নেই — কারণ লিখতে হবে।</span> <span class="en">(Not in fare chart — a reason is needed.)</span></span></div>`;
+  if(a>c)return `<div class="fwarn over">⚠️ <span><span class="bn">চার্টের চেয়ে ৳${fmt(a-c)} বেশি।</span> <span class="en">(৳${fmt(a-c)} more than chart)</span></span></div>`;
+  if(a&&a<=c)return `<div class="fwarn ok">✔ <span class="bn">চার্ট অনুযায়ী ঠিক আছে</span> <span class="en">(Within chart)</span></div>`;return ''}
+const REASONS=[['রাস্তা বন্ধ / ঘুরপথ','Road closed / detour'],['বৃষ্টি','Rain'],['রাতের ভাড়া','Night fare'],['বেশি মাল','Extra load'],['যানবাহন পাওয়া যায়নি','No regular transport'],['নতুন দোকান / জায়গা','New shop / place']];
+function reasonSheet(kind,c,amount,commit,prev){
+  let pick=prev||'';
+  const body=()=>`<div class="fwarn ${kind==='over'?'over':'none'}" style="font-size:15px">${kind==='over'?`⚠️ <span><b class="bn">চার্টের চেয়ে ৳${fmt(amount-c)} বেশি</b><br><span class="en">You entered ${tk(amount)} — chart is ${tk(c)}. Are you sure?</span></span>`:`ℹ️ <span><b class="bn">এই যাত্রা ভাড়ার চার্টে নেই</b><br><span class="en">This trip is not in the fare chart. Please give a reason.</span></span>`}</div>
+    <div><div class="lab">${L('কারণ বাছুন','Choose reason')}</div><div class="chips">${REASONS.map(([bn,en])=>{const v=`${bn} (${en})`;return `<button class="c ${pick===v?'on':''}" data-rs="${esc(v)}"><span class="bn">${bn}</span><small>${en}</small></button>`}).join('')}</div></div>
+    <div><div class="lab">${L('অথবা নিজে লিখুন','Or write it')}</div><input class="txt" id="rsT" placeholder="কারণ লিখুন (Write reason)" value="${esc(REASONS.some(([bn,en])=>pick===`${bn} (${en})`)?'':pick)}"></div>`;
+  openSheet(kind==='over'?L('নিশ্চিত তো?','Are you sure?'):L('কারণ লিখুন','Reason needed'),body(),`<button class="btn ghost" id="rsNo">${L('ফিরে যান','Go back')}</button><button class="btn primary" id="rsYes">${L('হ্যাঁ, নিশ্চিত','Yes, confirm')}</button>`);
+  const bind=()=>{$('shB').querySelectorAll('[data-rs]').forEach(x=>x.onclick=()=>{pick=x.dataset.rs;$('shB').innerHTML=body();bind()});$('rsT').oninput=e=>{pick=e.target.value}};bind();
+  $('rsNo').onclick=()=>{closeSheet();toast('যাত্রা যোগ হয়নি (Not added)')};
+  $('rsYes').onclick=()=>{const r=(pick||'').trim();if(r.length<2){toast('কারণ বাছুন বা লিখুন (Choose or write a reason)');vibe(40);return}commit(r)}}
+
+/* ===== other expense ===== */
+function expenseSheet(idx){
+  const b=S.bill;const ed=idx!=null?b.items[idx]:null;const st={cat:(ed&&ed.cat)||'labour',amount:ed?ed.amount:'',note:ed?ed.note:''};
+  const draw=()=>{$('shB').innerHTML=`<div><div class="lab">${L('খরচের ধরন','Type')}</div><div class="chips">${OTHER_CATS.map(c=>`<button class="c ${st.cat===c.k?'on':''}" data-ct="${c.k}"><span class="bn">${c.bn}</span><small>${c.en}</small></button>`).join('')}</div></div>
+    <div><div class="lab">${L('টাকা','Amount')}</div><div class="fare"><label class="in"><span>৳</span><input id="xA" type="number" inputmode="numeric" min="0" value="${st.amount}" placeholder="0"></label></div></div>
+    <div><div class="lab">${L('বিবরণ','Details')}</div><input class="txt" id="xN" placeholder="কেন খরচ হলো? (Why?)" value="${esc(st.note)}"></div>
+    <div class="fwarn none">ℹ️ <span class="bn">অন্যান্য খরচ ম্যানেজার আলাদাভাবে দেখবেন। <span class="en">(The manager reviews other costs separately.)</span></span></div>`;
+    $('shB').querySelectorAll('[data-ct]').forEach(x=>x.onclick=()=>{st.cat=x.dataset.ct;st.amount=$('xA').value;st.note=$('xN').value;draw()})};
+  openSheet(L('অন্যান্য খরচ','Other cost'),'',`<button class="btn primary" id="xSave">✔ ${ed?L('সেভ','Save'):L('যোগ করুন','Add')}</button>`);draw();
+  $('xSave').onclick=()=>{const a=Math.round(+$('xA').value);const n=$('xN').value.trim();if(!(a>0)){toast('টাকা লিখুন (Enter amount)');return}if(n.length<2){toast('বিবরণ লিখুন (Write details)');return}
+    const item={type:'other',cat:st.cat,amount:a,note:n};if(ed)b.items[idx]=item;else b.items.push(item);touchBill();closeSheet();render();toast('✔ খরচ যোগ হয়েছে (Added)')}}
+
+/* ===== send ===== */
+function confirmSend(){
+  const b=S.bill;const trips=b.items.filter(i=>i.type==='trip');const oth=b.items.filter(i=>i.type!=='trip');const oc=overCount(b);
+  openSheet(L('বিল নিশ্চিত করুন','Confirm bill'),`<div class="card" style="padding:6px 14px">
+      <div class="sumrow"><span>${L('তারিখ','Date')}</span><b>${enDate(b.date)}</b></div><div class="sumrow"><span>${L('রুট','Route')}</span><b>${esc(b.route)}</b></div>
+      <div class="sumrow"><span>${L('যাত্রা','Trips')}</span><b class="num">${trips.length} · ${tk(trips.reduce((s,i)=>s+i.amount,0))}</b></div>
+      ${oth.length?`<div class="sumrow"><span>${L('অন্যান্য খরচ','Other costs')}</span><b class="num">${oth.length} · ${tk(oth.reduce((s,i)=>s+i.amount,0))}</b></div>`:''}
+      <div class="sumrow" style="font-size:17px"><span>${L('মোট','Total')}</span><b class="num">${tk(billTotal(b))}</b></div></div>
+    ${oc?`<div class="fwarn over">⚠️ <span>${oc}টি যাত্রা চার্টের চেয়ে বেশি, কারণসহ পাঠানো হবে। <span class="en">(${oc} trip(s) above chart will be sent with your reasons.)</span></span></div>`:'<div class="fwarn ok">✔ <span class="bn">সব যাত্রা চার্ট অনুযায়ী</span> <span class="en">(All trips within chart)</span></div>'}
+    <p class="bn" style="margin:0;color:var(--ink2);font-size:14px">সেভ করার পর ম্যানেজারকে পাঠান। <span class="en">(After saving, send it to your manager.)</span></p>`,
+    `<button class="btn ghost" onclick="closeSheet()">${L('ফিরে যান','Back')}</button><button class="btn okb" id="cfYes">✅ ${L('সেভ করুন','Save')}</button>`);
+  $('cfYes').onclick=()=>{b.status='sent';b.changed=false;b.sentAt=Date.now();save();closeSheet();setTimeout(()=>shareSheet(b,true),220)}}
+function buildPayload(b){const me=ME();const o={t:'HBBILL',v:1,heroId:me.id,heroCode:me.code,heroName:me.name,depot:D.setup.depot,date:b.date,route:b.route,
+  items:b.items.map(i=>i.type==='trip'?{type:'trip',market:i.market,from:i.from,to:i.to,mode:i.mode,amount:i.amount,chart:i.chart,reason:i.reason||'',...(i.km>0?{km:+i.km}:{}),...(i.fromMarket?{fromMarket:i.fromMarket}:{})}:{type:'other',cat:i.cat,amount:i.amount,note:i.note||''}),
+  total:billTotal(b),createdAt:b.sentAt||b.updatedAt,setupVer:D.setup.ver};
+  const cm=(D.col||{})[b.date]||{};const col=Object.entries(cm).filter(x=>x[1]>0).map(([c,a])=>[c,Math.round(a)]);if(col.length)o.col=col;
+  o.sig=signObj(o);return o}
+function compactText(b,code){const me=ME();const oc=overCount(b);
+  return `🧾 হিরো বিল (Hero Bill)\n${me.name} (${me.code})\n📅 ${enDate(b.date)} · রুট (Route): ${b.route}\n🛺 যাত্রা (Trips): ${b.items.filter(i=>i.type==='trip').length} · 💰 মোট (Total): ${tk(billTotal(b))}${oc?`\n⚠ চার্টের বেশি (Over chart): ${oc}`:''}${(()=>{const cm=(D.col||{})[b.date]||{};const v=Object.values(cm).filter(x=>x>0);return v.length?`\n💵 আদায় (Collected): ${tk(v.reduce((s,x)=>s+x,0))} · ${v.length} দোকান (shops)`:''})()}\n—\n${code}`}
+async function shareSheet(b,fresh){
+  const p=buildPayload(b);const code=await packCode(p,'HB');const text=compactText(b,code);const me=ME();
+  const fname=`HeroBill_${me.code}_${b.date}.json`;const file=new File([JSON.stringify(p)],fname,{type:'application/json'});
+  const canFile=!!(navigator.canShare&&navigator.canShare({files:[file]}));
+  const wa=D.setup.mgrPhone?waDigits(D.setup.mgrPhone):'';
+  const conf=fresh?Array.from({length:18},(_,i)=>{const a=i/18*Math.PI*2;return `<i style="--x:${Math.round(Math.cos(a)*120)}px;--y:${Math.round(Math.sin(a)*90-30)}px;background:${['#2e2a8f','#2f7d5b','#d9a25a','#7f8fd8'][i%4]};animation-delay:${(i%5)*30}ms"></i>`}).join(''):'';
+  openSheet(fresh?L('সেভ হয়েছে!','Saved!'):L('বিল পাঠান','Send bill'),`
+    ${fresh?`<div class="done"><div class="conf">${conf}</div><div class="tick"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></div>
+      <h3 class="bn">বিল সেভ হয়েছে 🎉</h3><p class="bn">এখন ম্যানেজারকে পাঠান <span class="en">(Now send it to your manager)</span></p></div>`:''}
+    <div class="card" style="padding:12px 14px;display:flex;justify-content:space-between;align-items:center"><span><b>${enDate(b.date)}</b><br><small class="en">${esc(b.route)} · ${b.items.length} items</small></span><b class="num" style="font-size:20px">${tk(billTotal(b))}</b></div>
+    <div class="sgrid">
+      <button class="btn wa full" id="sWa"><span class="e">💬</span>${L('হোয়াটসঅ্যাপে পাঠান','Send on WhatsApp')}</button>
+      ${canFile?`<button class="btn soft" id="sFile"><span class="e">📎</span>${L('ফাইল শেয়ার','Share file')}</button>`:''}
+      <button class="btn ghost" id="sDl"><span class="e">⬇️</span>${L('ডাউনলোড','Download')}</button>
+      <button class="btn ghost" id="sMail"><span class="e">✉️</span>${L('ইমেইল','Email')}</button>
+      <button class="btn ghost" id="sCopy"><span class="e">📋</span>${L('কোড কপি','Copy code')}</button>
+    </div>`,`<button class="btn primary" id="sDone">${L('শেষ','Done')}</button>`,()=>{S.view='home';S.bill=null;render()});
+  $('sWa').onclick=()=>{window.open(`https://wa.me/${wa}?text=${encodeURIComponent(text)}`,'_blank');markShared(b)};
+  if($('sFile'))$('sFile').onclick=async()=>{try{await navigator.share({files:[file],title:'Hero Bill',text:compactText(b,'').replace(/\n—\n$/,'')});markShared(b)}catch(e){}};
+  $('sDl').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=fname;document.body.appendChild(a);a.click();a.remove();toast('⬇️ ডাউনলোড হয়েছে (Downloaded)');markShared(b)};
+  $('sMail').onclick=()=>{location.href=`mailto:${encodeURIComponent(D.setup.mgrEmail||'')}?subject=${encodeURIComponent(`Hero Bill · ${me.name} (${me.code}) · ${enDate(b.date)}`)}&body=${encodeURIComponent(text)}`;markShared(b)};
+  $('sCopy').onclick=async()=>{try{await navigator.clipboard.writeText(text)}catch(e){const t=document.createElement('textarea');t.value=text;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}toast('📋 কপি হয়েছে (Copied)');markShared(b)};
+  $('sDone').onclick=closeSheet}
+function markShared(b){b.sharedAt=Date.now();save()}
+
+/* ===== boot ===== */
+render();
+/* one-tap setup link: …/#setup=HS1.xxxx */
+async function setupFromLink(){const m=location.hash.match(/setup=([A-Za-z0-9_.\-]+)/);if(!m)return;history.replaceState(null,'',location.pathname+location.search);
+  try{await applySetup(await unpackCode(m[1]))}catch(e){toast('সেটআপ লিংক সঠিক নয় (Setup link not valid)')}}
+setupFromLink();window.addEventListener('hashchange',setupFromLink);
+tgtFromLink();window.addEventListener('hashchange',tgtFromLink);
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+</script>
+<style>
+.pwabar{position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:80;display:flex;align-items:center;gap:10px;background:#2e2a8f;color:#fff;border-radius:16px;padding:10px 12px;box-shadow:0 10px 30px #2e2a8f55;font-family:'Hind Siliguri','Ubuntu',sans-serif;animation:pwaUp .3s ease}
+.pwabar .t{flex:1;font-size:14px;line-height:1.3}.pwabar small{opacity:.8;font-size:12px}
+.pwabar button{border:0;border-radius:10px;padding:9px 14px;font:inherit;font-size:14px;font-weight:600;background:#fff;color:#2e2a8f}.pwabar .x{background:transparent;color:#fff;opacity:.8;padding:6px 8px;font-size:18px}
+@keyframes pwaUp{from{transform:translateY(30px);opacity:0}}
+</style>
+<script>
+(function(){
+  if(!('serviceWorker' in navigator)||!/^https?:/.test(location.protocol))return;
+  const bar=(html,onGo,id)=>{if(document.getElementById(id))return;const d=document.createElement('div');d.className='pwabar';d.id=id;d.innerHTML=html;document.body.appendChild(d);
+    d.querySelector('.go').onclick=()=>{onGo();d.remove()};d.querySelector('.x').onclick=()=>{d.remove();try{localStorage.setItem(id+'_x',Date.now())}catch(e){}}};
+  /* MANDATORY UPDATES: when a new version is published, the app locks, updates itself and restarts. */
+  const hadCtrl=!!navigator.serviceWorker.controller;
+  const lock=()=>{if(document.getElementById('pwaLock'))return;const d=document.createElement('div');d.id='pwaLock';
+    d.style.cssText='position:fixed;inset:0;z-index:2147483647;background:rgba(20,18,60,.92);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:24px;font-family:\'Hind Siliguri\',\'Ubuntu\',sans-serif';
+    d.innerHTML='<div style="font-size:44px">🔄</div><div style="font-size:19px;font-weight:700">নতুন ভার্সন ইনস্টল হচ্ছে…</div><div style="opacity:.85;font-size:14px">Updating to the new version — the app restarts in a moment.<br>আপনার ডেটা নিরাপদ আছে (Your data is safe).</div><button id="pwaLockGo" style="margin-top:8px;border:0;border-radius:10px;padding:10px 18px;font:inherit;font-weight:700;background:#fff;color:#2e2a8f;display:none">আবার চেষ্টা (Restart now)</button>';
+    document.body.appendChild(d);setTimeout(()=>{const b=document.getElementById('pwaLockGo');if(b){b.style.display='';b.onclick=()=>location.reload()}},8000)};
+  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
+    const force=w=>{if(!navigator.serviceWorker.controller)return;lock();w.postMessage('skipWaiting')};
+    if(reg.waiting)force(reg.waiting);
+    reg.addEventListener('updatefound',()=>{const w=reg.installing;if(w){if(navigator.serviceWorker.controller)lock();w.addEventListener('statechange',()=>{if(w.state==='installed')force(w);if(w.state==='redundant'){const l=document.getElementById('pwaLock');if(l&&!reg.waiting&&!reg.installing)l.remove()}})}});
+    const check=()=>reg.update().catch(()=>{});
+    check();setInterval(check,15*60*1000);
+    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')check()});
+    window.addEventListener('online',check);
+  }).catch(()=>{});
+  let reloading=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloading||!hadCtrl)return;reloading=true;lock();setTimeout(()=>location.reload(),600)});
+  /* install button (Android Chrome) */
+  let ev=null;const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();ev=e;if(standalone)return;
+    let x=0;try{x=+localStorage.getItem('pwaIns_x')||0}catch(_){}if(Date.now()-x<3*864e5)return;
+    setTimeout(()=>bar(`<div class="t">📲 অ্যাপটি ফোনে ইনস্টল করুন<br><small>(Install Hero Bill on this phone)</small></div><button class="go">ইনস্টল (Install)</button><button class="x">×</button>`,()=>{ev.prompt();ev=null},'pwaIns'),1500)});
+  window.addEventListener('appinstalled',()=>{const b=document.getElementById('pwaIns');if(b)b.remove()});
+})();
+</script>
+<div style="position:fixed;left:10px;bottom:10px;z-index:2147483000;background:#f59e0b;color:#1f1300;font:700 11px Ubuntu,Arial,sans-serif;padding:4px 9px;border-radius:999px;box-shadow:0 2px 8px #0003;pointer-events:none;letter-spacing:.04em">DEMO · fictional data</div><script>/* ===== Hero Bill shared DEMO data (same in Manager and Delivery Hero app) ===== */
+const DEMO_DEPOT='Barishal';
+const DEMO_FARES=[["Bakerganj","Bakerganj Bazar","Kalashkathi","Padri Shibpur",30,"2026-11-05"],["Bakerganj","Bakerganj Bazar","Padri Shibpur","Bakerganj Bazar",95,"2026-11-12"],["Bakerganj","Bakerganj Bazar","Kalashkathi","Depot",350,"2026-10-20"],["Bakerganj","Bakerganj Bazar","Depot","Kalashkathi",360,"2026-11-05"],["Bakerganj","Bakerganj Bazar","Padri Shibpur","Depot",365,"2026-11-05"],["Bakerganj","Bakerganj Bazar","Bakerganj Bazar","Padri Shibpur",100,"2026-10-20"],["Bakerganj","Bakerganj Bazar","Depot","Bakerganj Bazar",320,"2026-10-20"],["Bakerganj","Bakerganj Bazar","Depot","Padri Shibpur",330,"2026-11-05"],["Bakerganj","Bakerganj Bazar","Padri Shibpur","Kalashkathi",30,"2026-11-12"],["Bakerganj","Bakerganj Bazar","Bakerganj Bazar","Depot",300,"2026-11-12"],["Bakerganj","Dudhal","Charadi","Depot",375,"2026-10-20"],["Bakerganj","Dudhal","Depot","Dudhal Bazar",385,"2026-10-20"],["Bakerganj","Dudhal","Charadi","Dudhal Bazar",70,"2026-11-01"],["Bakerganj","Dudhal","Dudhal Bazar","Depot",380,"2026-11-05"],["Bakerganj","Dudhal","Dudhal Bazar","Charadi",75,"2026-11-12"],["Bakerganj","Dudhal","Depot","Charadi",420,"2026-11-01"],["Bakerganj","Dudhal","Depot","Charadi",395,"2026-10-01"],["Gournadi","Agailjhara","Agailjhara Bazar","Depot",380,"2026-09-15"],["Gournadi","Agailjhara","Depot","Agailjhara Bazar",415,"2026-10-20"],["Gournadi","Agailjhara","Gaila","Agailjhara Bazar",75,"2026-10-20"],["Gournadi","Agailjhara","Agailjhara Bazar","Gaila",70,"2026-11-01"],["Gournadi","Agailjhara","Gaila","Depot",455,"2026-10-20"],["Gournadi","Agailjhara","Agailjhara Bazar","Depot",405,"2026-10-10"],["Gournadi","Agailjhara","Depot","Gaila",450,"2026-11-01"],["Gournadi","Gournadi Bazar","Depot","Tarki Bandar",410,"2026-09-15"],["Gournadi","Gournadi Bazar","Gournadi Bazar","Depot",400,"2026-10-20"],["Gournadi","Gournadi Bazar","Tarki Bandar","Gournadi Bazar",50,"2026-09-15"],["Gournadi","Gournadi Bazar","Tarki Bandar","Depot",455,"2026-11-05"],["Gournadi","Gournadi Bazar","Depot","Tarki Bandar",430,"2026-10-20"],["Gournadi","Gournadi Bazar","Batajor","Depot",425,"2026-11-01"],["Gournadi","Gournadi Bazar","Tarki Bandar","Gournadi Bazar",75,"2026-11-05"],["Gournadi","Gournadi Bazar","Batajor","Tarki Bandar",125,"2026-11-01"],["Gournadi","Gournadi Bazar","Tarki Bandar","Batajor",130,"2026-10-10"],["Gournadi","Gournadi Bazar","Depot","Gournadi Bazar",420,"2026-11-05"],["Gournadi","Gournadi Bazar","Gournadi Bazar","Tarki Bandar",75,"2026-10-10"],["Gournadi","Gournadi Bazar","Depot","Gournadi Bazar",405,"2026-09-01"],["Gournadi","Gournadi Bazar","Depot","Batajor",405,"2026-11-05"],["Sadar","Alamdanga","Alamdanga Bazar","Hospital More",30,"2026-10-20"],["Sadar","Alamdanga","College Road","Depot",110,"2026-11-05"],["Sadar","Alamdanga","Alamdanga Bazar","Depot",85,"2026-11-12"],["Sadar","Alamdanga","Hospital More","Depot",95,"2026-11-12"],["Sadar","Alamdanga","Depot","Hospital More",100,"2026-11-05"],["Sadar","Alamdanga","Depot","College Road",105,"2026-11-01"],["Sadar","Alamdanga","Alamdanga Bus Stand","Depot",115,"2026-11-05"],["Sadar","Alamdanga","Depot","Alamdanga Bus Stand",120,"2026-11-01"],["Sadar","Alamdanga","Hospital More","College Road",30,"2026-11-01"],["Sadar","Alamdanga","Hospital More","Alamdanga Bazar",30,"2026-11-05"],["Sadar","Alamdanga","College Road","Hospital More",30,"2026-11-01"],["Sadar","Alamdanga","Depot","Alamdanga Bazar",85,"2026-11-12"],["Sadar","Alamdanga","Alamdanga Bus Stand","College Road",30,"2026-11-05"],["Sadar","Alamdanga","College Road","Alamdanga Bus Stand",30,"2026-10-20"],["Sadar","Chowk Bazar","Depot","Bazar Road",85,"2026-11-05"],["Sadar","Chowk Bazar","Bazar Road","Depot",90,"2026-11-01"],["Sadar","Chowk Bazar","Chowk Bazar","Depot",55,"2026-09-15"],["Sadar","Chowk Bazar","Chowk Bazar","Depot",75,"2026-11-12"],["Sadar","Chowk Bazar","Chowk Bazar","Sadar Road",30,"2026-11-12"],["Sadar","Chowk Bazar","Launch Ghat","Bazar Road",30,"2026-11-05"],["Sadar","Chowk Bazar","Depot","Launch Ghat",95,"2026-11-01"],["Sadar","Chowk Bazar","Depot","Sadar Road",75,"2026-11-12"],["Sadar","Chowk Bazar","Bazar Road","Sadar Road",30,"2026-11-05"],["Sadar","Chowk Bazar","Bazar Road","Launch Ghat",30,"2026-11-05"],["Sadar","Chowk Bazar","Depot","Chowk Bazar",75,"2026-11-05"],["Sadar","Chowk Bazar","Sadar Road","Bazar Road",30,"2026-10-10"],["Sadar","Chowk Bazar","Sadar Road","Depot",85,"2026-10-10"],["Sadar","Chowk Bazar","Sadar Road","Chowk Bazar",30,"2026-10-20"],["Sadar","Chowk Bazar","Launch Ghat","Depot",95,"2026-11-01"],["Sadar","Nathullabad","Depot","Rupatoli",130,"2026-10-10"],["Sadar","Nathullabad","Depot","Rupatoli",115,"2026-09-01"],["Sadar","Nathullabad","Depot","Nathullabad Bus Stand",105,"2026-10-20"],["Sadar","Nathullabad","Medical College Gate","Amtala More",30,"2026-11-01"],["Sadar","Nathullabad","Rupatoli","Nathullabad Bus Stand",30,"2026-10-10"],["Sadar","Nathullabad","Rupatoli","Amtala More",25,"2026-09-01"],["Sadar","Nathullabad","Rupatoli","Amtala More",30,"2026-10-10"],["Sadar","Nathullabad","Nathullabad Bus Stand","Rupatoli",30,"2026-10-20"],["Sadar","Nathullabad","Medical College Gate","Depot",115,"2026-11-12"],["Sadar","Nathullabad","Amtala More","Rupatoli",30,"2026-10-10"],["Sadar","Nathullabad","Depot","Medical College Gate",115,"2026-11-01"],["Sadar","Nathullabad","Rupatoli","Depot",95,"2026-09-15"],["Sadar","Nathullabad","Rupatoli","Depot",120,"2026-10-20"],["Sadar","Nathullabad","Depot","Amtala More",105,"2026-11-05"],["Sadar","Nathullabad","Amtala More","Depot",105,"2026-11-01"],["Sadar","Nathullabad","Amtala More","Medical College Gate",30,"2026-11-01"],["Sadar","Nathullabad","Nathullabad Bus Stand","Depot",95,"2026-11-01"],["Sadar","Nathullabad","Depot","Amtala More",90,"2026-09-15"],["Sadar ex","Babuganj","Depot","Babuganj Bazar",245,"2026-11-12"],["Sadar ex","Babuganj","Rahmatpur","Depot",205,"2026-10-20"],["Sadar ex","Babuganj","Madhabpasha","Rahmatpur",130,"2026-11-01"],["Sadar ex","Babuganj","Depot","Madhabpasha",280,"2026-11-05"],["Sadar ex","Babuganj","Depot","Rahmatpur",195,"2026-11-05"],["Sadar ex","Babuganj","Rahmatpur","Madhabpasha",140,"2026-10-10"],["Sadar ex","Babuganj","Babuganj Bazar","Depot",265,"2026-11-01"],["Sadar ex","Babuganj","Rahmatpur","Babuganj Bazar",105,"2026-11-12"],["Sadar ex","Babuganj","Babuganj Bazar","Rahmatpur",100,"2026-11-05"],["Sadar ex","Babuganj","Madhabpasha","Depot",285,"2026-11-05"],["Sadar ex","Ex Alamdanga","Kashipur","Bottola",30,"2026-11-01"],["Sadar ex","Ex Alamdanga","Kashipur","Depot",165,"2026-10-10"],["Sadar ex","Ex Alamdanga","Char Kawa","Depot",210,"2026-11-05"],["Sadar ex","Ex Alamdanga","Bottola","Kashipur",30,"2026-11-12"],["Sadar ex","Ex Alamdanga","Bottola","Depot",195,"2026-11-12"],["Sadar ex","Ex Alamdanga","Bottola","Char Kawa",75,"2026-11-05"],["Sadar ex","Ex Alamdanga","Depot","Kashipur",170,"2026-11-05"],["Sadar ex","Ex Alamdanga","Depot","Bottola",175,"2026-11-12"],["Sadar ex","Ex Alamdanga","Kashipur","Bottola",25,"2026-10-01"],["Sadar ex","Ex Alamdanga","Bottola","Char Kawa",65,"2026-09-15"],["Sadar ex","Ex Alamdanga","Depot","Char Kawa",205,"2026-10-10"],["Sadar ex","Ex Alamdanga","Char Kawa","Bottola",75,"2026-11-01"],["Ujirpur","Banaripara","Chakhar","Banaripara Bazar",105,"2026-10-10"],["Ujirpur","Banaripara","Depot","Chakhar",350,"2026-11-12"],["Ujirpur","Banaripara","Chakhar","Depot",345,"2026-10-20"],["Ujirpur","Banaripara","Banaripara Bazar","Depot",305,"2026-11-01"],["Ujirpur","Banaripara","Banaripara Bazar","Chakhar",120,"2026-10-10"],["Ujirpur","Banaripara","Depot","Banaripara Bazar",285,"2026-11-12"],["Ujirpur","Ujirpur Bazar","Depot","Ujirpur Bazar",380,"2026-10-20"],["Ujirpur","Ujirpur Bazar","Depot","Shikarpur",335,"2026-11-12"],["Ujirpur","Ujirpur Bazar","Depot","Guthia",300,"2026-11-01"],["Ujirpur","Ujirpur Bazar","Ujirpur Bazar","Shikarpur",85,"2026-11-05"],["Ujirpur","Ujirpur Bazar","Ujirpur Bazar","Depot",365,"2026-11-05"],["Ujirpur","Ujirpur Bazar","Shikarpur","Ujirpur Bazar",80,"2026-10-01"],["Ujirpur","Ujirpur Bazar","Guthia","Shikarpur",105,"2026-10-20"],["Ujirpur","Ujirpur Bazar","Guthia","Depot",295,"2026-10-20"],["Ujirpur","Ujirpur Bazar","Shikarpur","Depot",355,"2026-11-12"],["Ujirpur","Ujirpur Bazar","Shikarpur","Guthia",105,"2026-10-10"],["Ujirpur","Ujirpur Bazar","Shikarpur","Ujirpur Bazar",90,"2026-10-20"],["Ujirpur","Ujirpur Bazar","Ujirpur Bazar","Shikarpur",65,"2026-09-01"]]; /* [route, market, from, to, fare, lastUpdated] */
+const DEMO_HEROES=[
+  {id:'hd01',code:'DH-01',name:'Md. Rahim Uddin',phone:'+8801711000001',routes:['Sadar']},
+  {id:'hd02',code:'DH-02',name:'Karim Hossain',phone:'+8801811000002',routes:['Sadar ex']},
+  {id:'hd03',code:'DH-03',name:'Jamal Sheikh',phone:'+8801911000003',routes:['Bakerganj']},
+  {id:'hd04',code:'DH-04',name:'Shafiul Alam',phone:'+8801611000004',routes:['Sadar','Sadar ex']},
+  {id:'hd05',code:'DH-05',name:'Abdul Kader',phone:'+8801511000005',routes:['Ujirpur']},
+  {id:'hd06',code:'DH-06',name:'Rafiqul Islam',phone:'+8801311000006',routes:['Gournadi']}];
+const DEMO_PIN='1234';
+const DEMO_DAYS=91;
+/* how "honest" each hero is: chance a trip is claimed above chart, and how much */
+const DEMO_STYLE={hd01:[.05,20],hd02:[.32,60],hd03:[.10,30],hd04:[.08,25],hd05:[.12,30],hd06:[.06,20]};
+function demoRng(seed){let h=1779033703^seed.length;for(let i=0;i<seed.length;i++){h=Math.imul(h^seed.charCodeAt(i),3432918353);h=h<<13|h>>>19}
+  let a=h>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function demoChart(){const m=new Map();for(const [r,mk,f,t,a,u] of DEMO_FARES){const k=fareKey(r,mk,f,t);const p=m.get(k);if(!p||u>=p.u)m.set(k,{r,mk,f,t,a,u})}return m}
+function demoSetup(){const ch=demoChart();const s={t:'HBSETUP',v:1,demo:true,depot:DEMO_DEPOT,title:'Delivery Hero Conveyance Bill',mgrPhone:'+8801700000000',mgrEmail:'',ver:'demo-2026',
+  heroes:DEMO_HEROES.map(h=>({...h,pin:pinHash(h.id,DEMO_PIN)})),fares:[...ch.values()].map(x=>[x.r,x.mk,x.f,x.t,x.a])};s.sig=signObj(s);return s}
+const _isoD=d=>{const x=new Date(d);return new Date(x-x.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+function demoDates(){const out=[];const t=new Date();t.setHours(12,0,0,0);for(let i=DEMO_DAYS;i>=1;i--){const d=new Date(t);d.setDate(t.getDate()-i);if(d.getDay()!==5)out.push(_isoD(d))}return out} /* Fridays off */
+/* returns signed HBBILL objects for every hero for the last ~3 months (yesterday back) */
+function sampleBills(fares,heroes,depot){
+  const ch=new Map();for(const [r,mk,f,t,a] of fares)ch.set(fareKey(r,mk,f,t),{r,mk,f,t,a});const tree={};
+  for(const x of ch.values()){((tree[x.r]=tree[x.r]||{})[x.mk]=tree[x.r][x.mk]||[]).push(x)}
+  const allRoutes=Object.keys(tree).sort();
+  const homeOf=(r,mk)=>{const L=[...new Set(tree[r][mk].flatMap(e=>[e.f,e.t]))];return L.find(l=>/depot|ডিপো/i.test(l))||L.sort()[0]};
+  const fareOf=(r,mk,f,t)=>{const v=ch.get(fareKey(r,mk,f,t));return v?v.a:null};
+  const modes=[['cng',.38],['easybike',.24],['rickshaw',.2],['bus',.12],['van',.06]];
+  const pickMode=rn=>{let x=rn(),s=0;for(const [k,w] of modes){s+=w;if(x<s)return k}return 'cng'};
+  const overReasons=['রাতের ভাড়া (Night fare)','বৃষ্টি (Rain)','রাস্তা বন্ধ / ঘুরপথ (Road closed / detour)','বেশি মাল (Extra load)','যানবাহন পাওয়া যায়নি (No regular transport)'];
+  const newPlaces=['Notun Bazar','Station Road','Kheyaghat','Mollikpur More','Hat Khola'];
+  /* demo distance: fixed per leg (≈ ৳14 per km), entered on every trip */
+  const kmOf=(r,f,t,fare,rn)=>{rn();const q=demoRng('km|'+[r,f,t].map(normKey).sort().join('|'))();return {km:Math.max(.5,Math.round(fare/14*(.8+q*.4)*2)/2)}};
+  const bills=[];const dates=demoDates();
+  for(const h of heroes){const sty=DEMO_STYLE[h.id]||(()=>{const r=demoRng('style|'+h.id);return [.04+r()*.2,20+Math.round(r()*40)]})();const [pOver,maxOver]=sty;
+    const hr=(h.routes&&h.routes.length?h.routes:allRoutes).filter(r=>tree[r]);if(!hr.length)continue;
+    dates.forEach((date,di)=>{
+      const rn=demoRng(h.id+'|'+date);
+      if(rn()<.05)return; /* absent / leave */
+      const route=hr[di%hr.length];const mks=Object.keys(tree[route]||{});if(!mks.length)return;
+      const nMk=mks.length>1&&rn()<.45?2:1;const start=Math.floor(rn()*mks.length);const items=[];
+      for(let q=0;q<nMk;q++){const mk=mks[(start+q)%mks.length];const edges=tree[route][mk];
+        const home=homeOf(route,mk);let cur=home;const stops=2+Math.floor(rn()*3);
+        for(let s=0;s<stops;s++){const nx=edges.filter(e=>e.f===cur&&e.t!==home);if(!nx.length)break;const e=nx[Math.floor(rn()*nx.length)];
+          let amt=e.a,reason='';if(rn()<pOver){amt=e.a+5*Math.ceil((10+rn()*(maxOver-10))/5);reason=overReasons[Math.floor(rn()*overReasons.length)]}
+          items.push({type:'trip',market:mk,from:cur,to:e.t,mode:pickMode(rn),amount:amt,chart:e.a,reason,...kmOf(route,cur,e.t,e.a,rn)});cur=e.t}
+        if(cur!==home){const back=fareOf(route,mk,cur,home);if(back!=null){let amt=back,reason='';if(rn()<pOver*.6){amt=back+5*Math.ceil((10+rn()*(maxOver-10))/5);reason=overReasons[0]}items.push({type:'trip',market:mk,from:cur,to:home,mode:pickMode(rn),amount:amt,chart:back,reason,...kmOf(route,cur,home,back,rn)})}}}
+      if(rn()<.035){const mk=mks[start];items.push({type:'trip',market:mk,from:homeOf(route,mk),to:newPlaces[Math.floor(rn()*newPlaces.length)],mode:'cng',amount:5*Math.round((90+rn()*120)/5),chart:null,reason:'নতুন দোকান / জায়গা (New shop / place)',km:Math.round((6+rn()*10)*2)/2})}
+      if(rn()<.12){const cats=[['labour','Loading help at market',80,160],['food','Lunch on long route',60,110],['toll','Ghat toll',20,50]];const c=cats[Math.floor(rn()*cats.length)];items.push({type:'other',cat:c[0],amount:5*Math.round((c[2]+rn()*(c[3]-c[2]))/5),note:c[1]})}
+      if(pOver>.25&&rn()<.08&&items.length)items.push({...items[0]}); /* repeated trip */
+      if(!items.length)return;
+      const ts=new Date(date+'T19:30:00').getTime()+Math.floor(rn()*7200e3);
+      const o={t:'HBBILL',v:1,heroId:h.id,heroCode:h.code,heroName:h.name,depot,date,route,items,total:items.reduce((s,i)=>s+i.amount,0),createdAt:ts,setupVer:'demo-2026'};
+      o.sig=signObj(o);
+      bills.push(o)})}
+  return bills}
+function demoBills(){return sampleBills([...demoChart().values()].map(x=>[x.r,x.mk,x.f,x.t,x.a]),DEMO_HEROES,DEMO_DEPOT)}
+function sampleRecs(objs,tamperId){
+  objs.filter(o=>o.heroId===tamperId).forEach((o,i)=>{if(i%23===9){o.items[0].amount+=200;o.total+=200}}); /* files edited after the hero signed them */
+  const cut=iso(new Date(Date.now()-7*864e5));const recs=[];
+  for(const o of objs){
+    const rec={sample:true,id:`${o.heroId}|${o.date}|${normKey(o.route)}`,heroId:o.heroId,heroName:o.heroName,heroCode:o.heroCode,depot:o.depot,date:o.date,route:o.route,
+      items:o.items.map(it=>({type:it.type,market:it.market||'',...(it.fromMarket&&it.fromMarket!==it.market?{fromMarket:it.fromMarket}:{}),...(it.fromMarket&&it.fromMarket!==it.market?{fromMarket:it.fromMarket}:{}),from:it.from||'',to:it.to||'',mode:it.mode||'',cat:it.cat||'',amount:it.amount,chartAtEntry:it.chart==null?null:it.chart,reason:it.reason||'',note:it.note||'',...(it.km>0?{km:it.km}:{})})),
+      total:o.total,createdAt:o.createdAt,receivedAt:o.createdAt+36e5*14,setupVer:o.setupVer,sigOk:verifyObj(o),status:'pending',review:null,raw:o};
+    if(o.date<cut){const rn=demoRng('rev|'+rec.id);const at=o.createdAt+864e5*(1+Math.floor(rn()*3));
+      if(!rec.sigOk){rec.status='rejected';rec.review={lines:rec.items.map(()=>({})),remark:'File edited after submission',at}}
+      else if(rn()<.025){rec.status='rejected';rec.review={lines:rec.items.map(()=>({})),remark:'Duplicate claim — route not visited that day',at}}
+      else{const seen=new Set();rec.status='approved';
+        rec.review={remark:'',at,lines:rec.items.map(it=>{const L={};
+          if(it.type==='trip'){const k=fareKey('',it.market,it.from,it.to);if(seen.has(k)){L.rej=true;L.remark='Repeated trip'}seen.add(k);
+            const c=chartFare(rec.route,it.market,it.from,it.to);
+            if(!L.rej&&c==null){if(rn()<.5)L.remark='Verified new shop';else{L.rej=true;L.remark='Not verified'}}
+            else if(!L.rej&&it.amount>c){if(it.amount-c>30||rn()<.55){L.amount=c;L.remark='Capped at chart fare'}else L.remark='Reason accepted'}}
+          return L})};
+        if(rec.review.lines.some(l=>l.rej||l.amount!=null))rec.review.remark='Adjusted to fare chart'}}
+    recs.push(rec)}
+  return recs}
+
+/* ===================== DEMO COPY ONLY — 3 months of fictional "Model Depot" data =====================
+   Shared by the Depot Management demo and the Hero app demo (same people, routes, shops and fares). */
+function demoWorld(){let s=7;const rng=()=>{s=(s*1103515245+12345)%2147483648;return s/2147483648};const pick=a=>a[Math.floor(rng()*a.length)];
+  const DEP='Model Depot';
+  const RT=[['RT-01 : Sadar',['MD-101','MD-102'],'Rakib Hasan','Sadar',['Sadar Bazar','Chowmatha']],['RT-02 : Station Road',['MD-103'],'Mehedi Islam','Station Road',['Station Road','Bandar Road']],
+    ['RT-03 : Nathullabad',['MD-104','MD-105'],'Tanvir Ahmed','Nathullabad',['Nathullabad','Sagardi']],['RT-04 : Rupatoli',['MD-106'],'Sabbir Rahman','Rupatoli',['Rupatoli','Kashipur']],['RT-05 : Airport Road',['MD-107'],'Arif Billah','Airport Road',['Airport Road','Rahmatpur']]];
+  const MIO=['Karim Uddin','Jamal Hossain','Shahin Alam'];
+  const SH=['Rahman Pharmacy','Maa Medical Hall','Sonali Drug House','New Popular Pharmacy','Janata Medicine Corner','Bismillah Pharma','Hasan Medical Store','Shifa Pharmacy','Lazz Medicine Point','Al-Amin Drug House','Mukti Medical','Rupali Pharmacy','Bhai Bhai Medicine','Nirapad Pharma','Sheba Medical Hall','Amena Drug Store','Green Life Pharmacy','Desh Medical','Sathi Pharmacy','Royal Medicine Corner','City Drug House','Proshanti Medical','Nobin Pharmacy','Alif Medicine','Moumita Medical','Tasnim Pharmacy','Jononi Drug House','Arogya Pharmacy','Sufia Pharmacy','Nabil Medicine Corner','Hridoy Pharma','Uttara Pharmacy','Shapla Drug House','Kakoli Medical','Momota Pharmacy','Shuvo Medicine Point','Popular Diagnostic Pharmacy','Mayer Doa Medical','Ma Babar Doa Pharmacy','Sunrise Pharmacy','Tulip Medical','Ananda Pharmacy','Bondhu Medicine','Sabuj Pharma','Dhaka Drug House','Modina Medical','Nurjahan Pharmacy','Karim Medical Hall','Fatema Pharmacy','Life Care Pharmacy','Medi Point','Health Plus','Care Pharmacy','Akota Medical','Swastha Pharmacy','Dawa Ghar','Prottasha Pharmacy','Meghna Medical','Padma Drug House','Jamuna Pharmacy'];
+  const rows=[],custs=[];let ci=0;
+  RT.forEach((r,ri)=>r[1].forEach(terr=>{for(let k=0;k<6;k++){const code='C'+(20100+ci);const name=SH[ci%SH.length];ci++;const mk=pick(r[4]);const mob='017'+String(10000000+ci*7919).slice(0,8);const typ=pick(['Chemist','Chemist','Chemist','Retail','Hospital']);
+    const nInv=1+Math.floor(rng()*3);for(let j=0;j<nInv;j++){const days=Math.floor(3+rng()*(rng()<.25?110:50));rows.push({code,name,ctype:typ,market:mk,days,recv:Math.round((2000+rng()*30000)/10)*10,net:0,paid:0,route:terr,invoice:'INV-'+(81000+rows.length),invDate:'',depot:DEP,depotCode:'MD01',mio:MIO[ri%3],mioCode:'',area:'',zone:'',mobile:mob})}
+    custs.push({code,name,address:`${10+ci} ${mk}, Model Town`,market:mk,route:terr,owner:'',mobile:mob,thana:'',district:'',status:'Approved'})}}));
+  const F=[];RT.forEach(r=>r[4].forEach((mk,mi)=>{const pl=['Depot',mk+' Bus Stand',mk+' Bazar',mk+' Hospital More'];
+    for(let a=0;a<pl.length;a++)for(let c=a+1;c<pl.length;c++)F.push([r[3],mk,pl[a],pl[c],Math.round((15+rng()*45+(a===0?mi*15:0))/5)*5])}));
+  const heroes=RT.map((r,i)=>({id:'mh'+(i+1),code:'SA-0'+(i+1),name:r[2],phone:'+88017000000'+(10+i),routes:[r[3]],active:true,pin:pinHash('mh'+(i+1),'1234')}));
+  return {DEP,RT,MIO,rows,custs,F,heroes,rng}}
+const demoWorkDays=n=>{const out=[];const d=new Date(todayISO()+'T12:00:00');while(out.length<n){d.setDate(d.getDate()-1);if(d.getDay()!==5)out.push(iso(d))}return out.reverse()};
+
+/* ---------- Depot Management ---------- */
+async function demoSeedManager(){const W=demoWorld(),{DEP,RT,rows,custs,F,heroes,rng}=W;const now=Date.now();
+  const app={title:'Route Wise Collection Details',signs:'Prepared By, Delivery Assistant, Checked By, Approved By',depot:DEP,dec:'0',routeNames:{},routeSA:{},sort:'market',dayMode:'gt',dayMin:44,dayFrom:60,dayTo:90,mktSub:'0',groupMode:'route',
+    routeMaster:{[DEP]:RT.map((r,i)=>({id:'rt'+(i+1),name:r[0],terrs:r[1],sa:r[2]}))},v:5};
+  const older=(f)=>rows.map(x=>({...x,recv:Math.round(x.recv*f/10)*10,days:Math.max(1,x.days-Math.round((f-1)*30))}));
+  const rd=await rwDB();await new Promise((res,rej)=>{const t=rd.transaction(['settings','reports','customers'],'readwrite');t.objectStore('settings').put({key:'app',value:app});
+    t.objectStore('reports').put({fileName:'Receivable_Model_Depot_14-days-ago.xlsx',uploadedAt:now-14*864e5,rows:older(1.35)});
+    t.objectStore('reports').put({fileName:'Receivable_Model_Depot_7-days-ago.xlsx',uploadedAt:now-7*864e5,rows:older(1.15)});
+    t.objectStore('reports').put({fileName:'Receivable_Model_Depot_today.xlsx',uploadedAt:now-2*36e5,rows});
+    custs.forEach(c=>t.objectStore('customers').put({...c,updatedAt:now-5*864e5}));t.oncomplete=res;t.onerror=()=>rej(t.error)});rd.close();
+  await putMany('fares',F.map(([route,market,from,to,fare])=>({id:uid('f'),depot:DEP,route,market,from,to,fare,updated:iso(new Date(now-100*864e5))})));
+  await putMany('heroes',heroes);
+  const recs=sampleRecs(sampleBills(F,heroes.map(h=>({id:h.id,code:h.code,name:h.name,routes:h.routes})),DEP),'mh2').map(r=>{delete r.sample;return r});await putMany('bills',recs);
+  S.cfg={...S.cfg,depot:DEP,mgrPhone:'+8801700000001',heroUrl:location.href.replace(/depot-demo\/.*$/,'demo/'),centralPhone:''};await setKV('cfg',S.cfg);
+  /* 3 months of daily targets and DA collections (Fridays off) */
+  const ctT={},ctC={};for(const ds of demoWorkDays(78)){const at=new Date(ds+'T09:00:00').getTime();const C={},T={date:ds,at,routes:{},rep:'Receivable',share:true,sync:{target:{ok:true,at},result:{ok:true,at}}};
+    RT.forEach((r,ri)=>{let tot=0;r[1].forEach(terr=>{const v=Math.round((12000+rng()*30000)*(ri===3?.55:1)/10)*10;tot+=v;const sa=Math.round(v*(.55+rng()*.35));C[terr]={route:r[0],tname:r[3],da:r[2],daCode:'DA-'+(ri+1),sa,mio:v-sa,total:v}});
+      T.routes[r[0]]={target:Math.round(tot*(.85+rng()*.35)/100)*100,out:0,over:0,chem:12,inv:20,sa:r[2],terrs:r[1]}});ctT[ds]=T;ctC[ds]=C}
+  await setKV('ctTargets',ctT);await setKV('ctColl',ctC);
+  /* what heroes reported in the Hero app yesterday (feeds "Hero app vs system") */
+  const yd=Object.keys(ctC).sort().pop();const all=await getAll('bills');const upd=[];
+  RT.forEach((r,ri)=>{if(ri===4)return;const sys=r[1].reduce((a,t)=>a+ctC[yd][t].sa,0);const delta=[0,2500,-3000,0][ri];const bl=all.find(x=>x.heroId==='mh'+(ri+1)&&x.date===yd);if(!bl)return;
+    const shops=rows.filter(x=>r[1].includes(x.route));const tot=sys+delta;bl.col=[[shops[0].code,Math.round(tot*.6)],[shops[3].code,tot-Math.round(tot*.6)]];upd.push(bl)});await putMany('bills',upd);
+  /* Target Customers: 16 watched shops, added 10–80 days ago */
+  const by={};rows.forEach(x=>{(by[x.code]=by[x.code]||[]).push(x)});const codes=Object.keys(by).filter((c,i)=>i%3===0).slice(0,16);const list={};
+  codes.forEach((code,i)=>{const cur=by[code];const ago=10+Math.floor(rng()*70);const added=iso(new Date(now-ago*864e5));const inv={};const kind=i%5;
+    cur.forEach((x,j)=>{if(kind===3&&j===cur.length-1&&cur.length>1)return;inv[x.invoice]=kind===2?x.recv:Math.round(x.recv*(kind===0?2.6:1.6)/10)*10});
+    if(kind===4||kind===0)inv['INV-7'+(1000+i)]=Math.round((5000+rng()*15000)/10)*10;
+    const amt=Object.values(inv).reduce((a,v)=>a+v,0);const hist=[];for(let dd=0;dd<ago;dd+=4)hist.push({d:iso(new Date(now-(ago-dd)*864e5)),rem:Math.round(amt*(1-(kind===2?0:.5)*dd/ago)),nw:0});
+    const first=cur[0];const ti=RT.find(r=>r[1].includes(first.route));
+    list[code]={code,added,addedAt:now-ago*864e5,deadline:i%3===0?iso(new Date(now+(12-i)*864e5)):'',info:{name:first.name,type:first.ctype,market:first.market,address:'',mobile:first.mobile,owner:'',thana:'',district:'',terr:first.route,route:ti[0],sa:ti[2],mio:first.mio,area:'',zone:''},
+      snap:{repAt:now-ago*864e5,rep:'Receivable',amt,inv,n:Object.keys(inv).length,maxDays:60},hist}});
+  await setKV('tcm',{list,set:{critDays:15,horizon:30}})}
+async function demoBootManager(){let done=false;try{done=!!localStorage.getItem('demoSeeded')}catch(e){}if(done)return;
+  const wait=async(f,ms=15000)=>{const t0=Date.now();while(!f()){if(Date.now()-t0>ms)return false;await new Promise(r=>setTimeout(r,150))}return true};
+  await wait(()=>typeof getKV==='function'&&typeof putMany==='function'&&document.getElementById('lgForm')&&typeof db!=='undefined'&&!!db&&typeof S!=='undefined'&&S.cfg);await new Promise(r=>setTimeout(r,600));
+  const ov=document.createElement('div');ov.id='demoLoading';ov.style.cssText='position:fixed;inset:0;z-index:2147483646;background:#1d1a5ee6;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font:600 20px Ubuntu,sans-serif';ov.innerHTML='<div style="font-size:42px">🧪</div>Loading 3 months of demo data…<small style="opacity:.8;font-weight:400">Model Depot · fictional data</small>';document.body.appendChild(ov);
+  try{if(!(await getKV('auth'))){const set=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v};set('aD','Model Depot');set('aP','demo1234');set('aP2','demo1234');set('aM','demomaster');
+      document.getElementById('lgForm').requestSubmit();await wait(()=>document.getElementById('login').hidden||!document.body.classList.contains('locked'),8000)}
+    await demoSeedManager();try{localStorage.setItem('demoSeeded','1')}catch(e){}}catch(e){ov.innerHTML='Demo data could not load: '+e.message;return}
+  location.reload()}
+
+/* ---------- Hero app (logged in as Rakib Hasan, SA-01) ---------- */
+function demoSeedHero(){let n=0;const did=()=>"d"+Date.now().toString(36)+(n++).toString(36);const W=demoWorld(),{DEP,RT,rows,F,heroes}=W;const me=heroes[0];
+  const s={t:'HBSETUP',v:1,depot:DEP,title:'Delivery Hero Conveyance Bill',mgrPhone:'+8801700000001',mgrEmail:'',ver:'demo',heroes,fares:F};s.sig=signObj(s);
+  const bills=sampleBills(F,[{id:me.id,code:me.code,name:me.name,routes:me.routes}],DEP).map(o=>({id:did(),heroId:me.id,date:o.date,route:o.route,items:o.items.map(i=>({...i,id:did()})),status:'sent',changed:false,sentAt:o.createdAt,updatedAt:o.createdAt}));
+  const r=RT[0];const byC={};rows.filter(x=>r[1].includes(x.route)).forEach(x=>{const o=byC[x.code]||(byC[x.code]={code:x.code,name:x.name,phone:x.mobile,mk:x.market,amt:0,inv:0,days:0,no:[]});o.amt+=x.recv;o.inv++;o.days=Math.max(o.days,x.days);o.no.push(x.invoice)});
+  const T={t:'HBTGT',v:1,depot:DEP,date:todayISO(),rep:'Receivable_Model_Depot_today.xlsx',repAt:Date.now()-2*36e5,at:Date.now()-36e5,routes:{[r[3]]:Object.values(byC).map(o=>[o.code,o.name,o.phone,o.mk,o.mk,o.amt,o.inv,o.days,o.mk+', Model Town',o.no.join(', ')])},heroes:{[me.id]:[r[3]]}};T.sig=signObj(T);
+  const codes=Object.keys(byC);const col={[todayISO()]:{[codes[0]]:byC[codes[0]].amt,[codes[2]]:Math.round(byC[codes[2]].amt/2/10)*10}};
+  return {setup:s,heroId:me.id,bills,tgt:T,col}}
+
+try{if(!D.setup&&!localStorage.getItem('demoSeededHero')){localStorage.setItem('herobill_app_v1',JSON.stringify(demoSeedHero()));localStorage.setItem('demoSeededHero','1');location.reload()}}catch(e){console.error('demo seed',e)}</script></body>
+</html>
