@@ -1,5 +1,5 @@
 /* Hero Bill service worker — works offline; updates when you replace files on the server */
-const VERSION = 'a97439b618';
+const VERSION = '56c5ff040a';
 const SCOPE = new URL(self.registration.scope).pathname;
 const PREFIX = 'herobill-' + SCOPE + '@';   /* each app (hero, depot, demos) keeps its own offline copy */
 const CACHE = PREFIX + VERSION;
