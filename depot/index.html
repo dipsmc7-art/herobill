@@ -2993,8 +2993,7 @@ async function gateSubmit(err){const a0=gateGet();let o=gateParse($('aTok').valu
   if(j.k)try{localStorage.setItem('dm_conn',JSON.stringify({u:o.u,k:j.k}))}catch(e){}
   if(j.depot&&S.cfg.depot!==j.depot){S.cfg.depot=j.depot;await setKV('cfg',S.cfg)}
   toast('✅ This PC is activated for '+(j.depot||'your depot'));
-  const auth=await getKV('auth'),ses=await getKV('session');let tabOk=false;try{tabOk=sessionStorage.getItem('hbm')==='1'}catch(x){}
-  if(auth&&ses&&(ses.until>Date.now()||(ses.tab&&tabOk)))enter();else showLogin()}
+  await setKV('session',{until:0});try{sessionStorage.removeItem('hbm')}catch(x){}showLogin()}   /* after the token: always the password step (create passwords on a new PC, log in on an existing one) */
 /* background check on every start: blocked / released tokens lock the PC; long offline periods ask for a check */
 async function gateVerify(){if(!DM_GATE)return;const a=gateGet();if(!a||!a.t||a.lock)return;
   try{const j=await gateCall(a.u,{action:'tcheck',t:a.t,pc:a.pc});
