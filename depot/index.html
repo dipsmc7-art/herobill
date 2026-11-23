@@ -2037,7 +2037,7 @@ async function showLogin(mode){lgAnimStart();
     ${pwField('aP','Manager password','min 4 characters')}${pwField('aP2','Confirm password')}
     ${pwField('aM','Master password','min 6 characters — for password reset')}
     <div class="hint">Write the master password down and keep it safe. It is the only way to reset a forgotten password.</div>
-    <div class="lgerr" id="lgErr"></div><div class="lgrow"><span class="hint">v1.0</span><button class="btn primary" type="submit">Create &amp; continue →</button></div>`;
+    <div class="lgerr" id="lgErr"></div><div class="lgrow"><span class="hint">${OPAS?"OPAS":"v1.0"}</span><button class="btn primary" type="submit">Create &amp; continue →</button></div>`;
   if(mode==='login')m.innerHTML=`<h3>Welcome back</h3><p class="lead">${esc(S.cfg.depot||'Depot')} · Manager login</p>
     ${pwField('aP','Password')}
     <label class="hint" style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" class="cb" id="aR" checked> Keep me logged in on this PC</label>
