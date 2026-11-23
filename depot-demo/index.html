@@ -583,6 +583,12 @@ body.locked>*:not(#login):not(.overlay):not(.toast):not(#printArea){display:none
 @keyframes invs{to{background-position:300% 0}}
 @keyframes invb{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 @media (prefers-reduced-motion:reduce){.dmcard.inv,.dmcard.inv .dmsoon,.invart .bx{animation:none}}
+.dmcard.rw,.dmcard.ct,.dmcard.tc,.dmcard.hbk{background-size:320% 320%!important;animation:invg 11s ease-in-out infinite}
+.dmcard.rw{background-image:linear-gradient(120deg,#ffffff 0%,#eaf2ff 24%,#e8f7f4 50%,#f3efff 76%,#ffffff 100%)!important}
+.dmcard.ct{background-image:linear-gradient(120deg,#ffffff 0%,#e3f6f1 24%,#eef9e8 50%,#e6f2fb 76%,#ffffff 100%)!important;animation-duration:12.5s;animation-delay:-3s}
+.dmcard.tc{background-image:linear-gradient(120deg,#ffffff 0%,#fff2e2 24%,#fdebee 50%,#fff8e6 76%,#ffffff 100%)!important;animation-duration:10s;animation-delay:-6s}
+.dmcard.hbk{background-image:linear-gradient(120deg,#ffffff 0%,#f8e9ef 24%,#f1ecff 50%,#fdf0e6 76%,#ffffff 100%)!important;animation-duration:13s;animation-delay:-2s}
+@media (prefers-reduced-motion:reduce){.dmcard.rw,.dmcard.ct,.dmcard.tc,.dmcard.hbk{animation:none}}
 html.opas .hbonly{display:none!important}html:not(.opas) .opasonly{display:none!important}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
