@@ -2959,11 +2959,11 @@ async function rwTrim(){if(!S.cfg.depot)return;try{const db=await rwDB();const a
   db.close()}catch(e){console.warn('rwTrim',e)}}
 
 /* =============== LOGIN TOKEN: one token per PC, tied to one depot, made by head office =============== */
-const DM_GATE=false;                 /* demo copies set this to false */
+const DM_GATE=true;                 /* demo copies set this to false */
 const GATE_GRACE=7*864e5;           /* days a PC may stay offline before it must check its token again */
 const gateGet=()=>{try{return JSON.parse(localStorage.getItem('dm_act')||'null')}catch(e){return null}};
 const gateSet=o=>{try{o?localStorage.setItem('dm_act',JSON.stringify(o)):localStorage.removeItem('dm_act')}catch(e){}};
-const gateNeeded=()=>{if(!DM_GATE)return false;const a=gateGet();return !a||!a.t||!!a.lock};
+function gateNeeded(){if(!DM_GATE)return false;const a=gateGet();return !a||!a.t||!!a.lock}
 const gateDepot=()=>{if(!DM_GATE)return '';const a=gateGet();return a&&!a.lock?a.depot||'':''};
 function gatePcId(){const a=new Uint8Array(4);crypto.getRandomValues(a);return 'PC-'+[...a].map(x=>x.toString(16).padStart(2,'0')).join('').toUpperCase()}
 function gateParse(s){const dec=b=>{try{const o=JSON.parse(new TextDecoder().decode(unb64u(b)));return /^https:\/\/script\.google\.com\/.+\/exec$/.test(o.u)&&o.t?o:null}catch(e){return null}};
@@ -3233,6 +3233,24 @@ function demoSeedHero(){let n=0;const did=()=>"d"+Date.now().toString(36)+(n++).
   const T={t:'HBTGT',v:1,depot:DEP,date:todayISO(),rep:'Receivable_Model_Depot_today.xlsx',repAt:Date.now()-2*36e5,at:Date.now()-36e5,routes:{[r[3]]:Object.values(byC).map(o=>[o.code,o.name,o.phone,o.mk,o.mk,o.amt,o.inv,o.days,o.mk+', Model Town',o.no.join(', ')])},heroes:{[me.id]:[r[3]]}};T.sig=signObj(T);
   const codes=Object.keys(byC);const col={[todayISO()]:{[codes[0]]:byC[codes[0]].amt,[codes[2]]:Math.round(byC[codes[2]].amt/2/10)*10}};
   return {setup:s,heroId:me.id,bills,tgt:T,col}}
+
+/* ---------- demo: login token page works without head office ---------- */
+const DEMO_TOKEN_U='https://script.google.com/macros/s/DEMO/exec';
+const DEMO_TOKEN=gateMake(DEMO_TOKEN_U,'demo-model-depot-pc-0001');
+{const _need=gateNeeded;gateNeeded=function(){try{if(!localStorage.getItem('demoSeeded'))return false}catch(e){}return _need()}}
+gateCall=async function(u,b){await new Promise(r=>setTimeout(r,500));let T=[];try{T=JSON.parse(localStorage.getItem('demoTokens')||'[]')}catch(e){}
+  const save=()=>{try{localStorage.setItem('demoTokens',JSON.stringify(T))}catch(e){}};
+  if(!T.length){T.push({id:'T-DEMO01',t:'demo-model-depot-pc-0001',depot:'Model Depot',pc:'',status:'Active',note:'Demo token'});save()}
+  const now=new Date().toISOString().slice(0,16).replace('T',' ');
+  if(b.action==='activate'||b.action==='tcheck'){const r=T.find(x=>x.t===b.t);if(!r)return {ok:false,error:'Token not valid'};if(r.status==='Blocked')return {ok:false,error:'This token has been blocked'};
+    if(r.pc&&r.pc!==b.pc)return {ok:false,error:b.action==='tcheck'?'Token released':'This token is already used on another PC'};
+    if(!r.pc){if(b.action==='tcheck')return {ok:false,error:'Token released'};r.pc=b.pc;r.act=now;r.info=b.info||''}r.last=now;save();return {ok:true,depot:r.depot}}
+  if(!b.key)return {ok:false,error:'Wrong key'};
+  if(b.action==='mint'){const out=[];for(let i=0;i<(b.n||1);i++){const t='demo-'+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2),id='T-'+Math.random().toString(36).slice(2,8).toUpperCase();T.push({id,t,depot:b.depot,pc:'',status:'Active',note:b.note||'',created:now});out.push({id,t})}save();return {ok:true,tokens:out}}
+  if(b.action==='tokens')return {ok:true,rows:T.slice().reverse().map(r=>({'Token ID':r.id,Depot:r.depot,PC:r.pc,Activated:r.act||'',  'Last check':r.last||'',Status:r.status,Note:r.note,Info:r.info||''}))};
+  if(b.action==='tstatus'){const r=T.find(x=>x.id===b.id);if(!r)return {ok:false,error:'Token not found'};if(b.op==='block')r.status='Blocked';if(b.op==='unblock')r.status='Active';if(b.op==='release'){r.pc='';r.act='';r.last=''}save();return {ok:true}}
+  return {ok:false,error:'Unknown action'}};
+try{if(!sessionStorage.getItem('hq_u'))sessionStorage.setItem('hq_u',DEMO_TOKEN_U)}catch(e){}
 
 demoBootManager();</script></body>
 </html>

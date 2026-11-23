@@ -2963,7 +2963,7 @@ const DM_GATE=true;                 /* demo copies set this to false */
 const GATE_GRACE=7*864e5;           /* days a PC may stay offline before it must check its token again */
 const gateGet=()=>{try{return JSON.parse(localStorage.getItem('dm_act')||'null')}catch(e){return null}};
 const gateSet=o=>{try{o?localStorage.setItem('dm_act',JSON.stringify(o)):localStorage.removeItem('dm_act')}catch(e){}};
-const gateNeeded=()=>{if(!DM_GATE)return false;const a=gateGet();return !a||!a.t||!!a.lock};
+function gateNeeded(){if(!DM_GATE)return false;const a=gateGet();return !a||!a.t||!!a.lock}
 const gateDepot=()=>{if(!DM_GATE)return '';const a=gateGet();return a&&!a.lock?a.depot||'':''};
 function gatePcId(){const a=new Uint8Array(4);crypto.getRandomValues(a);return 'PC-'+[...a].map(x=>x.toString(16).padStart(2,'0')).join('').toUpperCase()}
 function gateParse(s){const dec=b=>{try{const o=JSON.parse(new TextDecoder().decode(unb64u(b)));return /^https:\/\/script\.google\.com\/.+\/exec$/.test(o.u)&&o.t?o:null}catch(e){return null}};
