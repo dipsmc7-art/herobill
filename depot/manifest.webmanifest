@@ -1,7 +1,7 @@
 {
   "name": "Depot Management",
   "short_name": "Depot Mgmt",
-  "description": "Route Wise Receivable, Hero Bill Manager and Collection Target for depot managers",
+  "description": "Route Wise Receivable, Collection Target and Target Customer Monitoring for depot managers",
   "lang": "en",
   "start_url": "./",
   "scope": "./",
