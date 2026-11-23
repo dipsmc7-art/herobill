@@ -574,6 +574,15 @@ body.locked>*:not(#login):not(.overlay):not(.toast):not(#printArea){display:none
 .tcsub{display:block;color:var(--ink3);font-size:11.5px;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tcwrap{overflow:auto}.tcgrp{cursor:pointer}.tcgrp td{background:#fbefe1!important;border-top:2px solid #f0d9bd;font-size:13.5px}.tcgrp:hover td{background:#f8e4cc!important}.tcchev{display:inline-block;width:14px;color:#a1580e}.tctbl td.mono{white-space:nowrap}#tcWrap .ctpage{max-width:1440px}
 @media (max-width:900px){.tccats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.dmcard.inv{cursor:default;border-color:#ddd6f3;background:linear-gradient(120deg,#ffffff 0%,#f1edff 22%,#e6f6f2 46%,#fff3e3 70%,#f6effa 88%,#ffffff 100%);background-size:320% 320%;animation:invg 10s ease-in-out infinite}
+.dmcard.inv:hover{transform:none}.dmcard.inv .dmic{background:#ffffffb3}
+.dmcard.inv .invart{margin:6px 0 2px}.invart svg{width:100%;height:64px;display:block;fill:none;stroke:#2e2a8f;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.55}
+.invart .bx{animation:invb 3.2s ease-in-out infinite}.invart .b2{animation-delay:.8s}.invart .clip path{stroke:#1c8c7e}
+.dmcard.inv .dmsoon{margin-top:auto;align-self:flex-start;padding:7px 14px;border-radius:999px;font-size:12.5px;font-weight:700;color:#fff;letter-spacing:.2px;background:linear-gradient(90deg,#2e2a8f,#1c8c7e,#d98a1a,#7b1e3a,#2e2a8f);background-size:300% 100%;animation:invs 6s linear infinite;box-shadow:0 4px 12px #2e2a8f2e}
+@keyframes invg{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes invs{to{background-position:300% 0}}
+@keyframes invb{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@media (prefers-reduced-motion:reduce){.dmcard.inv,.dmcard.inv .dmsoon,.invart .bx{animation:none}}
 html.opas .hbonly{display:none!important}html:not(.opas) .opasonly{display:none!important}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
@@ -2912,6 +2921,10 @@ async function dmShow(){
         <div class="dmst" id="dmCtSt"><span class="muted">Loading…</span></div><div class="dmgo">Open →</div></button>
       <button class="dmcard tc" id="dmTC"><div class="dmic">👁️</div><div class="dmct"><b>Target Customers</b><span>Monitoring — dues when added vs collected since</span></div>${caHtml('tc',['tcA','tcB'])}
         <div class="dmst" id="dmTcSt"><span class="muted">Loading…</span></div><div class="dmgo">Open →</div></button>
+      <div class="dmcard inv" id="dmINV" role="button" tabindex="0" aria-label="Inventory Counting and Month Closing, coming soon"><div class="dmic">📦</div><div class="dmct"><b>Inventory Counting &amp; Month Closing</b><span>Count depot stock, reconcile with the system and close the month</span></div>
+        <div class="invart" aria-hidden="true"><svg viewBox="0 0 240 64"><path class="ln" d="M6 58H234"/><g class="bx"><rect x="18" y="30" width="26" height="26" rx="2"/><rect x="46" y="30" width="26" height="26" rx="2"/><rect x="32" y="4" width="26" height="26" rx="2"/></g><g class="bx b2"><rect x="96" y="30" width="26" height="26" rx="2"/><rect x="124" y="30" width="26" height="26" rx="2"/></g>
+          <g class="clip"><rect x="178" y="10" width="40" height="46" rx="4"/><path d="M188 10v-4h20v4M186 24h10M186 34h10M186 44h10M200 24l4 4 7-8M200 34l4 4 7-8"/></g></svg></div>
+        <div class="dmsoon">⏳ Coming soon</div></div>
       <div class="dmcard soon" aria-label="More tools coming soon"><div class="gears"><span class="g1">⚙️</span><span class="g2">⚙️</span><span class="g3">🔧</span></div>
         <div class="dmct"><b>More tools</b><span>Under development — coming soon</span></div><div class="dots"><i></i><i></i><i></i></div></div>
     </div></div>
@@ -2919,7 +2932,7 @@ async function dmShow(){
     <div class="dmwave" aria-hidden="true">${dmFlow()}
       <div class="dmfoot">Depot Management ${OPAS?'OPAS':'v1.0'} · Designed by: ABM Shafiquzzaman</div></div>`;
   caBind($('dmHome'));trRender().then(p=>{if(p&&!DM.nudged){DM.nudged=true;trDailyNudge(p)}});if($('dmHB'))$('dmHB').onclick=()=>dmOpenHB();if($('dmSet'))$('dmSet').onclick=()=>{dmOpenHB();go('settings')};$('dmRW').onclick=()=>dmOpenRW();$('dmCT').onclick=()=>ctOpen('overview');ctCardStat();$('dmTC').onclick=()=>tcOpen('summary');tcCardStat();
-  $('dmOut').onclick=()=>dmLogout();
+  $('dmOut').onclick=()=>dmLogout();const inv=$('dmINV');if(inv)inv.onclick=()=>toast('Inventory Counting & Month Closing is coming soon');
   const s=DM.rwSum||await rwSummary();DM.rwSum=s;const el=$('dmRwSt');if(!el)return;
   el.innerHTML=s?`<div><b>৳ ${kfmt(s.total)}</b><small>receivable</small></div><div><b>${s.cust}</b><small>customers · ${s.routes} territories</small></div><div><b>${fmtStamp(s.at).split(',')[0]}</b><small>last upload</small></div>`
     :'<div><b>—</b><small>no receivable uploaded yet</small></div>'}
