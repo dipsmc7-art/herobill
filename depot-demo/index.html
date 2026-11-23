@@ -12,9 +12,13 @@ window.DM_FONTS={inter:['Inter + Noto Sans Bengali','Inter','Noto Sans Bengali',
  poppins:['Poppins + Hind Siliguri','Poppins','Hind Siliguri','Poppins:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700','Familiar, round and bold'],
  jakarta:['Plus Jakarta Sans + Hind Siliguri','Plus Jakarta Sans','Hind Siliguri','Plus+Jakarta+Sans:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700','Stylish headings, premium feel'],
  ubuntu:['Ubuntu + Hind Siliguri','Ubuntu','Hind Siliguri','Ubuntu:wght@400;500;700&family=Hind+Siliguri:wght@400;500;600;700','The original look']};
-(function(){let k='inter';try{k=localStorage.getItem('dm_font')||'inter'}catch(e){}if(!DM_FONTS[k])k='inter';const f=DM_FONTS[k];window.DM_FONT=k;
+/* the head office sets the font for all depots; each PC keeps the last one it received */
+window.dmApplyFont=function(k,live){if(!DM_FONTS[k])k='inter';const f=DM_FONTS[k];window.DM_FONT=k;
  window.DM_FONT_CSS="'"+f[1]+"','"+f[2]+"',Arial,sans-serif";window.DM_FONT_URL='https://fonts.googleapis.com/css2?family='+f[3]+'&family=Ubuntu+Mono&display=swap';
- document.write('<link rel="stylesheet" href="'+DM_FONT_URL+'">');document.documentElement.style.setProperty('--appfont',DM_FONT_CSS)})();</script>
+ if(live){const l=document.createElement('link');l.rel='stylesheet';l.href=DM_FONT_URL;document.head.appendChild(l)}else document.write('<link rel="stylesheet" href="'+DM_FONT_URL+'">');
+ document.documentElement.style.setProperty('--appfont',DM_FONT_CSS)};
+window.dmSetFont=function(k){if(!k||!DM_FONTS[k]||k===window.DM_FONT)return;try{localStorage.setItem('dm_font',k)}catch(e){}dmApplyFont(k,true)};
+(function(){let k='inter';try{k=localStorage.getItem('dm_font')||'inter'}catch(e){}dmApplyFont(k,false)})();</script>
 <style>
 :root{
   --bg:#f4f3f8;--card:#fff;--ink:#1d1b3a;--ink2:#55536e;--ink3:#8e8ca4;--line:#e6e4ef;--line2:#d6d3e4;
@@ -2201,11 +2205,16 @@ async function gdLoadList(depot){const key=$('gdOK').value,box=$('gdRL');if(!key
 function gdHQ(){if(!$('login').hidden){if(S.lgMode==='token')gdTokDlg();return}modal('Head-office backup',gdPanelHtml()+gdFontHtml(),[{l:'Close'}]);gdBind();gdFontBind()}
 /* app font for this PC (hidden menu) */
 function gdFontHtml(){const F=window.DM_FONTS||{};const all=Object.values(F).map(f=>f[3]).join('&family=');
-  return `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=${all}&display=swap"><div class="gdbox" style="margin-top:14px"><b>Aa App font</b> <span class="hint">· this PC</span>
+  let k0='';try{k0=sessionStorage.getItem('hq_ok')||''}catch(e){}
+  return `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=${all}&display=swap"><div class="gdbox" style="margin-top:14px"><b>Aa App font</b> <span class="hint">· for all depots</span>
+    <div class="fgrid" style="margin-top:8px"><div class="field"><label>Owner key</label><input type="password" id="fnK" autocomplete="off" value="${esc(k0)}"></div><div class="hint" style="align-self:end;padding-bottom:8px">Each depot PC switches the next time it opens (or within a few hours).</div></div>
     <div class="fontopts">${Object.entries(F).map(([k,f])=>`<button type="button" class="fontopt ${k===window.DM_FONT?'on':''}" data-font="${k}" style="font-family:'${f[1]}','${f[2]}',sans-serif">
       <span class="fn">${esc(f[0])}${k==='inter'?' <em>default</em>':''}</span><span class="fs">৳ 1,25,400 · 98%</span><span class="fb">কোড পেস্ট করুন</span><span class="fd">${esc(f[4])}</span></button>`).join('')}</div></div>`}
-function gdFontBind(){document.querySelectorAll('[data-font]').forEach(b=>b.onclick=()=>{const k=b.dataset.font;if(k===window.DM_FONT){toast('Already in use');return}
-  try{localStorage.setItem('dm_font',k)}catch(e){}toast('Font changed — reloading…');setTimeout(()=>location.reload(),500)})}
+function gdFontBind(){document.querySelectorAll('[data-font]').forEach(b=>b.onclick=async()=>{const k=b.dataset.font,key=$('fnK').value;if(!key){toast('Enter the owner key');$('fnK').focus();return}
+  const u=gdUrl()||(typeof DEMO_TOKEN_U!=='undefined'?DEMO_TOKEN_U:'');if(!u){toast('This PC is not connected to the head office');return}
+  try{const j=await gateCall(u,{key,action:'setfont',font:k});if(!j.ok)throw new Error(/Unknown action/i.test(j.error)?'Update the head-office script to v7 first':j.error);
+    try{sessionStorage.setItem('hq_ok',key)}catch(e){}dmSetFont(k);document.querySelectorAll('[data-font]').forEach(x=>x.classList.toggle('on',x.dataset.font===k));toast('✅ Font set for all depots')}
+  catch(e){toast(e.message)}})}
 /* ---------- timers ---------- */
 async function gdStart(){await gdLoad();gdChip();
   if(gdReady()&&(GD.dirty||!GD.last||Date.now()-GD.last.t>12*36e5||GD.err))setTimeout(()=>gdRun(),8000);
@@ -3030,7 +3039,7 @@ async function gateSubmit(err){const a0=gateGet();let o=gateParse($('aTok').valu
   let j;try{j=await gateCall(o.u,{action:'activate',t:o.t,pc,info:(navigator.userAgent.match(/(Windows[^;)]*|Mac OS X [\d_]+|Android [\d.]+|Linux)/)||[''])[0]})}
   catch(e){b.disabled=false;b.textContent='Activate →';return err(navigator.onLine?e.message||'Could not reach head office':'No internet connection. Connect to the internet to activate.')}
   if(!j.ok){b.disabled=false;b.textContent='Activate →';return err(gateMsg(j.error))}
-  gateSet({u:o.u,t:o.t,pc,depot:j.depot||'',ok:Date.now()});
+  gateSet({u:o.u,t:o.t,pc,depot:j.depot||'',ok:Date.now()});if(j.font)dmSetFont(j.font);
   if(j.k)try{localStorage.setItem('dm_conn',JSON.stringify({u:o.u,k:j.k}))}catch(e){}
   if(j.depot&&S.cfg.depot!==j.depot){S.cfg.depot=j.depot;await setKV('cfg',S.cfg)}
   toast('✅ This PC is activated for '+(j.depot||'your depot'));
@@ -3038,7 +3047,7 @@ async function gateSubmit(err){const a0=gateGet();let o=gateParse($('aTok').valu
 /* background check on every start: blocked / released tokens lock the PC; long offline periods ask for a check */
 async function gateVerify(){if(!DM_GATE)return;const a=gateGet();if(!a||!a.t||a.lock)return;
   try{const j=await gateCall(a.u,{action:'tcheck',t:a.t,pc:a.pc});
-    if(j.ok){a.ok=Date.now();if(j.depot)a.depot=j.depot;gateSet(a);if(j.depot&&S.cfg.depot!==j.depot){S.cfg.depot=j.depot;await setKV('cfg',S.cfg)}return}
+    if(j.ok){a.ok=Date.now();if(j.depot)a.depot=j.depot;gateSet(a);if(j.font)dmSetFont(j.font);if(j.depot&&S.cfg.depot!==j.depot){S.cfg.depot=j.depot;await setKV('cfg',S.cfg)}return}
     if(/already used|blocked|released|not valid|unknown token/i.test(j.error||'')){a.lock=j.error;gateSet(a);showLogin('token')}}
   catch(e){if(Date.now()-(a.ok||0)>GATE_GRACE){a.lock='offline';gateSet(a);showLogin('token')}}}
 setInterval(()=>{if(navigator.onLine)gateVerify()},6*36e5);
@@ -3285,10 +3294,11 @@ gateCall=async function(u,b){await new Promise(r=>setTimeout(r,500));let T=[];tr
   const now=new Date().toISOString().slice(0,16).replace('T',' ');
   if(b.action==='activate'||b.action==='tcheck'){const r=T.find(x=>x.t===b.t);if(!r)return {ok:false,error:'Token not valid'};if(r.status==='Blocked')return {ok:false,error:'This token has been blocked'};
     if(r.pc&&r.pc!==b.pc)return {ok:false,error:b.action==='tcheck'?'Token released':'This token is already used on another PC'};
-    if(!r.pc){if(b.action==='tcheck')return {ok:false,error:'Token released'};r.pc=b.pc;r.act=now;r.info=b.info||''}r.last=now;save();return {ok:true,depot:r.depot}}
+    if(!r.pc){if(b.action==='tcheck')return {ok:false,error:'Token released'};r.pc=b.pc;r.act=now;r.info=b.info||''}r.last=now;save();return {ok:true,depot:r.depot,font:localStorage.getItem('demoFont')||''}}
   if(!b.key)return {ok:false,error:'Wrong key'};
   if(b.action==='mint'){const out=[];for(let i=0;i<(b.n||1);i++){const t='demo-'+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2),id='T-'+Math.random().toString(36).slice(2,8).toUpperCase();T.push({id,t,depot:b.depot,pc:'',status:'Active',note:b.note||'',created:now});out.push({id,t})}save();return {ok:true,tokens:out}}
   if(b.action==='tokens')return {ok:true,rows:T.slice().reverse().map(r=>({'Token ID':r.id,Depot:r.depot,PC:r.pc,Activated:r.act||'',  'Last check':r.last||'',Status:r.status,Note:r.note,Info:r.info||''}))};
+  if(b.action==='setfont'){try{localStorage.setItem('demoFont',b.font)}catch(e){}return {ok:true,font:b.font}}
   if(b.action==='tstatus'){const r=T.find(x=>x.id===b.id);if(!r)return {ok:false,error:'Token not found'};if(b.op==='block')r.status='Blocked';if(b.op==='unblock')r.status='Active';if(b.op==='release'){r.pc='';r.act='';r.last=''}save();return {ok:true}}
   return {ok:false,error:'Unknown action'}};
 try{if(!sessionStorage.getItem('hq_u'))sessionStorage.setItem('hq_u',DEMO_TOKEN_U)}catch(e){}
