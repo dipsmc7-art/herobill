@@ -1969,7 +1969,7 @@ function renderSettings(){
   const tabs=[['depot',OPAS?'Depot details':'Depot & printing'],['security','Password & security'],['data','Backup & data']];
   let body='';const c=S.cfg;
   if(S.setTab==='depot'){const deps=allDepots();body=`<h3>${OPAS?'Depot details':'Depot &amp; printing'}</h3><p class="lead">${OPAS?'Depot details used across the tools and in the head-office backup.':'Used on every printed bill and in the setup file sent to Delivery Heroes.'}</p>
-    <div class="fgrid"><div class="field"><label>Depot</label><input id="sD" list="dlD" value="${esc(c.depot)}" placeholder="e.g. Barishal"><datalist id="dlD">${deps.map(d=>`<option value="${esc(d)}">`).join('')}</datalist></div>
+    <div class="fgrid"><div class="field"><label>Depot</label><input id="sD" list="dlD" value="${esc(c.depot)}" placeholder="e.g. Barishal" ${gateDepot()?'readonly title="Set by the login token"':''}><datalist id="dlD">${deps.map(d=>`<option value="${esc(d)}">`).join('')}</datalist></div>
     <div class="field hbonly"><label>Bill title</label><input id="sT" value="${esc(c.title)}"></div>
     <div class="field full hbonly"><label>Signature boxes (comma separated, up to 5)</label><input id="sG" value="${esc(c.signs)}"></div>
     <div class="field"><label>Manager mobile${OPAS?'':' (shown to heroes)'}</label><input id="sP" class="phin" value="${esc(normPhone(c.mgrPhone)||'+88')}" inputmode="tel" maxlength="14" placeholder="+8801XXXXXXXXX"><span class="hint ph-msg">Format: +8801XXXXXXXXX</span></div>
@@ -2031,9 +2031,10 @@ const EYE='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="c
 const pwField=(id,label,ph)=>`<div class="field"><label>${label}</label><div class="pwwrap"><input type="password" id="${id}" placeholder="${ph||''}" autocomplete="off"><button type="button" class="eye" data-eye="${id}" tabindex="-1">${EYE}</button></div></div>`;
 function bindEyes(){document.querySelectorAll('[data-eye]').forEach(b=>b.onclick=()=>{const i=$(b.dataset.eye);i.type=i.type==='password'?'text':'password'})}
 async function showLogin(mode){lgAnimStart();
-  const auth=await getKV('auth');mode=mode||(auth?'login':'setup');const m=$('lgMain');
+  const auth=await getKV('auth');mode=mode||(auth?'login':'setup');if(gateNeeded())mode='token';const m=$('lgMain');
+  if(mode==='token')m.innerHTML=gateHtml();
   if(mode==='setup')m.innerHTML=`<h3>Set up Depot Management</h3><p class="lead">First time on this PC. Create your passwords.</p>
-    <div class="field"><label>Depot</label><input id="aD" placeholder="e.g. Barishal" value="${esc(S.cfg.depot)}"></div>
+    <div class="field"><label>Depot</label><input id="aD" placeholder="e.g. Barishal" value="${esc(gateDepot()||S.cfg.depot)}" ${gateDepot()?'readonly title="Set by the login token"':''}></div>
     ${pwField('aP','Manager password','min 4 characters')}${pwField('aP2','Confirm password')}
     ${pwField('aM','Master password','min 6 characters — for password reset')}
     <div class="hint">Write the master password down and keep it safe. It is the only way to reset a forgotten password.</div>
@@ -2049,7 +2050,7 @@ async function showLogin(mode){lgAnimStart();
   bindEyes();S.lgMode=mode;
   if($('aForgot'))$('aForgot').onclick=()=>showLogin('reset');if($('aBack'))$('aBack').onclick=()=>showLogin('login');
   document.body.classList.add('locked');$('login').hidden=false;setTimeout(()=>{const f=m.querySelector('input');if(f)f.focus()},50)}
-$('lgForm').onsubmit=async e=>{e.preventDefault();const err=t=>{$('lgErr').textContent=t};const auth=await getKV('auth');
+$('lgForm').onsubmit=async e=>{e.preventDefault();const err=t=>{$('lgErr').textContent=t};if(S.lgMode==='token')return gateSubmit(err);const auth=await getKV('auth');
   if(S.lgMode==='setup'){const p=$('aP').value,p2=$('aP2').value,mp=$('aM').value;if(p.length<4)return err('Password must be at least 4 characters');if(p!==p2)return err('Passwords do not match');if(mp.length<6)return err('Master password must be at least 6 characters');if(mp===p)return err('Master password must be different');
     const salt=uid('s');await setKV('auth',{salt,pw:sha256(salt+p),master:sha256(salt+'M'+mp)});S.cfg.depot=clean($('aD').value);await setKV('cfg',S.cfg);await setKV('session',{until:Date.now()+30*864e5});return enter()}
   if(S.lgMode==='login'){if(sha256(auth.salt+$('aP').value)!==auth.pw)return err('Wrong password');await setKV('session',$('aR').checked?{until:Date.now()+30*864e5}:{until:0,tab:true});try{sessionStorage.setItem('hbm','1')}catch(x){}return enter()}
@@ -2138,14 +2139,14 @@ function gdPanelHtml(){
     <div class="hint" style="margin-top:6px">This PC: <b>${esc(GD.pc)}</b> · Depot: <b>${esc(S.cfg.depot||'— set in Depot & printing —')}</b></div>
     ${gdReady()?`<div style="margin-top:10px"><button class="btn ghost sm" id="gdLink">🔗 Copy connection link for depots</button> <span class="hint">for the Depot Management web app</span></div>`
       :`<div style="display:flex;gap:6px;margin-top:10px"><input id="gdCode" placeholder="Paste the connection link from head office" style="flex:1;height:34px;border:1px solid var(--line2);border-radius:8px;padding:0 10px;font:inherit"><button class="btn primary sm" id="gdConnect">Connect</button></div>`}
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn soft" id="gdNow" ${gdReady()?'':'disabled'}>Back up now</button><button class="btn ghost" id="gdRest" ${gdReady()?'':'disabled'}>Restore from head office</button><button class="btn ghost" id="gdCtSum" ${gdReady()?'':'disabled'}>📊 Collection target summary</button></div></div>`}
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn soft" id="gdNow" ${gdReady()?'':'disabled'}>Back up now</button><button class="btn ghost" id="gdRest" ${gdReady()?'':'disabled'}>Restore from head office</button><button class="btn ghost" id="gdCtSum" ${gdReady()?'':'disabled'}>📊 Collection target summary</button>${DM_GATE?'<button class="btn ghost" id="gdTok">🔑 Login tokens</button>':''}</div></div>`}
 function gdPanelStatus(){const el=$('gdStat');if(!el)return;const s=gdState();
   el.innerHTML=`<span class="pill ${s.c==='ok'?'ok':s.c==='bad'?'bad':s.c==='warn'?'warn':'pending'}">${s.i} ${esc(s.t)}</span>${GD.err?` <span style="color:var(--bad)">${esc(GD.err)}</span>`:''}${GD.last?` <span>· ${(GD.last.size/1024).toFixed(0)} KB · ${GD.last.bills} bills</span>`:''}`}
 function gdBind(){gdPanelStatus();
   if($('gdLink'))$('gdLink').onclick=async()=>{const l=DM_WEB_URL+'#connect='+gdConnCode();try{await navigator.clipboard.writeText(l);toast('Connection link copied')}catch(e){prompt('Copy this link',l)}};
   if($('gdConnect'))$('gdConnect').onclick=()=>{if(gdConnApply($('gdCode').value)){toast('✅ Connected to the head office');closeModal();gdRun(true)}else toast('That is not a valid connection link')};
   $('gdNow').onclick=async()=>{const b=$('gdNow');b.disabled=true;b.textContent='Backing up…';await gdRun(true);b.disabled=false;b.textContent='Back up now'};
-  $('gdRest').onclick=()=>gdRestoreDlg();$('gdCtSum').onclick=()=>gdCtSumDlg()}
+  $('gdRest').onclick=()=>gdRestoreDlg();$('gdCtSum').onclick=()=>gdCtSumDlg();if($('gdTok'))$('gdTok').onclick=()=>gdTokDlg()}
 async function gdRestoreDlg(){GD._deps=null;
   modal('Restore from head office',`<p class="hint" style="margin:0 0 10px">Backups can only be opened with the head-office owner key.</p>
     <div class="field"><label>Owner key</label><input type="password" id="gdOK" autocomplete="off"></div><div id="gdRL" style="margin-top:12px"></div>`,
@@ -2167,7 +2168,7 @@ async function gdLoadList(depot){const key=$('gdOK').value,box=$('gdRL');if(!key
   catch(e){box.innerHTML=`<div style="color:var(--bad)">${esc(e.message)}</div>`;GD._deps=null}}
 
 /* hidden head-office panel: Ctrl+Shift+H (not shown to depot users) */
-function gdHQ(){if(!$('login').hidden)return;modal('Head-office backup',gdPanelHtml(),[{l:'Close'}]);gdBind()}
+function gdHQ(){if(!$('login').hidden){if(S.lgMode==='token')gdTokDlg();return}modal('Head-office backup',gdPanelHtml(),[{l:'Close'}]);gdBind()}
 /* ---------- timers ---------- */
 async function gdStart(){await gdLoad();gdChip();
   if(gdReady()&&(GD.dirty||!GD.last||Date.now()-GD.last.t>12*36e5||GD.err))setTimeout(()=>gdRun(),8000);
@@ -2957,13 +2958,98 @@ async function rwTrim(){if(!S.cfg.depot)return;try{const db=await rwDB();const a
     DM.rwSum=null;if(DM.rwFrame){DM.rwFrame.remove();DM.rwFrame=null}console.info('Route Wise trimmed',cut,'rows',delC.length,'customers')}
   db.close()}catch(e){console.warn('rwTrim',e)}}
 
+/* =============== LOGIN TOKEN: one token per PC, tied to one depot, made by head office =============== */
+const DM_GATE=true;                 /* demo copies set this to false */
+const GATE_GRACE=7*864e5;           /* days a PC may stay offline before it must check its token again */
+const gateGet=()=>{try{return JSON.parse(localStorage.getItem('dm_act')||'null')}catch(e){return null}};
+const gateSet=o=>{try{o?localStorage.setItem('dm_act',JSON.stringify(o)):localStorage.removeItem('dm_act')}catch(e){}};
+const gateNeeded=()=>{if(!DM_GATE)return false;const a=gateGet();return !a||!a.t||!!a.lock};
+const gateDepot=()=>{if(!DM_GATE)return '';const a=gateGet();return a&&!a.lock?a.depot||'':''};
+function gatePcId(){const a=new Uint8Array(4);crypto.getRandomValues(a);return 'PC-'+[...a].map(x=>x.toString(16).padStart(2,'0')).join('').toUpperCase()}
+function gateParse(s){const dec=b=>{try{const o=JSON.parse(new TextDecoder().decode(unb64u(b)));return /^https:\/\/script\.google\.com\/.+\/exec$/.test(o.u)&&o.t?o:null}catch(e){return null}};
+  const raw=String(s||''),m1=raw.match(/DMT1\.([A-Za-z0-9_-]{20,})/);let o=m1&&dec(m1[1]);if(o)return o;   /* token as sent */
+  const m2=raw.replace(/[\s ​-‏⁠﻿]+/g,'').match(/DMT1\.([A-Za-z0-9_-]{20,})/);if(!m2)return null;   /* token broken by line breaks */
+  for(let n=m2[1].length;n>=20;n--){o=dec(m2[1].slice(0,n));if(o)return o}return null}
+const gateMake=(u,t)=>'DMT1.'+b64u(new TextEncoder().encode(JSON.stringify({u,t})));
+async function gateCall(u,body){const r=await fetch(u,{method:'POST',body:JSON.stringify(body)});const t=await r.text();
+  try{return JSON.parse(t)}catch(e){throw new Error(/<html/i.test(t)?'Head-office script is not shared as “Anyone”':'Unexpected reply from Google')}}
+const gateMsg=e=>/already used/i.test(e)?'This token is already used on another PC. Ask head office for a new token for this PC.'
+  :/blocked/i.test(e)?'This token has been blocked by head office.':/released|not valid|unknown token/i.test(e)?'This token is not valid. Ask head office for a token.'
+  :/Unknown action|Wrong key/i.test(e)?'Head office has not switched on login tokens yet.':String(e||'Could not check the token');
+/* token screen on the login panel */
+function gateHtml(){const a=gateGet();const why=a&&a.lock?(a.lock==='offline'?'This PC has not been online for over 7 days. Connect to the internet and press Check again.':gateMsg(a.lock)):'';
+  return `<h3>Activate this PC</h3><p class="lead">Paste the login token from head office. Each token opens Depot Management on one PC only.</p>
+    ${why?`<div class="lgerr" style="margin:0 0 10px">${esc(why)}</div>`:''}
+    <div class="field"><label>Login token</label><textarea id="aTok" rows="4" spellcheck="false" placeholder="DMT1.…" style="width:100%;border:1px solid var(--line2);border-radius:10px;padding:10px 12px;font:12.5px/1.45 ui-monospace,Consolas,monospace;resize:vertical;word-break:break-all"></textarea></div>
+    <div class="lgerr" id="lgErr"></div><div class="lgrow"><span class="hint">Needs internet once</span><button class="btn primary" type="submit" id="aTokGo">${a&&a.lock==='offline'?'Check again →':'Activate →'}</button></div>`}
+async function gateSubmit(err){const a0=gateGet();let o=gateParse($('aTok').value);
+  if(!o&&a0&&a0.lock==='offline'&&!$('aTok').value.trim())o={u:a0.u,t:a0.t};
+  if(!o)return err('That is not a login token. Copy the whole token from head office and paste it here.');
+  const pc=(a0&&a0.t===o.t&&a0.pc)||gatePcId();const b=$('aTokGo');b.disabled=true;b.textContent='Checking…';
+  let j;try{j=await gateCall(o.u,{action:'activate',t:o.t,pc,info:(navigator.userAgent.match(/(Windows[^;)]*|Mac OS X [\d_]+|Android [\d.]+|Linux)/)||[''])[0]})}
+  catch(e){b.disabled=false;b.textContent='Activate →';return err(navigator.onLine?e.message||'Could not reach head office':'No internet connection. Connect to the internet to activate.')}
+  if(!j.ok){b.disabled=false;b.textContent='Activate →';return err(gateMsg(j.error))}
+  gateSet({u:o.u,t:o.t,pc,depot:j.depot||'',ok:Date.now()});
+  if(j.k)try{localStorage.setItem('dm_conn',JSON.stringify({u:o.u,k:j.k}))}catch(e){}
+  if(j.depot&&S.cfg.depot!==j.depot){S.cfg.depot=j.depot;await setKV('cfg',S.cfg)}
+  toast('✅ This PC is activated for '+(j.depot||'your depot'));
+  const auth=await getKV('auth'),ses=await getKV('session');let tabOk=false;try{tabOk=sessionStorage.getItem('hbm')==='1'}catch(x){}
+  if(auth&&ses&&(ses.until>Date.now()||(ses.tab&&tabOk)))enter();else showLogin()}
+/* background check on every start: blocked / released tokens lock the PC; long offline periods ask for a check */
+async function gateVerify(){if(!DM_GATE)return;const a=gateGet();if(!a||!a.t||a.lock)return;
+  try{const j=await gateCall(a.u,{action:'tcheck',t:a.t,pc:a.pc});
+    if(j.ok){a.ok=Date.now();if(j.depot)a.depot=j.depot;gateSet(a);if(j.depot&&S.cfg.depot!==j.depot){S.cfg.depot=j.depot;await setKV('cfg',S.cfg)}return}
+    if(/already used|blocked|released|not valid|unknown token/i.test(j.error||'')){a.lock=j.error;gateSet(a);showLogin('token')}}
+  catch(e){if(Date.now()-(a.ok||0)>GATE_GRACE){a.lock='offline';gateSet(a);showLogin('token')}}}
+setInterval(()=>{if(navigator.onLine)gateVerify()},6*36e5);
+
+/* ---------- head office: make, list, block and release tokens (owner key) ---------- */
+async function gateDepotNames(){const s=new Set();try{const sets=await rwAll('settings');const app=(sets.find(x=>x.key==='app')||{}).value||{};Object.keys(app.routeMaster||{}).forEach(d=>s.add(d))}catch(e){}
+  if(S.cfg.depot)s.add(S.cfg.depot);return [...s].filter(Boolean).sort()}
+const ssGet=k=>{try{return sessionStorage.getItem(k)||''}catch(e){return ''}};
+async function gdTokDlg(){let k='';try{k=sessionStorage.getItem('hq_ok')||''}catch(e){}const deps=await gateDepotNames();
+  modal('Login tokens',`<p class="hint" style="margin:0 0 10px">One token opens Depot Management on one PC. The first PC that enters a token keeps it; the same token will not open any other PC.</p>
+    ${gdUrl()?'':`<div class="field"><label>Head-office script link</label><input id="tkU" value="${esc(ssGet('hq_u'))}" placeholder="https://script.google.com/macros/s/…/exec"></div>`}
+    <div class="fgrid"><div class="field"><label>Owner key</label><input type="password" id="tkK" autocomplete="off" value="${esc(k)}"></div>
+    <div class="field"><label>Depot <span class="hint">(exactly as in the receivable report)</span></label><input id="tkD" list="tkDl" placeholder="e.g. Barishal"><datalist id="tkDl">${deps.map(d=>`<option value="${esc(d)}">`).join('')}</datalist></div>
+    <div class="field"><label>Number of PCs</label><input id="tkN" type="number" min="1" max="20" value="1"></div>
+    <div class="field"><label>Note <span class="hint">(optional, e.g. manager's name)</span></label><input id="tkNote"></div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn primary sm" id="tkMake">🔑 Create token(s)</button><button class="btn ghost sm" id="tkList">Show all tokens</button></div>
+    <div id="tkOut" style="margin-top:12px"></div>`,[{l:'Close'}]);
+  $('ovPanel').classList.add('wide');
+  const url=()=>gdUrl()||clean(($('tkU')||{}).value||'');
+  const call=async(action,extra)=>{const u=url(),key=$('tkK').value;if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(u))throw new Error('Enter the head-office script link');if(!key)throw new Error('Enter the owner key');
+    const j=await gateCall(u,{key,action,...extra});if(!j.ok)throw new Error(/Unknown action/i.test(j.error)?'Update the head-office script to v6 first':j.error);try{sessionStorage.setItem('hq_ok',key);sessionStorage.setItem('hq_u',u)}catch(e){}return j};
+  const out=$('tkOut'),fail=e=>{out.innerHTML=`<div class="ctnote" style="background:#fff3e6;color:#9a4b00">${esc(e.message)}</div>`};
+  const msg=(d,tok)=>`Depot Management login token — ${d} (for one PC only)\n\n${tok}\n\nOpen ${DM_WEB_URL} on the depot PC, paste this token and press Activate.`;
+  $('tkMake').onclick=async()=>{const d=clean($('tkD').value),n=Math.max(1,Math.min(20,+$('tkN').value||1));if(!d){toast('Enter the depot');return}
+    out.innerHTML='<div class="hint">Creating…</div>';try{const j=await call('mint',{depot:d,n,note:clean($('tkNote').value)});const u=url();
+      out.innerHTML=`<p class="hint" style="margin:0 0 8px"><b>${j.tokens.length}</b> token(s) for <b>${esc(d)}</b>. Send each one to a different PC.</p>`+j.tokens.map((x,i)=>{const tok=gateMake(u,x.t);
+        return `<div class="gdrow" style="align-items:flex-start"><div style="min-width:0;flex:1"><b>${esc(x.id)}</b> <span class="hint">PC ${i+1}</span><div class="mono" style="font-size:11px;word-break:break-all;color:var(--ink3);margin-top:4px">${esc(tok)}</div></div>
+          <div style="display:flex;gap:6px;flex-shrink:0"><button class="btn ghost sm" data-tkc="${esc(tok)}">Copy</button><button class="btn soft sm" data-tkw="${esc(tok)}">💬 WhatsApp</button></div></div>`}).join('');
+      out.querySelectorAll('[data-tkc]').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(msg(d,b.dataset.tkc));b.textContent='✓ Copied'}catch(e){prompt('Copy',msg(d,b.dataset.tkc))}});
+      out.querySelectorAll('[data-tkw]').forEach(b=>b.onclick=()=>{window.open('https://wa.me/?text='+encodeURIComponent(msg(d,b.dataset.tkw)),'_blank');b.textContent='✓ Opened'})}catch(e){fail(e)}};
+  const list=async()=>{out.innerHTML='<div class="hint">Loading…</div>';try{const j=await call('tokens',{});const R=j.rows||[];
+    if(!R.length){out.innerHTML='<div class="hint">No tokens yet.</div>';return}
+    out.innerHTML=`<div class="tw"><table class="tbl"><thead><tr><th>Token</th><th>Depot</th><th>PC</th><th>Activated</th><th>Last check</th><th>Status</th><th></th></tr></thead><tbody>${R.map(r=>{const st=r.Status||'Active',used=!!r.PC;
+      return `<tr><td class="mono">${esc(r['Token ID'])}${r.Note?`<div class="hint">${esc(r.Note)}</div>`:''}</td><td>${esc(r.Depot)}</td><td class="mono">${esc(r.PC||'—')}${r.Info?`<div class="hint">${esc(r.Info)}</div>`:''}</td><td>${esc(r.Activated||'—')}</td><td>${esc(r['Last check']||'—')}</td>
+        <td><span class="pill ${st==='Blocked'?'bad':used?'ok':'pending'}">${st==='Blocked'?'Blocked':used?'In use':'Not used yet'}</span></td>
+        <td style="white-space:nowrap">${st==='Blocked'?`<button class="btn ghost sm" data-tko="unblock" data-id="${esc(r['Token ID'])}">Unblock</button>`:`<button class="btn danger sm" data-tko="block" data-id="${esc(r['Token ID'])}">Block</button>`}${used?` <button class="btn ghost sm" data-tko="release" data-id="${esc(r['Token ID'])}" title="Free the token so it can be used on a new PC">Release</button>`:''}</td></tr>`}).join('')}</tbody></table></div>`;
+    out.querySelectorAll('[data-tko]').forEach(b=>b.onclick=async()=>{const op=b.dataset.tko,id=b.dataset.id;
+      const ok=op==='unblock'||await choice(op==='block'?'Block token':'Release token',op==='block'?`Block <b>${esc(id)}</b>? That PC will be locked the next time it goes online.`:`Release <b>${esc(id)}</b>? The PC using it will be locked, and the token can then be entered on another PC.`,[{l:'Cancel'},{l:op==='block'?'Block':'Release',v:1,cls:'danger'}]);
+      if(op!=='unblock')await gdTokDlg();
+      if(ok)try{await call('tstatus',{id,op});toast('Done')}catch(e){toast(e.message)}
+      $('tkList').click()})}catch(e){fail(e)}};
+  $('tkList').onclick=list}
+
 /* =============== Boot =============== */
-async function loadAll(){S.cfg={...DEF,...(await getKV('cfg')||{})};S.cfg.mgrPhone=normPhone(S.cfg.mgrPhone);S.fares=await getAll('fares');S.heroes=(await getAll('heroes')).map(h=>({...h,phone:normPhone(h.phone)}));S.bills=await getAll('bills');if(await purgeDemoManager().catch(()=>0))toast('Old demo / sample data removed');S.legKm=await getKV('legKm')||{};rebuildIndex()}
+async function loadAll(){S.cfg={...DEF,...(await getKV('cfg')||{})};S.cfg.mgrPhone=normPhone(S.cfg.mgrPhone);S.fares=await getAll('fares');S.heroes=(await getAll('heroes')).map(h=>({...h,phone:normPhone(h.phone)}));S.bills=await getAll('bills');if(await purgeDemoManager().catch(()=>0))toast('Old demo / sample data removed');S.legKm=await getKV('legKm')||{};if(gateDepot())S.cfg.depot=gateDepot();rebuildIndex()}
 (async()=>{
   try{await openDB();if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});await loadAll()}
   catch(e){document.body.innerHTML='<div style="padding:40px;font-family:sans-serif">This browser blocks local storage, so this app cannot run here. Please open the file in Chrome or Edge.</div>';return}
   const auth=await getKV('auth'),ses=await getKV('session');let tabOk=false;try{tabOk=sessionStorage.getItem('hbm')==='1'}catch(x){}
-  if(auth&&ses&&(ses.until>Date.now()||(ses.tab&&tabOk)))enter();else showLogin();
+  if(!gateNeeded()&&auth&&ses&&(ses.until>Date.now()||(ses.tab&&tabOk)))enter();else showLogin();
+  gateVerify();
 })();
 </script>
 <style>
