@@ -5,7 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Depot Management</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono&family=Hind+Siliguri:wght@400;500;600&display=swap" rel="stylesheet">
+<script>/* app font: chosen per PC in the hidden head-office menu (Ctrl+Shift+H) */
+window.DM_FONTS={inter:['Inter + Noto Sans Bengali','Inter','Noto Sans Bengali','Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700','Sharpest numbers and tables (default)'],
+ figtree:['Figtree + Noto Sans Bengali','Figtree','Noto Sans Bengali','Figtree:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700','Clear like Inter, a little warmer'],
+ lexend:['Lexend + Noto Sans Bengali','Lexend','Noto Sans Bengali','Lexend:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700','Easiest to read, wider letters'],
+ poppins:['Poppins + Hind Siliguri','Poppins','Hind Siliguri','Poppins:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700','Familiar, round and bold'],
+ jakarta:['Plus Jakarta Sans + Hind Siliguri','Plus Jakarta Sans','Hind Siliguri','Plus+Jakarta+Sans:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700','Stylish headings, premium feel'],
+ ubuntu:['Ubuntu + Hind Siliguri','Ubuntu','Hind Siliguri','Ubuntu:wght@400;500;700&family=Hind+Siliguri:wght@400;500;600;700','The original look']};
+(function(){let k='inter';try{k=localStorage.getItem('dm_font')||'inter'}catch(e){}if(!DM_FONTS[k])k='inter';const f=DM_FONTS[k];window.DM_FONT=k;
+ window.DM_FONT_CSS="'"+f[1]+"','"+f[2]+"',Arial,sans-serif";window.DM_FONT_URL='https://fonts.googleapis.com/css2?family='+f[3]+'&family=Ubuntu+Mono&display=swap';
+ document.write('<link rel="stylesheet" href="'+DM_FONT_URL+'">');document.documentElement.style.setProperty('--appfont',DM_FONT_CSS)})();</script>
 <style>
 :root{
   --bg:#f4f3f8;--card:#fff;--ink:#1d1b3a;--ink2:#55536e;--ink3:#8e8ca4;--line:#e6e4ef;--line2:#d6d3e4;
@@ -16,7 +25,7 @@
 *{box-sizing:border-box}
 [hidden]{display:none !important}
 html,body{margin:0}
-body{font-family:'Ubuntu','Hind Siliguri','Noto Sans Bengali',system-ui,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body{font-family:var(--appfont,'Ubuntu','Hind Siliguri',Arial,sans-serif);font-variant-numeric:tabular-nums;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
 button,input,select,textarea{font:inherit;color:inherit}
 .num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
 .mono{font-family:'Ubuntu Mono',ui-monospace,Consolas,monospace}
@@ -391,7 +400,7 @@ body.dmon{overflow:hidden}
 .spk{display:block}.sm{font-size:11.5px}
 @media (max-width:700px){.rtbl .hm{display:none}}
 @media (max-width:900px){.igrid{grid-template-columns:minmax(0,1fr)}.hb{grid-template-columns:minmax(80px,1fr) 1.3fr auto}}
-@media print{.insprint .btn,.insprint .dbar,.insprint .itabs,.insprint .seg,.insprint .ptitle .acts{display:none !important}.insprint .card{box-shadow:none;break-inside:avoid}.insprint{font-family:'Ubuntu',Arial,sans-serif}}
+@media print{.insprint .btn,.insprint .dbar,.insprint .itabs,.insprint .seg,.insprint .ptitle .acts{display:none !important}.insprint .card{box-shadow:none;break-inside:avoid}.insprint{font-family:var(--appfont,'Ubuntu',Arial,sans-serif);font-variant-numeric:tabular-nums}}
 /* review window */
 .rvov{position:fixed;inset:0;z-index:55;background:rgba(29,27,58,.45);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;padding:24px}
 .rvov.show{display:flex}
@@ -525,8 +534,8 @@ body.locked>*:not(#login):not(.overlay):not(.toast):not(#printArea){display:none
 .dmflow .fn .halo{fill:#fff;stroke:#2e2a8f;stroke-opacity:.15}
 @keyframes dmHalo{0%,100%{stroke-opacity:.1;fill:#fff}50%{stroke-opacity:.35;fill:#f1f0fc}}
 .dmflow .fg rect{fill:#d9a25a;fill-opacity:.85}.dmflow .fc text{fill:#0f766e;font:700 13px 'Ubuntu',sans-serif}
-.dmflow .ft{fill:#2e2a8f;fill-opacity:.55;font:600 10.5px 'Ubuntu','Hind Siliguri',sans-serif;letter-spacing:.04em}
-.dmflow .fk{fill:#2e2a8f;fill-opacity:.35;font:italic 10px 'Ubuntu',sans-serif}.dmflow .fk.c{fill:#0f766e}
+.dmflow .ft{fill:#2e2a8f;fill-opacity:.55;font:600 10.5px var(--appfont,'Ubuntu',sans-serif);letter-spacing:.04em}
+.dmflow .fk{fill:#2e2a8f;fill-opacity:.35;font:italic 10px var(--appfont,'Ubuntu',sans-serif)}.dmflow .fk.c{fill:#0f766e}
 .dmwave .dmfoot{position:absolute;left:0;right:0;bottom:2px;padding:0;font-size:11px}
 @media (prefers-reduced-motion:reduce){.dmflow *{animation:none!important}.dmflow .fg,.dmflow .fc{display:none}}
 @media (min-width:1000px){
@@ -589,6 +598,12 @@ body.locked>*:not(#login):not(.overlay):not(.toast):not(#printArea){display:none
 .dmcard.tc{background-image:linear-gradient(120deg,#fff 0%,#fff 30%,#fdf3e6 50%,#fff 70%,#fff 100%)!important;animation-delay:-8s}
 .dmcard.hbk{background-image:linear-gradient(120deg,#fff 0%,#fff 30%,#f9edf1 50%,#fff 70%,#fff 100%)!important;animation-delay:-2s}
 @media (prefers-reduced-motion:reduce){.dmcard.rw,.dmcard.ct,.dmcard.tc,.dmcard.hbk{animation:none}}
+.fontopts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.fontopt{display:flex;flex-direction:column;gap:2px;text-align:left;border:1.5px solid var(--line2);border-radius:12px;background:#fff;padding:10px 12px;cursor:pointer;color:var(--ink)}
+.fontopt:hover{border-color:var(--brand)}.fontopt.on{border-color:var(--brand);background:var(--brandSoft)}
+.fontopt .fn{font-size:12.5px;font-weight:700}.fontopt .fn em{font-style:normal;font-size:10.5px;color:#0f766e;background:#e3f4ec;border-radius:6px;padding:1px 6px;margin-left:4px}
+.fontopt .fs{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}.fontopt .fb{font-size:14px}.fontopt .fd{font-size:11px;color:var(--ink3)}
+@media (max-width:700px){.fontopts{grid-template-columns:1fr}}
 html.opas .hbonly{display:none!important}html:not(.opas) .opasonly{display:none!important}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
@@ -2183,7 +2198,14 @@ async function gdLoadList(depot){const key=$('gdOK').value,box=$('gdRL');if(!key
   catch(e){box.innerHTML=`<div style="color:var(--bad)">${esc(e.message)}</div>`;GD._deps=null}}
 
 /* hidden head-office panel: Ctrl+Shift+H (not shown to depot users) */
-function gdHQ(){if(!$('login').hidden){if(S.lgMode==='token')gdTokDlg();return}modal('Head-office backup',gdPanelHtml(),[{l:'Close'}]);gdBind()}
+function gdHQ(){if(!$('login').hidden){if(S.lgMode==='token')gdTokDlg();return}modal('Head-office backup',gdPanelHtml()+gdFontHtml(),[{l:'Close'}]);gdBind();gdFontBind()}
+/* app font for this PC (hidden menu) */
+function gdFontHtml(){const F=window.DM_FONTS||{};const all=Object.values(F).map(f=>f[3]).join('&family=');
+  return `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=${all}&display=swap"><div class="gdbox" style="margin-top:14px"><b>Aa App font</b> <span class="hint">· this PC</span>
+    <div class="fontopts">${Object.entries(F).map(([k,f])=>`<button type="button" class="fontopt ${k===window.DM_FONT?'on':''}" data-font="${k}" style="font-family:'${f[1]}','${f[2]}',sans-serif">
+      <span class="fn">${esc(f[0])}${k==='inter'?' <em>default</em>':''}</span><span class="fs">৳ 1,25,400 · 98%</span><span class="fb">কোড পেস্ট করুন</span><span class="fd">${esc(f[4])}</span></button>`).join('')}</div></div>`}
+function gdFontBind(){document.querySelectorAll('[data-font]').forEach(b=>b.onclick=()=>{const k=b.dataset.font;if(k===window.DM_FONT){toast('Already in use');return}
+  try{localStorage.setItem('dm_font',k)}catch(e){}toast('Font changed — reloading…');setTimeout(()=>location.reload(),500)})}
 /* ---------- timers ---------- */
 async function gdStart(){await gdLoad();gdChip();
   if(gdReady()&&(GD.dirty||!GD.last||Date.now()-GD.last.t>12*36e5||GD.err))setTimeout(()=>gdRun(),8000);
@@ -2226,7 +2248,7 @@ async function gdCtSumLoad(){const key=$('ctsK').value,date=$('ctsD').value,box=
     ...(shared.length?['',`*Total (${shared.length} of ${total} depots) - ${gdLac(T)} (average ${gdLac(N?T/N:0)} for ${N} SA)*`]:[]),
     ...(pending.length?['',`Not shared yet (${pending.length}): ${pending.map(gdDepName).join(', ')}`]:[])].join('\n');
   box.innerHTML=`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px"><span class="pill ok">✅ ${shared.length} shared</span><span class="pill ${pending.length?'warn':'ok'}">⏳ ${pending.length} not shared</span><span class="pill pending">${esc(gdLac(T))} total</span></div>
-    <textarea id="ctsMsg" rows="${Math.min(18,msg.split('\n').length+1)}" style="width:100%;font:14px/1.5 Ubuntu,Arial,sans-serif;border:1px solid var(--line2);border-radius:10px;padding:10px">${esc(msg)}</textarea>
+    <textarea id="ctsMsg" rows="${Math.min(18,msg.split('\n').length+1)}" style="width:100%;font:14px/1.5 var(--appfont,Ubuntu,Arial,sans-serif);border:1px solid var(--line2);border-radius:10px;padding:10px">${esc(msg)}</textarea>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="btn ghost sm" id="ctsCopy">📋 Copy</button><button class="btn primary sm" id="ctsWa">💬 Send to WhatsApp group</button></div>
     <p class="hint" style="margin:6px 0 0">WhatsApp opens with the message ready: choose the group and press Send. You can edit the text above first.</p>`;
   $('ctsCopy').onclick=async()=>{try{await navigator.clipboard.writeText($('ctsMsg').value);toast('Copied')}catch(e){$('ctsMsg').select()}};
@@ -2654,7 +2676,7 @@ function tcExport(L){const w=XLSX.utils.book_new();
   const ws=XLSX.utils.aoa_to_sheet([head,...rows]);ws['!cols']=head.map((h,i)=>({wch:[12,28,14,14,10,16,18,16,30,14,11,6,11,14,10,10,12,9,12,10,8,16,10][i]}));
   XLSX.utils.book_append_sheet(w,ws,'Target customers');XLSX.writeFile(w,`Target_Customers_${(S.cfg.depot||'Depot').replace(/\W+/g,'_')}_${todayISO()}.xlsx`)}
 function tcPrint(L){const T={a:sum(L,x=>x.amt),c:sum(L,x=>x.col),r:sum(L,x=>x.rem)};
-  $('printArea').innerHTML=`<style>@page{size:A4 landscape;margin:10mm}.tcp{font:11px Ubuntu,Arial,sans-serif;color:#111}.tcp h2{margin:0 0 2px;font-size:16px}.tcp .s{color:#555;margin-bottom:8px}.tcp table{width:100%;border-collapse:collapse}.tcp th,.tcp td{border:1px solid #bbb;padding:3px 5px;text-align:left;vertical-align:top}.tcp th{background:#f1f1f1}.tcp .n{text-align:right;white-space:nowrap}.tcp tfoot td{font-weight:700;background:#f7f7f7}.tcp tr.g td{font-weight:700;background:#fbefe1}</style>
+  $('printArea').innerHTML=`<style>@page{size:A4 landscape;margin:10mm}.tcp{font:11px var(--appfont,Ubuntu,Arial,sans-serif);color:#111}.tcp h2{margin:0 0 2px;font-size:16px}.tcp .s{color:#555;margin-bottom:8px}.tcp table{width:100%;border-collapse:collapse}.tcp th,.tcp td{border:1px solid #bbb;padding:3px 5px;text-align:left;vertical-align:top}.tcp th{background:#f1f1f1}.tcp .n{text-align:right;white-space:nowrap}.tcp tfoot td{font-weight:700;background:#f7f7f7}.tcp tr.g td{font-weight:700;background:#fbefe1}</style>
     <div class="tcp"><h2>Target Customer Monitoring · ${esc(S.cfg.depot||'')}</h2><div class="s">${fmtDate(todayISO())} · ${L.length} customers · dues when added ${tk(T.a)} · collected ${tk(T.c)} (${tcPct(T.a?T.c/T.a:0)}) · outstanding ${tk(T.r)}</div>
     <table><thead><tr><th>#</th><th>Code</th><th>Customer / address</th><th>Route · SA · MIO</th><th>Added</th><th class="n">Days</th><th>Deadline</th><th class="n">Dues when added</th><th class="n">Collected</th><th class="n">%</th><th class="n">Outstanding</th><th class="n">New dues</th><th>Category</th></tr></thead>
     <tbody>${tcGroups(L).map(g=>`<tr class="g"><td colspan="7">${esc(g.key)} · ${g.rows.length} customer(s)${g.sa?' · SA: '+esc(g.sa):''}</td><td class="n">${fmt(g.a)}</td><td class="n">${fmt(g.c)}</td><td class="n">${tcPct(g.a?g.c/g.a:0)}</td><td class="n">${fmt(g.r)}</td><td class="n">${g.n?fmt(g.n):''}</td><td></td></tr>`+g.rows.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.code)}</td><td><b>${esc(x.info.name)}</b><br>${esc([x.info.market,x.info.address,x.info.mobile].filter(Boolean).join(' · '))}</td><td>${esc([x.info.route,x.info.sa,x.info.mio].filter(Boolean).join(' · '))}</td><td>${fmtDate(x.added)}</td><td class="n">${x.days}</td><td>${x.deadline?fmtDate(x.deadline):''}</td><td class="n">${fmt(x.amt)}</td><td class="n">${fmt(x.col)}</td><td class="n">${tcPct(x.pct)}</td><td class="n">${fmt(x.rem)}</td><td class="n">${x.newAmt?fmt(x.newAmt):''}</td><td>${TC_CAT[x.cat][0]}</td></tr>`).join('')).join('')}</tbody>
@@ -2715,18 +2737,18 @@ const CA={
     <g class="tc-ok" style="animation-delay:0s"><circle cx="96" cy="44" r="9" fill="${CA_K}"/><path d="M91 44l4 4 6-7" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></g>
     <g class="tc-ok" style="animation-delay:1.6s"><circle cx="256" cy="44" r="9" fill="${CA_K}"/><path d="M251 44l4 4 6-7" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></g>
     <g class="tc-scan"><circle cx="0" cy="40" r="15" fill="#ffffffcc" stroke="${CA_K}" stroke-width="2.6"/><path d="M11 51l13 13" stroke="${CA_K}" stroke-width="4" stroke-linecap="round"/></g>
-    <text x="230" y="20" text-anchor="middle" font-size="8.5" fill="${CA_G}" font-family="Ubuntu,Arial" letter-spacing=".5">TARGET CUSTOMERS</text></svg>`},
+    <text x="230" y="20" text-anchor="middle" font-size="8.5" fill="${CA_G}" style="font-family:var(--appfont,Ubuntu,Arial)" letter-spacing=".5">TARGET CUSTOMERS</text></svg>`},
   tcB:{n:'Dues falling',svg:()=>`<svg viewBox="0 0 460 112">
     <line x1="40" y1="98" x2="440" y2="98" stroke="${CA_K}" stroke-width="2"/><line x1="40" y1="14" x2="40" y2="98" stroke="${CA_K}" stroke-width="2"/>
     ${[78,66,55,41,30,19,10].map((h,i)=>`<rect class="tc-bar" x="${64+i*52}" y="${98-h}" width="26" height="${h}" fill="${i===6?CA_K:'#fff'}" stroke="${CA_K}" stroke-width="1.8" style="animation-delay:${i*.35}s"/>`).join('')}
     <path class="tc-line" d="M77 14 L129 28 L181 40 L233 54 L285 66 L337 78 L389 86" fill="none" stroke="${CA_K}" stroke-width="1.6" stroke-dasharray="4 4"/>
-    <text x="440" y="110" text-anchor="end" font-size="8.5" fill="${CA_G}" font-family="Ubuntu,Arial" letter-spacing=".5">OUTSTANDING ↓</text></svg>`},
+    <text x="440" y="110" text-anchor="end" font-size="8.5" fill="${CA_G}" style="font-family:var(--appfont,Ubuntu,Arial)" letter-spacing=".5">OUTSTANDING ↓</text></svg>`},
   rw:{n:'Invoice → SA → DIC',svg:()=>{const src=(RW_SRC.match(/<div class="lganim"[^>]*>\s*(<svg[\s\S]*?<\/svg>)/)||[])[1]||'';return src}},
   hbA:{n:'Ride & claim',svg:()=>`<svg viewBox="0 0 460 112">
     <line x1="6" y1="98" x2="454" y2="98" stroke="${CA_K}" stroke-width="2"/><path d="M30 98V66l26-18 26 18v32" fill="#fff" stroke="${CA_K}" stroke-width="2" stroke-linejoin="round"/><rect x="48" y="78" width="16" height="20" fill="${CA_K}"/>
-    <text x="56" y="110" text-anchor="middle" font-size="8.5" fill="${CA_G}" font-family="Ubuntu,Arial" letter-spacing=".5">DEPOT</text>
+    <text x="56" y="110" text-anchor="middle" font-size="8.5" fill="${CA_G}" style="font-family:var(--appfont,Ubuntu,Arial)" letter-spacing=".5">DEPOT</text>
     <path d="M372 98V64h64v34M366 64l8-14h60l8 14z" fill="#fff" stroke="${CA_K}" stroke-width="2" stroke-linejoin="round"/><path d="M378 64v-6M392 64v-6M406 64v-6M420 64v-6" stroke="${CA_K}" stroke-width="1.4"/><rect x="384" y="74" width="40" height="24" fill="none" stroke="${CA_K}" stroke-width="1.6"/>
-    <text x="404" y="110" text-anchor="middle" font-size="8.5" fill="${CA_G}" font-family="Ubuntu,Arial" letter-spacing=".5">MARKET</text>
+    <text x="404" y="110" text-anchor="middle" font-size="8.5" fill="${CA_G}" style="font-family:var(--appfont,Ubuntu,Arial)" letter-spacing=".5">MARKET</text>
     <path d="M96 92h260" stroke="${CA_K}" stroke-width="1.4" stroke-dasharray="4 6" class="ca-road"/>
     <g class="ca-ride"><g transform="translate(96 0)">
       <g class="ca-wh" style="transform-origin:-12px 88px"><circle cx="-12" cy="88" r="9" fill="#fff" stroke="${CA_K}" stroke-width="2"/><path d="M-12 79v18M-21 88h18" stroke="${CA_K}" stroke-width="1"/></g>
@@ -2740,17 +2762,17 @@ const CA={
   hbB:{n:'Bill review',svg:()=>`<svg viewBox="0 0 460 112">
     <line x1="6" y1="98" x2="454" y2="98" stroke="${CA_K}" stroke-width="2"/>
     <g class="cb-in"><g transform="translate(150 6)"><path d="M0 0h110v78l-9 6-9-6-9 6-9-6-9 6-9-6-9 6-9-6-9 6-9-6-9 6-9-6z" fill="#fff" stroke="${CA_K}" stroke-width="2" stroke-linejoin="round"/>
-      <text x="10" y="14" font-size="7.5" font-weight="700" fill="${CA_K}" font-family="Ubuntu,Arial">CONVEYANCE BILL</text>
+      <text x="10" y="14" font-size="7.5" font-weight="700" fill="${CA_K}" style="font-family:var(--appfont,Ubuntu,Arial)">CONVEYANCE BILL</text>
       <g class="cb-l1"><path d="M10 26h60" stroke="#bdbdbd" stroke-width="2" stroke-linecap="round"/><text x="100" y="29" text-anchor="end" font-size="8" fill="${CA_K}" font-family="Arial">60</text></g>
       <g class="cb-l2"><path d="M10 38h48" stroke="#bdbdbd" stroke-width="2" stroke-linecap="round"/><text x="100" y="41" text-anchor="end" font-size="8" fill="${CA_K}" font-family="Arial">40</text></g>
       <g class="cb-l3"><path d="M10 50h54" stroke="#bdbdbd" stroke-width="2" stroke-linecap="round"/><text x="100" y="53" text-anchor="end" font-size="8" fill="${CA_K}" font-family="Arial">20</text></g>
       <path d="M10 60h90" stroke="${CA_K}" stroke-width="1.2"/><text x="100" y="71" text-anchor="end" font-size="9" font-weight="700" fill="${CA_K}" font-family="Arial">৳ 120</text>
-      <g class="cb-stamp"><rect x="18" y="22" width="74" height="22" rx="3" fill="#fff" stroke="${CA_K}" stroke-width="2.2"/><text x="55" y="37" text-anchor="middle" font-size="9.5" font-weight="700" letter-spacing=".8" fill="${CA_K}" font-family="Ubuntu,Arial">APPROVED</text></g>
+      <g class="cb-stamp"><rect x="18" y="22" width="74" height="22" rx="3" fill="#fff" stroke="${CA_K}" stroke-width="2.2"/><text x="55" y="37" text-anchor="middle" font-size="9.5" font-weight="700" letter-spacing=".8" fill="${CA_K}" style="font-family:var(--appfont,Ubuntu,Arial)">APPROVED</text></g>
     </g></g>
     <g class="cb-lens"><circle cx="0" cy="0" r="13" fill="rgba(255,255,255,.6)" stroke="${CA_K}" stroke-width="2.4"/><path d="M9 9l12 12" stroke="${CA_K}" stroke-width="4" stroke-linecap="round"/></g>
     <path d="M330 98V78h96v20" fill="none" stroke="${CA_K}" stroke-width="2"/><path d="M336 78l6-8h72l6 8" fill="#fff" stroke="${CA_K}" stroke-width="2" stroke-linejoin="round"/>
-    <text x="378" y="110" text-anchor="middle" font-size="8.5" fill="${CA_G}" font-family="Ubuntu,Arial" letter-spacing=".5">APPROVED</text>
-    <text x="60" y="110" text-anchor="middle" font-size="8.5" fill="${CA_G}" font-family="Ubuntu,Arial" letter-spacing=".5">FARE CHART</text>
+    <text x="378" y="110" text-anchor="middle" font-size="8.5" fill="${CA_G}" style="font-family:var(--appfont,Ubuntu,Arial)" letter-spacing=".5">APPROVED</text>
+    <text x="60" y="110" text-anchor="middle" font-size="8.5" fill="${CA_G}" style="font-family:var(--appfont,Ubuntu,Arial)" letter-spacing=".5">FARE CHART</text>
     <g transform="translate(26 50)" stroke="${CA_K}" stroke-width="1.6" fill="#fff"><rect width="68" height="46" rx="3"/><path d="M0 12h68M0 24h68M0 35h68M34 0v46" fill="none"/></g></svg>`},
   ctA:{n:'On target',svg:()=>`<svg viewBox="0 0 460 112">
     <line x1="6" y1="98" x2="454" y2="98" stroke="${CA_K}" stroke-width="2"/>
@@ -2758,19 +2780,19 @@ const CA={
       <circle class="ct-ring" r="8" fill="none" stroke="${CA_K}" stroke-width="1.6"/></g>
     <path d="M380 90v8M370 98l10-8 10 8" stroke="${CA_K}" stroke-width="2" fill="none"/>
     <g class="ct-dart"><g transform="translate(60 52)"><path d="M0 0h50" stroke="${CA_K}" stroke-width="2.4" stroke-linecap="round"/><path d="M50 -5l12 5-12 5z" fill="${CA_K}"/><path d="M0 0l-10-8M0 0l-10 8M6 0l-8-8M6 0l-8 8" stroke="${CA_K}" stroke-width="1.6"/></g></g>
-    <g class="ct-pct"><rect x="150" y="14" width="96" height="26" rx="13" fill="#fff" stroke="${CA_K}" stroke-width="2"/><text x="198" y="31" text-anchor="middle" font-size="11" font-weight="700" fill="${CA_K}" font-family="Ubuntu,Arial">100% ✓</text></g>
+    <g class="ct-pct"><rect x="150" y="14" width="96" height="26" rx="13" fill="#fff" stroke="${CA_K}" stroke-width="2"/><text x="198" y="31" text-anchor="middle" font-size="11" font-weight="700" fill="${CA_K}" style="font-family:var(--appfont,Ubuntu,Arial)">100% ✓</text></g>
     <g transform="translate(40 80)"><rect width="250" height="10" rx="5" fill="#fff" stroke="${CA_K}" stroke-width="1.6"/><rect class="ct-fill" x="2" y="2" width="246" height="6" rx="3" fill="${CA_K}"/></g>
-    <text x="165" y="110" text-anchor="middle" font-size="8.5" fill="${CA_G}" font-family="Ubuntu,Arial" letter-spacing=".5">TODAY'S COLLECTION</text></svg>`},
+    <text x="165" y="110" text-anchor="middle" font-size="8.5" fill="${CA_G}" style="font-family:var(--appfont,Ubuntu,Arial)" letter-spacing=".5">TODAY'S COLLECTION</text></svg>`},
   ctB:{n:'Target vs collected',svg:()=>`<svg viewBox="0 0 460 112">
     <line x1="6" y1="98" x2="454" y2="98" stroke="${CA_K}" stroke-width="2"/>
-    <line x1="40" y1="40" x2="300" y2="40" stroke="${CA_K}" stroke-width="1.6" stroke-dasharray="6 5"/><text x="304" y="43" font-size="8" fill="${CA_G}" font-family="Ubuntu,Arial">TARGET</text>
+    <line x1="40" y1="40" x2="300" y2="40" stroke="${CA_K}" stroke-width="1.6" stroke-dasharray="6 5"/><text x="304" y="43" font-size="8" fill="${CA_G}" style="font-family:var(--appfont,Ubuntu,Arial)">TARGET</text>
     ${[58,46,64,52,70].map((h,i)=>`<rect class="cg-bar cg-b${i}" x="${52+i*48}" y="${98-h}" width="28" height="${h}" rx="2" fill="${i===4?CA_K:'#fff'}" stroke="${CA_K}" stroke-width="2"/>`).join('')}
     <g class="cg-tick"><circle cx="258" cy="16" r="8" fill="${CA_K}"/><path d="m254 16 2.8 2.8 5.2-5.6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
     <g transform="translate(360 0)"><path d="M0 98V66h70v32" fill="#fff" stroke="${CA_K}" stroke-width="2"/><path d="M-4 66h78" stroke="${CA_K}" stroke-width="2.4"/><path d="M25 66h20" stroke="#fff" stroke-width="3"/>
       <text x="35" y="86" text-anchor="middle" font-size="12" font-weight="700" fill="${CA_K}" font-family="Arial">৳</text>
       <g class="cg-coin"><circle cx="35" cy="20" r="8" fill="#fff" stroke="${CA_K}" stroke-width="2"/><text x="35" y="23.5" text-anchor="middle" font-size="9" font-weight="700" fill="${CA_K}" font-family="Arial">৳</text></g></g>
-    <text x="395" y="110" text-anchor="middle" font-size="8.5" fill="${CA_G}" font-family="Ubuntu,Arial" letter-spacing=".5">COLLECTED</text>
-    <text x="160" y="110" text-anchor="middle" font-size="8.5" fill="${CA_G}" font-family="Ubuntu,Arial" letter-spacing=".5">LAST 5 DAYS</text></svg>`}};
+    <text x="395" y="110" text-anchor="middle" font-size="8.5" fill="${CA_G}" style="font-family:var(--appfont,Ubuntu,Arial)" letter-spacing=".5">COLLECTED</text>
+    <text x="160" y="110" text-anchor="middle" font-size="8.5" fill="${CA_G}" style="font-family:var(--appfont,Ubuntu,Arial)" letter-spacing=".5">LAST 5 DAYS</text></svg>`}};
 const caGet=(card,def)=>{try{return localStorage.getItem('dm_ca_'+card)||def}catch(e){return def}};
 function caHtml(card,opts){const cur=caGet(card,opts[0]);return `<div class="caw" data-card="${card}"><div class="cabox">${CA[cur].svg()}</div>${opts.length>1?`<div class="cadots" title="Choose animation">${opts.map(k=>`<span role="button" tabindex="0" data-ca="${k}" class="${k===cur?'on':''}" title="${esc(CA[k].n)}"></span>`).join('')}</div>`:''}</div>`}
 function caBind(root){root.querySelectorAll('.caw [data-ca]').forEach(b=>b.onclick=e=>{e.stopPropagation();const w=b.closest('.caw');try{localStorage.setItem('dm_ca_'+w.dataset.card,b.dataset.ca)}catch(x){}
@@ -2960,7 +2982,7 @@ function dmFlow(){const X=[150,435,720,1005,1290],Y=34;
 function dmOpenHB(){$('dmHome').hidden=true;$('rwWrap').hidden=true;$('ctWrap').hidden=true;$('tcWrap').hidden=true;document.body.classList.remove('dmon');document.title=(OPAS?'Settings':'Hero Bill Manager')+' · Depot Management';render();window.scrollTo(0,0)}
 function dmOpenRW(){$('dmHome').hidden=true;$('tcWrap').hidden=true;$('ctWrap').hidden=true;$('rwWrap').hidden=false;document.body.classList.add('dmon');document.title='Route Wise Receivable · Depot Management';
   if(!DM.rwFrame){const f=document.createElement('iframe');f.id='rwFrame';f.title='Route Wise Receivable';
-    const inj=`<script>window.DM_EMBED=${JSON.stringify({depot:S.cfg.depot||''})};<\/script>`;f.srcdoc=RW_SRC.replace('<head>','<head>'+inj);$('rwWrap').appendChild(f);DM.rwFrame=f}}
+    const inj=`<script>window.DM_EMBED=${JSON.stringify({depot:S.cfg.depot||''})};<\/script><link rel="stylesheet" href="${window.DM_FONT_URL||''}"><style>body,button,input,select,textarea,table,h1,h2,h3,h4{font-family:${window.DM_FONT_CSS||'Ubuntu,Arial,sans-serif'}!important;font-variant-numeric:tabular-nums}</style>`;f.srcdoc=RW_SRC.replace('<head>','<head>'+inj);$('rwWrap').appendChild(f);DM.rwFrame=f}}
 
 async function ctCardStat(){await ctLoad();const el=$('dmCtSt');if(!el)return;const t=todayISO();const T=S.ctTargets[t];
   const done=Object.keys(S.ctTargets).filter(x=>S.ctColl[x]).sort().slice(-7);let tg=0,ac=0;const t2=await ctRouteMaster();for(const x of done){const h=ctHistory(t2).find(y=>y.date===x);if(h){tg+=h.tgt;ac+=h.ach}}
