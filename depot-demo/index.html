@@ -623,6 +623,9 @@ body.locked>*:not(#login):not(.overlay):not(.toast):not(#printArea){display:none
 .csrt{margin-top:14px}.csrt .csh .hint{font-size:11.5px}.cstbl th.r,.cstbl td.r{text-align:right}.cstbl td,.cstbl th{white-space:nowrap}.cstbl .spk{display:block}.cstbl tfoot td{border-top:2px solid var(--line2);background:#faf9fd}
 .cswarn{font-size:12.5px;line-height:1.45;border-radius:10px;padding:8px 10px;margin:6px 0 2px}.cswarn.bad{background:#fdecea;color:#8a1c25;border:1px solid #f5c2c0}.cswarn.mid{background:#fff4e0;color:#8a5300;border:1px solid #f3d9a4}.cswarn.ok{background:#e9f7ef;color:#0f6b46;border:1px solid #bfe6cf}
 .cstbl tr.cslow td{background:#fff6f5}
+#ovPanel.xwide{max-width:1180px!important}
+.cspfill{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px}.cspfill .field{margin:0}.cspfill select{min-width:180px}
+.cstbl th,.cstbl td{padding:8px 9px;font-size:12.5px}.cstbl th{font-size:10.5px;line-height:1.25;white-space:normal;vertical-align:bottom}.csplan td{padding:6px 9px}
 .csempty{display:flex;flex-direction:column;gap:8px}.csempty span{font-size:13px;color:var(--ink2)}
 @media (max-width:1100px){.csgrid{grid-template-columns:1fr 1fr}.csmon{grid-column:1/-1}}@media (max-width:700px){.csgrid{grid-template-columns:1fr}}
 html.opas .hbonly{display:none!important}html:not(.opas) .opasonly{display:none!important}
@@ -3148,10 +3151,10 @@ async function csRender(){const box=$('dmCS');if(!box)return;await ctLoad();cons
   const tg=M[mon]&&M[mon].amt||0;const monEnd=iso(new Date(+mon.slice(0,4),+mon.slice(5,7),0,12));
   const nextDay=(()=>{const x=new Date(d0+'T12:00:00');x.setDate(x.getDate()+1);return iso(x)})();const left=nextDay<=monEnd?csWork(nextDay,monEnd):0;const due=Math.max(0,tg-mtd.total);
   const pr=tg?mtd.total/tg*100:0;const expP=tg?csWork(mStart,d0)/Math.max(1,csWork(mStart,monEnd))*100:0;
-  const monthCard=`<div class="csmon"><div class="csh"><b>🎯 ${csMon(mon)} target</b><button class="btn ghost sm" id="csSet">${tg?'✎ Edit':'＋ Set target'}</button></div>
+  const monthCard=`<div class="csmon"><div class="csh"><b>🎯 ${csMon(mon)} target</b><button class="btn ghost sm" id="csSet">${tg?'✎ Edit plan':'＋ Set route-wise plan'}</button></div>
     ${tg?`<div class="csbig">৳ ${csK(mtd.total)} <small>of ৳ ${csK(tg)}</small></div>
       <div class="csbar"><i style="width:${Math.min(100,pr).toFixed(1)}%"></i><em style="left:${Math.min(100,expP).toFixed(1)}%" title="Time gone: ${expP.toFixed(0)}% of working days"></em></div>
-      ${csWarn(pr,expP,due,left)}
+      ${csWarn(pr,expP,due,left)}${'${CSBEHIND}'}
       <div class="csrows"><div><span>Collection progress</span><b><i class="cspc ${pr>=expP?'g3':pr>=expP-5?'g1':'r2'}">${pr.toFixed(1)}%</i></b></div>
         <div><span>Time gone</span><b>${expP.toFixed(1)}% <small>${csWork(mStart,d0)} of ${csWork(mStart,monEnd)} working days</small></b></div>
         <div><span>Due to collect</span><b>৳ ${csN(due)}</b></div>
@@ -3161,37 +3164,62 @@ async function csRender(){const box=$('dmCS');if(!box)return;await ctLoad();cons
         <div><span>vs last month (1–${+lmEnd.slice(8)} ${new Date(lmEnd+'T12:00:00').toLocaleDateString('en-GB',{month:'short'})})</span><b>${lmt?`${csDelta(mtd.total,lmt)} <small>${mtd.total>=lmt?'+':'−'}৳ ${csN(Math.abs(mtd.total-lmt))}</small>`:'<span class="csdl n">no data</span>'}</b></div></div></div>`;
   /* route-wise trend */
   const t2=await ctRouteMaster();const last7=dates.slice(-7);const routes=new Map();
-  const R=name=>{let o=routes.get(name);if(!o){o={name,sa:'',d0:0,d0sa:0,lm0:0,seq:{},mtd:0,lmtd:0,tgt:null,ach:0};routes.set(name,o)}return o};
+  const R=name=>{let o=routes.get(name);if(!o){o={name,sa:'',d0:0,d0sa:0,lm0:0,seq:{},mtd:0,lmtd:0,tgt:null,ach:0,mt:null};routes.set(name,o)}return o};
   const add=(d,fn)=>{const A=ctAchieved(t2,d);for(const [r,a] of Object.entries(A)){const o=R(r);if(a.da&&!o.sa)o.sa=a.da;fn(o,a)}};
   add(d0,(o,a)=>{o.d0=a.total;o.d0sa=a.sa});const lm0=csMatch(have,csLastMonth(d0));if(lm0)add(lm0,(o,a)=>{o.lm0=a.total});
   last7.forEach(d=>add(d,(o,a)=>{o.seq[d]=a.total}));inM.forEach(d=>add(d,(o,a)=>{o.mtd+=a.total}));lmD.forEach(d=>add(d,(o,a)=>{o.lmtd+=a.total}));
   const T=S.ctTargets[d0];if(T)for(const [r,x] of Object.entries(T.routes||{})){const o=R(r);o.tgt=x.target||0;if(!o.sa)o.sa=x.sa||''}
+  const MR=(M[mon]&&M[mon].routes)||{};for(const [r,x] of Object.entries(MR)){const o=R(r);o.mt=x.target||0;if(!o.sa)o.sa=x.sa||''}
   for(const o of routes.values()){if(!o.sa){const t=Object.values(t2).find(v=>v.route===o.name);if(t)o.sa=t.sa||''}}
-  const rows=[...routes.values()].filter(o=>o.mtd||o.d0||o.tgt).sort((a,b)=>b.mtd-a.mtd);
-  const table=`<div class="csrt"><div class="csh"><b>📍 Route-wise collection</b><span class="hint">latest day ${csD(d0)} · trend = last ${last7.length} collection days · target = set for ${csD(d0)}</span></div>
-    <div class="tw"><table class="tbl cstbl"><thead><tr><th>Route</th><th>SA</th><th class="r">${csD(d0)}</th><th class="r">Same day last month</th><th class="r">SA %</th><th>Trend</th><th class="r">Target</th><th class="r">Achieved</th><th class="r">This month</th><th class="r">vs last month</th></tr></thead><tbody>
-    ${rows.map(o=>{const sp=o.d0?o.d0sa/o.d0*100:null,ach=o.tgt?o.d0/o.tgt*100:null,g=csPct(o.mtd,o.lmtd);
-      return `<tr${ach!=null&&ach<60?' class="cslow"':''}><td>${ach!=null&&ach<60?'<span title="Low collection: under 60% of today\'s target">⚠️</span> ':''}<b>${esc(o.name)}</b></td><td>${esc(o.sa||'—')}</td><td class="r num">${csN(o.d0)}</td><td class="r num">${lm0?csN(o.lm0):'—'}</td>
+  const rows=[...routes.values()].filter(o=>o.mtd||o.d0||o.tgt||o.mt).sort((a,b)=>b.mtd-a.mtd);const hasMT=rows.some(o=>o.mt);
+  const table=`<div class="csrt"><div class="csh"><b>📍 Route-wise collection</b><span class="hint">latest day ${csD(d0)} · trend = last ${last7.length} collection days · day target = set for ${csD(d0)}${hasMT?` · time gone ${expP.toFixed(0)}%`:''}</span></div>
+    <div class="tw"><table class="tbl cstbl"><thead><tr><th>Route</th><th>SA</th><th class="r">${csD(d0)}</th><th class="r">Same day<br>last month</th><th class="r">SA %</th><th>Trend</th><th class="r">Day target</th><th class="r">Achieved</th>${hasMT?'<th class="r">Month target</th>':''}<th class="r">This month</th>${hasMT?'<th class="r">Progress</th>':''}<th class="r">vs last month</th></tr></thead><tbody>
+    ${rows.map(o=>{const sp=o.d0?o.d0sa/o.d0*100:null,ach=o.tgt?o.d0/o.tgt*100:null,g=csPct(o.mtd,o.lmtd),mp=o.mt?o.mtd/o.mt*100:null,behind=mp!=null&&expP-mp>10,lowDay=ach!=null&&ach<60;
+      const why=[behind?`only ${mp.toFixed(0)}% of the month target collected with ${expP.toFixed(0)}% time gone`:'',lowDay?'under 60% of today\'s target':''].filter(Boolean).join('; ');
+      return `<tr${behind||lowDay?' class="cslow"':''}><td>${why?`<span title="Low collection: ${why}">⚠️</span> `:''}<b>${esc(o.name)}</b></td><td>${esc(o.sa||'—')}</td><td class="r num">${csN(o.d0)}</td><td class="r num">${lm0?csN(o.lm0):'—'}</td>
         <td class="r">${sp!=null?`<i class="cspc ${csTone(sp)}">${sp.toFixed(0)}%</i>`:'—'}</td><td>${spark(last7.map(d=>o.seq[d]??0),'#2e2a8f')}</td>
         <td class="r num">${o.tgt!=null?csN(o.tgt):'<span class="muted">not set</span>'}</td><td class="r">${ach!=null?`<i class="cspc ${csTone(ach)}">${ach.toFixed(0)}%</i>`:'—'}</td>
-        <td class="r num">${csN(o.mtd)}</td><td class="r">${g==null?'<span class="muted">—</span>':`<span class="csdl ${g>=0?'up':'dn'}">${g>=0?'▲':'▼'} ${Math.abs(g).toFixed(0)}%</span>`}</td></tr>`}).join('')}
+        ${hasMT?`<td class="r num">${o.mt?csN(o.mt):'<span class="muted">—</span>'}</td>`:''}<td class="r num">${csN(o.mtd)}</td>${hasMT?`<td class="r">${mp!=null?`<i class="cspc ${mp>=expP?'g3':mp>=expP-5?'g1':mp>=expP-10?'r1':'r2'}">${mp.toFixed(0)}%</i>`:'—'}</td>`:''}<td class="r">${g==null?'<span class="muted">—</span>':`<span class="csdl ${g>=0?'up':'dn'}">${g>=0?'▲':'▼'} ${Math.abs(g).toFixed(0)}%</span>`}</td></tr>`}).join('')}
     </tbody><tfoot><tr><td colspan="2"><b>Depot total</b></td><td class="r num"><b>${csN(sum(rows,x=>x.d0))}</b></td><td class="r num"><b>${lm0?csN(sum(rows,x=>x.lm0)):'—'}</b></td><td></td><td></td>
       <td class="r num"><b>${T?csN(sum(rows,x=>x.tgt||0)):'—'}</b></td><td class="r">${T&&sum(rows,x=>x.tgt||0)?`<b>${(sum(rows,x=>x.d0)/sum(rows,x=>x.tgt||0)*100).toFixed(0)}%</b>`:''}</td>
-      <td class="r num"><b>${csN(mtd.total)}</b></td><td class="r">${lmt?csDelta(mtd.total,lmt):''}</td></tr></tfoot></table></div></div>`;
-  box.innerHTML=`<div class="csgrid">${dayCard(d1)}${dayCard(d0)}${monthCard}</div>${rows.length?table:''}`;
+      ${hasMT?`<td class="r num"><b>${csN(sum(rows,x=>x.mt||0))}</b></td>`:''}<td class="r num"><b>${csN(mtd.total)}</b></td>${hasMT?`<td class="r">${tg?`<b>${pr.toFixed(0)}%</b>`:''}</td>`:''}<td class="r">${lmt?csDelta(mtd.total,lmt):''}</td></tr></tfoot></table></div></div>`;
+  const behindR=rows.filter(o=>o.mt&&expP-o.mtd/o.mt*100>10);const bh=behindR.length?`<div class="cswarn bad" style="margin-top:6px">📍 <b>${behindR.length} route${behindR.length>1?'s':''} behind:</b> ${behindR.map(o=>`${esc(o.name)} (${(o.mtd/o.mt*100).toFixed(0)}%)`).join(', ')}</div>`:'';
+  box.innerHTML=`<div class="csgrid">${dayCard(d1)}${dayCard(d0)}${monthCard.replace('${CSBEHIND}',bh)}</div>${rows.length?table:''}`;
   $('csSet').onclick=()=>csTargetDlg(mon)}
 
+/* ---------- monthly collection plan: route-wise targets, depot target = their total ---------- */
 async function csTargetDlg(mon){const M=(await getKV('ctMonthly'))||{};const cur=todayISO().slice(0,7);mon=mon||cur;
   const nx=(()=>{const x=new Date(cur+'-01T12:00:00');x.setMonth(x.getMonth()+1);return iso(x).slice(0,7)})();const opts=[...new Set([cur,mon,nx])].sort();
-  modal('Monthly collection target',`<p class="hint" style="margin:0 0 12px">Total collection the depot should achieve in the month (SA + MIO). It can be set or changed any day; collection from the 1st of the month always counts toward it.</p>
-    <div class="fgrid"><div class="field"><label>Month</label><select id="mtM">${opts.map(m=>`<option value="${m}" ${m===mon?'selected':''}>${csMon(m)}</option>`).join('')}</select></div>
-    <div class="field"><label>Target (৳)</label><input id="mtA" inputmode="numeric" placeholder="e.g. 6079973" value="${M[mon]&&M[mon].amt||''}"></div></div>
-    <div class="hint" id="mtH" style="margin-top:6px"></div>`,[{l:'Cancel'},{l:'Save target',cls:'primary',fn:async()=>{const m=$('mtM').value,a=Math.round(ctNum($('mtA').value));if(!a){toast('Enter the target amount');return false}
-    M[m]={amt:a,at:Date.now()};await setKV('ctMonthly',M);toast('✅ Target saved for '+csMon(m));setTimeout(csRender,50);return true}}]);
-  const show=()=>{const m=$('mtM').value,a=ctNum($('mtA').value);const end=iso(new Date(+m.slice(0,4),+m.slice(5,7),0,12));$('mtH').innerHTML=a?`৳ ${csN(a)} · about ৳ ${csN(a/csWork(m+'-01',end))} per working day (${csWork(m+'-01',end)} working days, Fridays off)`:''};
-  $('mtM').onchange=()=>{const m=$('mtM').value;$('mtA').value=M[m]&&M[m].amt||'';show()};$('mtA').oninput=show;show();
-}
-
+  const O=await ctOutstanding();const t2=O.t2;
+  /* last month's collection per route */
+  const lmOf=m=>{const x=new Date(m+'-01T12:00:00');x.setMonth(x.getMonth()-1);return iso(x).slice(0,7)};
+  const lmCol=m=>{const lm=lmOf(m),o={};for(const d of Object.keys(S.ctColl))if(d.startsWith(lm))for(const [r,a] of Object.entries(ctAchieved(t2,d)))o[r]=(o[r]||0)+a.total;return o};
+  const names=[...new Set([...O.list.map(r=>r.route),...Object.keys(lmCol(mon)),...Object.keys((M[mon]&&M[mon].routes)||{})])];
+  const info=Object.fromEntries(O.list.map(r=>[r.route,r]));
+  const rowsFor=m=>{const L=lmCol(m),saved=(M[m]&&M[m].routes)||{};return names.map(n=>{const r=info[n]||{};return {name:n,sa:r.sa||(saved[n]&&saved[n].sa)||'',out:r.out||0,over:r.over||0,inv:r.inv||0,chem:r.chem||0,lm:L[n]||0,target:saved[n]?saved[n].target:''}}).sort((a,b)=>b.out-a.out)};
+  let R=rowsFor(mon);
+  const body=()=>`<p class="hint" style="margin:0 0 10px">Plan the month route by route. The depot target is the total of the routes. It can be set any day; collection from the 1st of the month always counts.
+      Outstanding, overdue, invoices and chemists are from the latest receivable report${O.rep&&O.rep.uploadedAt?` (uploaded ${new Date(O.rep.uploadedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'})})`:''}.</p>
+    <div class="cspfill"><div class="field"><label>Month</label><select id="mtM">${opts.map(m=>`<option value="${m}" ${m===mon?'selected':''}>${csMon(m)}</option>`).join('')}</select></div>
+      <div class="field"><label>Fill all: % of outstanding</label><div style="display:flex;gap:6px"><input id="mtP" inputmode="decimal" placeholder="e.g. 60" style="width:90px"><button type="button" class="btn ghost sm" id="mtPgo">Fill</button></div></div>
+      <div class="field"><label>Fill all: last month + %</label><div style="display:flex;gap:6px"><input id="mtL" inputmode="decimal" placeholder="e.g. 10" style="width:90px"><button type="button" class="btn ghost sm" id="mtLgo">Fill</button></div></div></div>
+    <div class="tw" style="max-height:52vh"><table class="tbl cstbl csplan"><thead><tr><th>Route</th><th>SA</th><th class="r">Outstanding</th><th class="r">Overdue<br>&gt;44 days</th><th class="r">Invoices</th><th class="r">Chemists</th><th class="r">Last month<br>collected</th><th class="r">Monthly<br>target ৳</th><th class="r">% of<br>outstanding</th></tr></thead>
+      <tbody>${R.map((r,i)=>`<tr><td><b>${esc(r.name)}</b></td><td>${esc(r.sa||'—')}</td><td class="r num">${csN(r.out)}</td><td class="r num">${csN(r.over)} <small class="muted">${r.out?Math.round(r.over/r.out*100)+'%':''}</small></td><td class="r num">${r.inv}</td><td class="r num">${r.chem}</td><td class="r num">${r.lm?csN(r.lm):'—'}</td>
+        <td class="r"><input class="mtR" data-i="${i}" inputmode="numeric" value="${r.target===''?'':Math.round(r.target)}" placeholder="0" style="width:110px;text-align:right;padding:6px 8px"></td><td class="r num" id="mtPc${i}"></td></tr>`).join('')}</tbody>
+      <tfoot><tr><td colspan="2"><b>Depot total</b></td><td class="r num"><b>${csN(sum(R,x=>x.out))}</b></td><td class="r num"><b>${csN(sum(R,x=>x.over))}</b></td><td class="r num"><b>${sum(R,x=>x.inv)}</b></td><td class="r num"><b>${sum(R,x=>x.chem)}</b></td><td class="r num"><b>${csN(sum(R,x=>x.lm))}</b></td><td class="r num"><b id="mtT">0</b></td><td class="r num" id="mtTp"></td></tr></tfoot></table></div>
+    <div class="hint" id="mtH" style="margin-top:8px"></div>`;
+  const recalc=()=>{let t=0;document.querySelectorAll('.mtR').forEach(el=>{const i=+el.dataset.i,v=ctNum(el.value);R[i].target=el.value===''?'':v;t+=v;const o=R[i].out;$('mtPc'+i).textContent=v&&o?Math.round(v/o*100)+'%':''});
+    const out=sum(R,x=>x.out),m=$('mtM').value,end=iso(new Date(+m.slice(0,4),+m.slice(5,7),0,12)),wd=csWork(m+'-01',end);
+    $('mtT').textContent=csN(t);$('mtTp').textContent=t&&out?Math.round(t/out*100)+'%':'';$('mtH').innerHTML=t?`Depot target <b>৳ ${csN(t)}</b> · about ৳ ${csN(t/wd)} per working day (${wd} working days, Fridays off)`:''};
+  const bind=()=>{document.querySelectorAll('.mtR').forEach(el=>el.oninput=recalc);
+    $('mtM').onchange=()=>{mon=$('mtM').value;R=rowsFor(mon);$('ovBody').innerHTML=body();bind()};
+    $('mtPgo').onclick=()=>{const p=ctNum($('mtP').value);if(!p)return;document.querySelectorAll('.mtR').forEach(el=>{el.value=Math.round(R[+el.dataset.i].out*p/100/100)*100||''});recalc()};
+    $('mtLgo').onclick=()=>{const p=ctNum($('mtL').value);document.querySelectorAll('.mtR').forEach(el=>{const lm=R[+el.dataset.i].lm;el.value=lm?Math.round(lm*(1+p/100)/100)*100:''});recalc()};recalc()};
+  modal('Monthly collection plan',body(),[{l:'Cancel'},{l:'Save plan',cls:'primary',fn:async()=>{const m=$('mtM').value;const routes={};let t=0;
+    for(const r of R){const v=Math.round(ctNum(r.target));if(v>0){routes[r.name]={target:v,sa:r.sa,out:r.out,over:r.over,inv:r.inv,chem:r.chem,lm:r.lm};t+=v}}
+    if(!t){toast('Enter a target for at least one route');return false}
+    M[m]={amt:t,at:Date.now(),routes};await setKV('ctMonthly',M);toast('✅ Collection plan saved for '+csMon(m));setTimeout(csRender,50);return true}}]);
+  $('ovPanel').classList.add('wide','xwide');bind()}
 
 /* =============== Boot =============== */
 async function loadAll(){S.cfg={...DEF,...(await getKV('cfg')||{})};S.cfg.mgrPhone=normPhone(S.cfg.mgrPhone);S.fares=await getAll('fares');S.heroes=(await getAll('heroes')).map(h=>({...h,phone:normPhone(h.phone)}));S.bills=await getAll('bills');if(await purgeDemoManager().catch(()=>0))toast('Old demo / sample data removed');S.legKm=await getKV('legKm')||{};if(gateDepot())S.cfg.depot=gateDepot();rebuildIndex()}
@@ -3404,12 +3432,13 @@ gateCall=async function(u,b){await new Promise(r=>setTimeout(r,500));let T=[];tr
   if(b.action==='tstatus'){const r=T.find(x=>x.id===b.id);if(!r)return {ok:false,error:'Token not found'};if(b.op==='block')r.status='Blocked';if(b.op==='unblock')r.status='Active';if(b.op==='release'){r.pc='';r.act='';r.last=''}save();return {ok:true}}
   return {ok:false,error:'Unknown action'}};
 try{if(!sessionStorage.getItem('hq_u'))sessionStorage.setItem('hq_u',DEMO_TOKEN_U)}catch(e){}
-/* demo: a monthly depot target so the home page shows target vs achievement */
+/* demo: a route-wise monthly plan so the home page shows target vs achievement */
 (async()=>{for(let i=0;i<120;i++){if(typeof db!=='undefined'&&db&&S&&S.cfg)break;await new Promise(r=>setTimeout(r,250))}
-  try{if(!localStorage.getItem('demoSeeded'))return;const M=(await getKV('ctMonthly'))||{};const mon=todayISO().slice(0,7);if(M[mon])return;
-    const C=(await getKV('ctColl'))||{};const lm=(()=>{const x=new Date(mon+'-01T12:00:00');x.setMonth(x.getMonth()-1);return iso(x).slice(0,7)})();
-    let t=0;for(const [d,day] of Object.entries(C))if(d.startsWith(lm))for(const c of Object.values(day))t+=c.total||0;
-    M[mon]={amt:Math.round((t||3000000)*1.08/1000)*1000,at:Date.now()};await setKV('ctMonthly',M);if(typeof csRender==='function')csRender()}catch(e){}})();
+  try{if(!localStorage.getItem('demoSeeded'))return;const M=(await getKV('ctMonthly'))||{};const mon=todayISO().slice(0,7);if(M[mon]&&M[mon].routes)return;
+    await ctLoad();const O=await ctOutstanding();const lm=(()=>{const x=new Date(mon+'-01T12:00:00');x.setMonth(x.getMonth()-1);return iso(x).slice(0,7)})();
+    const L={};for(const d of Object.keys(S.ctColl))if(d.startsWith(lm))for(const [r,a] of Object.entries(ctAchieved(O.t2,d)))L[r]=(L[r]||0)+a.total;
+    const f=[1.12,1.05,1.15,1.0,1.1,1.08];const routes={};let t=0;Object.keys(L).forEach((r,i)=>{const o=O.list.find(x=>x.route===r)||{};const v=Math.round(L[r]*f[i%f.length]/1000)*1000;routes[r]={target:v,sa:o.sa||'',out:o.out||0,over:o.over||0,inv:o.inv||0,chem:o.chem||0,lm:L[r]};t+=v});
+    if(!t)return;M[mon]={amt:t,at:Date.now(),routes};await setKV('ctMonthly',M);if(typeof csRender==='function'&&$('dmCS'))csRender()}catch(e){console.error(e)}})();
 
 demoBootManager();</script></body>
 </html>
