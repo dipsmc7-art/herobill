@@ -644,6 +644,13 @@ body.locked>*:not(#login):not(.overlay):not(.toast):not(#printArea){display:none
 .miseg button small{display:block;font-weight:400;color:var(--ink3);font-size:11.5px;margin-top:2px}.miseg button.on{border-color:var(--brand);background:var(--brandSoft)}
 .midrop{display:block;border:1.5px dashed var(--line2);border-radius:12px;padding:14px;text-align:center;cursor:pointer;margin-bottom:10px;font-size:13px}.midrop:hover{border-color:var(--brand)}
 .mifl{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}.mifl .field{margin:0}.mifl select{min-width:170px}
+.mitf{position:relative}.mitbtn{min-width:240px;max-width:340px;display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--line2);background:#fff;border-radius:10px;padding:9px 12px;font:inherit;font-size:13.5px;cursor:pointer;color:var(--ink);text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mitbtn.empty{color:var(--ink3);border-color:#e7b0bf;background:#fff8fa}.mitbtn span{color:var(--ink3)}
+.mitpanel{position:absolute;z-index:20;top:100%;left:0;margin-top:6px;width:380px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 40px #1b18502a;padding:10px}
+.mitpanel>input{width:100%;margin-bottom:8px;font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--line2);border-radius:8px}
+.mitpanel label{display:flex;align-items:center;gap:8px;padding:5px 6px;margin:0;border-radius:8px;font-size:13px;cursor:pointer;text-transform:none;letter-spacing:0;color:var(--ink);font-weight:500}.mitpanel label span{text-transform:none;letter-spacing:0}.mitpanel label,.mitpanel .mitlist label{height:auto;min-height:0;line-height:1.3;padding-top:7px;padding-bottom:7px}.mitlist{display:flex;flex-direction:column;gap:0}.mitpanel label:hover{background:#f6f4fa}.mitpanel label span{margin-left:auto;color:var(--ink3);font-size:11.5px;white-space:nowrap}
+.mitpanel input[type=checkbox]{width:auto}.mitall{border-bottom:1px solid var(--line);border-radius:0!important;margin-bottom:4px}.mitlist{max-height:280px;overflow:auto}.mitlist label[hidden]{display:none}
+.mitfoot{display:flex;justify-content:flex-end;gap:8px;border-top:1px solid var(--line);padding-top:8px;margin-top:6px}
 .miempty{background:#fff;border:1px dashed var(--line2);border-radius:14px;padding:26px;text-align:center;color:var(--ink2);font-size:13.5px}
 .mikpis{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;margin-bottom:8px}.mikpis>div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 14px;display:flex;flex-direction:column}
 .mikpis b{font-size:18px}.mikpis span{font-size:11.5px;color:var(--ink3)}.mikpis .neg b{color:#b42318}.mikpis.big>div{flex:1;min-width:150px}
@@ -3260,7 +3267,7 @@ async function csTargetDlg(mon){const M=(await getKV('ctMonthly'))||{};const cur
 
 /* =============== MARKET INVESTIGATION: send customers for field verification, then report line by line =============== */
 const MI_LIVE=false;   /* production shows the tool only when this is true; the demo always shows it */
-const MI={page:'send',src:'recv',up:null,mode:'gt',days:44,days2:90,ctype:'',loaded:null,q:'',sel:null,open:new Set(),cur:null,closed:new Set()};
+const MI={page:'send',src:'recv',up:null,mode:'gt',days:44,days2:90,types:new Set(),allTypes:false,tq:'',loaded:null,q:'',sel:null,open:new Set(),cur:null,closed:new Set()};
 const MI_BY=['DIC','SA','MIO'];
 const MI_METHOD=['Physically visited','Over phone','MIO confirmed by himself'];
 const MI_FIND=['Due with chemist','Withdrawn by MIO','Product migrated','Paid but not deposited','Dispute / return','Other'];
@@ -3284,10 +3291,14 @@ function miRender(){const W=$('miWrap');const open=MI.data.cases.filter(c=>c.sta
 async function miSource(){const A=await dmRWApi();if(MI.src==='upload')return MI.up?{rows:MI.up.rows,label:`Uploaded file · ${MI.up.name}`}:null;
   const L=A.latest();return L?{rows:L.rows,label:`Latest receivable report · ${L.fileName||''} (${new Date(L.uploadedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'})})`}:null}
 function miFilter(rows){const d=+MI.days||0,d2=+MI.days2||0;return rows.filter(r=>{const x=+r.days||0;
-  const okD=MI.mode==='gt'?x>d:MI.mode==='lt'?x<d:MI.mode==='range'?x>=Math.min(d,d2)&&x<=Math.max(d,d2):true;return okD&&(MI.ctype==='__all'||String(r.ctype||'')===MI.ctype)})}
-const miFltLabel=()=>(MI.mode==='gt'?`In transit more than ${MI.days} days`:MI.mode==='lt'?`In transit less than ${MI.days} days`:MI.mode==='range'?`In transit ${MI.days}–${MI.days2} days`:'All days')+' · '+(MI.ctype==='__all'?'All customer types':MI.ctype);
+  const okD=MI.mode==='gt'?x>d:MI.mode==='lt'?x<d:MI.mode==='range'?x>=Math.min(d,d2)&&x<=Math.max(d,d2):true;return okD&&(MI.allTypes||MI.types.has(String(r.ctype||'')))})}
+const miDayOk=r=>{const x=+r.days||0,d=+MI.days||0,d2=+MI.days2||0;return MI.mode==='gt'?x>d:MI.mode==='lt'?x<d:MI.mode==='range'?x>=Math.min(d,d2)&&x<=Math.max(d,d2):true};
+const miTypeLabel=()=>MI.allTypes?'All customer types':MI.types.size?[...MI.types].map(t=>t||'(blank)').join(', '):'';
+const miFltLabel=()=>(MI.mode==='gt'?`In transit more than ${MI.days} days`:MI.mode==='lt'?`In transit less than ${MI.days} days`:MI.mode==='range'?`In transit ${MI.days}–${MI.days2} days`:'All days')+' · '+miTypeLabel();
 async function miSend(){const P=$('miPage');const A=await dmRWApi();const src=await miSource();const L=A.latest();
-  const types=src?[...src.rows.reduce((m,r)=>m.set(r.ctype||'(blank)',(m.get(r.ctype||'(blank)')||0)+1),new Map())].sort((a,b)=>b[1]-a[1]):[];
+  const tm=new Map();if(src)for(const r of src.rows){if(!miDayOk(r))continue;const k=String(r.ctype||'');const o=tm.get(k)||{n:0,a:0};o.n++;o.a+=+r.recv||0;tm.set(k,o)}
+  const types=[...tm].sort((a,b)=>b[1].a-a[1].a);const tAll={n:sum(types,x=>x[1].n),a:sum(types,x=>x[1].a)};
+  const tBtn=MI.allTypes?`All types (${tAll.n})`:MI.types.size?(MI.types.size===1?esc([...MI.types][0]||'(blank)'):`${MI.types.size} types selected`):'— Select customer type —';
   P.innerHTML=`<div class="mibox"><div class="mih">Data source</div>
       <div class="miseg"><button data-src="recv" class="${MI.src==='recv'?'on':''}">📍 Receivable report${L?` <small>${esc(L.fileName||'')} · ${new Date(L.uploadedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</small>`:' <small>not uploaded</small>'}</button>
         <button data-src="upload" class="${MI.src==='upload'?'on':''}">⬆ Upload file <small>${MI.up?esc(MI.up.name):'same format as the receivable report'}</small></button></div>
@@ -3295,7 +3306,10 @@ async function miSend(){const P=$('miPage');const A=await dmRWApi();const src=aw
       <div class="mifl">
         <div class="field"><label>In-transit days</label><div style="display:flex;gap:6px"><select id="miMode">${[['gt','More than'],['lt','Less than'],['range','Between'],['all','All days']].map(([v,l])=>`<option value="${v}" ${MI.mode===v?'selected':''}>${l}</option>`).join('')}</select>
           ${MI.mode!=='all'?`<input id="miD" inputmode="numeric" value="${MI.days}" style="width:70px">`:''}${MI.mode==='range'?`<input id="miD2" inputmode="numeric" value="${MI.days2}" style="width:70px">`:''}<span class="hint" style="align-self:center">days</span></div></div>
-        <div class="field"><label>Customer type <b style="color:#b42318">*</b></label><select id="miType" ${src?'':'disabled'}><option value="">— Select customer type —</option><option value="__all" ${MI.ctype==='__all'?'selected':''}>All types (${src?src.rows.length:0})</option>${types.map(([t,n])=>`<option value="${esc(t==='(blank)'?'':t)}" ${MI.ctype===(t==='(blank)'?'':t)&&MI.ctype!==''?'selected':''}>${esc(t)} (${n})</option>`).join('')}</select></div>
+        <div class="field mitf"><label>Customer type <b style="color:#b42318">*</b> <span class="hint">(one or more)</span></label><button type="button" id="miType" class="mitbtn ${MI.allTypes||MI.types.size?'':'empty'}" ${src?'':'disabled'}>${tBtn} <span>▾</span></button>
+          <div class="mitpanel" id="miTP" hidden><input id="miTQ" placeholder="Search type…" value="${esc(MI.tq)}"><label class="mitall"><input type="checkbox" id="miTA" ${MI.allTypes?'checked':''}> <b>All types</b><span>${tAll.n} inv · ${tk(tAll.a)}</span></label>
+            <div class="mitlist">${types.map(([t,o])=>`<label data-tn="${esc((t||'(blank)').toLowerCase())}"><input type="checkbox" data-ty="${esc(t)}" ${MI.allTypes||MI.types.has(t)?'checked':''} ${MI.allTypes?'disabled':''}> ${esc(t||'(blank)')}<span>${o.n} inv · ${tk(o.a)}</span></label>`).join('')}</div>
+            <div class="mitfoot"><button type="button" class="btn ghost sm" id="miTC">Clear</button><button type="button" class="btn primary sm" id="miTD">Done</button></div></div></div>
         <div class="field"><label>&nbsp;</label><button class="btn primary" id="miLoad" ${src?'':'disabled'}>Load list →</button></div></div>
       ${src?'':`<div class="ctnote">${MI.src==='upload'?'Upload a file to start.':'Upload the receivable report in Route Wise Receivable first, or switch to Upload file.'}</div>`}</div>
     <div id="miList"></div>`;
@@ -3305,8 +3319,13 @@ async function miSend(){const P=$('miPage');const A=await dmRWApi();const src=aw
     MI.up={name:f.name,rows:r.rows};MI.loaded=null;miSend()}}
   $('miMode').onchange=e=>{MI.mode=e.target.value;MI.loaded=null;miSend()};
   if($('miD'))$('miD').onchange=e=>{MI.days=+e.target.value||0;if(MI.loaded)miLoadList()};if($('miD2'))$('miD2').onchange=e=>{MI.days2=+e.target.value||0;if(MI.loaded)miLoadList()};
-  $('miType').onchange=e=>{MI.ctype=e.target.value;if(MI.loaded)miLoadList()};
-  $('miLoad').onclick=()=>{if(!$('miType').value&&MI.ctype===''){toast('Select a customer type first');$('miType').focus();return}MI.ctype=$('miType').value;miLoadList()};
+  const tp=$('miTP');$('miType').onclick=e=>{e.stopPropagation();tp.hidden=!tp.hidden;if(!tp.hidden)$('miTQ').focus()};tp.onclick=e=>e.stopPropagation();
+  document.addEventListener('click',function cl(){if(tp.isConnected&&!tp.hidden){tp.hidden=true;miSend()}document.removeEventListener('click',cl)},{once:false});
+  $('miTQ').oninput=e=>{MI.tq=e.target.value;const q=MI.tq.toLowerCase();tp.querySelectorAll('[data-tn]').forEach(l=>l.hidden=!!q&&!l.dataset.tn.includes(q))};$('miTQ').oninput({target:$('miTQ')});
+  $('miTA').onchange=e=>{MI.allTypes=e.target.checked;if(MI.allTypes)MI.types.clear();tp.querySelectorAll('[data-ty]').forEach(c=>{c.checked=MI.allTypes;c.disabled=MI.allTypes})};
+  tp.querySelectorAll('[data-ty]').forEach(c=>c.onchange=()=>{c.checked?MI.types.add(c.dataset.ty):MI.types.delete(c.dataset.ty)});
+  $('miTC').onclick=()=>{MI.allTypes=false;MI.types.clear();MI.loaded=null;miSend()};$('miTD').onclick=()=>{tp.hidden=true;MI.loaded=null;miSend()};
+  $('miLoad').onclick=e=>{if(!MI.allTypes&&!MI.types.size){e.stopPropagation();toast('Select a customer type first');tp.hidden=false;$('miTQ').focus();return}tp.hidden=true;miLoadList()};
   if(MI.loaded)miLoadList();else $('miList').innerHTML=src?'<div class="miempty">Select a customer type and press <b>Load list</b>. Without a customer type, nothing is loaded.</div>':''}
 async function miLoadList(){const A=await dmRWApi();const src=await miSource();if(!src)return;const rows=miFilter(src.rows);MI.loaded={rows,label:src.label};
   const G=A.groups(rows);if(!MI.sel||MI.selFor!==miFltLabel()+src.label){MI.sel=new Set(G.map(g=>g.key));MI.selFor=miFltLabel()+src.label}
@@ -3578,7 +3597,7 @@ function demoWorld(){let s=7;const rng=()=>{s=(s*1103515245+12345)%2147483648;re
   const MIO=['Karim Uddin','Jamal Hossain','Shahin Alam'];
   const SH=['Rahman Pharmacy','Maa Medical Hall','Sonali Drug House','New Popular Pharmacy','Janata Medicine Corner','Bismillah Pharma','Hasan Medical Store','Shifa Pharmacy','Lazz Medicine Point','Al-Amin Drug House','Mukti Medical','Rupali Pharmacy','Bhai Bhai Medicine','Nirapad Pharma','Sheba Medical Hall','Amena Drug Store','Green Life Pharmacy','Desh Medical','Sathi Pharmacy','Royal Medicine Corner','City Drug House','Proshanti Medical','Nobin Pharmacy','Alif Medicine','Moumita Medical','Tasnim Pharmacy','Jononi Drug House','Arogya Pharmacy','Sufia Pharmacy','Nabil Medicine Corner','Hridoy Pharma','Uttara Pharmacy','Shapla Drug House','Kakoli Medical','Momota Pharmacy','Shuvo Medicine Point','Popular Diagnostic Pharmacy','Mayer Doa Medical','Ma Babar Doa Pharmacy','Sunrise Pharmacy','Tulip Medical','Ananda Pharmacy','Bondhu Medicine','Sabuj Pharma','Dhaka Drug House','Modina Medical','Nurjahan Pharmacy','Karim Medical Hall','Fatema Pharmacy','Life Care Pharmacy','Medi Point','Health Plus','Care Pharmacy','Akota Medical','Swastha Pharmacy','Dawa Ghar','Prottasha Pharmacy','Meghna Medical','Padma Drug House','Jamuna Pharmacy'];
   const rows=[],custs=[];let ci=0;
-  RT.forEach((r,ri)=>r[1].forEach(terr=>{for(let k=0;k<6;k++){const code='C'+(20100+ci);const name=SH[ci%SH.length];ci++;const mk=pick(r[4]);const mob='017'+String(10000000+ci*7919).slice(0,8);const typ=pick(['General','General','General','FCB','FCB']);
+  RT.forEach((r,ri)=>r[1].forEach(terr=>{for(let k=0;k<6;k++){const code='C'+(20100+ci);const name=SH[ci%SH.length];ci++;const mk=pick(r[4]);const mob='017'+String(10000000+ci*7919).slice(0,8);const typ=pick(['GENERAL','GENERAL','GENERAL','FCB FY-26-27','FCB FY-26-27','FCB FY-26-27','FCB FY-25-26','EWC-26','GWS-26-27','MDC (FY 26-27)','SC-26','WC-26']);
     const nInv=1+Math.floor(rng()*3);for(let j=0;j<nInv;j++){const days=Math.floor(3+rng()*(rng()<.25?110:50));rows.push({code,name,ctype:typ,market:mk,days,recv:Math.round((2000+rng()*30000)/10)*10,net:0,paid:0,route:terr,invoice:'INV-'+(81000+rows.length),invDate:'',depot:DEP,depotCode:'MD01',mio:MIO[ri%3],mioCode:'',area:'',zone:'',mobile:mob})}
     custs.push({code,name,address:`${10+ci} ${mk}, Model Town`,market:mk,route:terr,owner:'',mobile:mob,thana:'',district:'',status:'Approved'})}}));
   const F=[];RT.forEach(r=>r[4].forEach((mk,mi)=>{const pl=['Depot',mk+' Bus Stand',mk+' Bazar',mk+' Hospital More'];
@@ -3663,15 +3682,17 @@ try{if(!sessionStorage.getItem('hq_u'))sessionStorage.setItem('hq_u',DEMO_TOKEN_
     const L={};for(const d of Object.keys(S.ctColl))if(d.startsWith(lm))for(const [r,a] of Object.entries(ctAchieved(O.t2,d)))L[r]=(L[r]||0)+a.total;
     const f=[1.12,1.05,1.15,1.0,1.1,1.08];const routes={};let t=0;Object.keys(L).forEach((r,i)=>{const o=O.list.find(x=>x.route===r)||{};const v=Math.round(L[r]*f[i%f.length]/1000)*1000;routes[r]={target:v,sa:o.sa||'',out:o.out||0,over:o.over||0,inv:o.inv||0,chem:o.chem||0,lm:L[r]};t+=v});
     if(!t)return;M[mon]={amt:t,at:Date.now(),routes};await setKV('ctMonthly',M);if(typeof csRender==='function'&&$('dmCS'))csRender()}catch(e){console.error(e)}})();
-/* demo: customer types as in the real report (FCB, General) — one-time fix for demos seeded earlier */
-(async()=>{try{if(!localStorage.getItem('demoSeeded')||localStorage.getItem('demoCtype2'))return;const M={Chemist:'General',Retail:'FCB',Hospital:'FCB'};
+/* demo: customer types as in the real report (FCB FY-26-27, GENERAL, EWC-26 …) — one-time fix for demos seeded earlier */
+(async()=>{try{if(!localStorage.getItem('demoSeeded')||localStorage.getItem('demoCtype3'))return;
+  const T3=['GENERAL','GENERAL','GENERAL','FCB FY-26-27','FCB FY-26-27','FCB FY-26-27','FCB FY-25-26','EWC-26','GWS-26-27','MDC (FY 26-27)','SC-26','WC-26'];
+  const ty=code=>{let h=0;for(const ch of String(code))h=(h*31+ch.charCodeAt(0))>>>0;return T3[h%T3.length]};
   const db2=await new Promise((ok,no)=>{const r=indexedDB.open('RouteCollectionDB_demo');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
   if(db2.objectStoreNames.contains('reports')){const all=await new Promise(ok=>{const q=db2.transaction('reports').objectStore('reports').getAll();q.onsuccess=()=>ok(q.result||[])});
-    const t=db2.transaction('reports','readwrite'),st=t.objectStore('reports');for(const rep of all){(rep.rows||[]).forEach(r=>{if(M[r.ctype])r.ctype=M[r.ctype]});st.put(rep)}await new Promise(ok=>t.oncomplete=ok)}
+    const t=db2.transaction('reports','readwrite'),st=t.objectStore('reports');for(const rep of all){(rep.rows||[]).forEach(r=>{r.ctype=ty(r.code)});st.put(rep)}await new Promise(ok=>t.oncomplete=ok)}
   db2.close();for(let i=0;i<80&&!(typeof db!=='undefined'&&db);i++)await new Promise(r=>setTimeout(r,250));
-  const T=await getKV('tcm');if(T&&T.list){Object.values(T.list).forEach(x=>{if(x.info&&M[x.info.type])x.info.type=M[x.info.type]});await setKV('tcm',T)}
-  const I=await getKV('mi');if(I&&I.cases){I.cases.forEach(c=>c.lines.forEach(l=>{if(M[l.ctype])l.ctype=M[l.ctype]}));await setKV('mi',I)}
-  localStorage.setItem('demoCtype2','1');if(DM&&DM.rwFrame){DM.rwFrame.remove();DM.rwFrame=null}}catch(e){console.error(e)}})();
+  const T=await getKV('tcm');if(T&&T.list){Object.values(T.list).forEach(x=>{if(x.info)x.info.type=ty(x.code)});await setKV('tcm',T)}
+  const I=await getKV('mi');if(I&&I.cases){I.cases.forEach(c=>c.lines.forEach(l=>{l.ctype=ty(l.code)}));await setKV('mi',I)}
+  localStorage.setItem('demoCtype3','1');if(DM&&DM.rwFrame){DM.rwFrame.remove();DM.rwFrame=null}}catch(e){console.error(e)}})();
 
 demoBootManager();</script></body>
 </html>
