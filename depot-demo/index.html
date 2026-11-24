@@ -3112,6 +3112,7 @@ async function gdTokDlg(){let k='';try{k=sessionStorage.getItem('hq_ok')||''}cat
       $('tkList').click()})}catch(e){fail(e)}};
   $('tkList').onclick=list}
 
+/* build 2026-11-24b */
 /* =============== HOME: COLLECTION STATUS (DA Collection report vs same day last month, monthly depot target, route-wise trend) =============== */
 const csK=v=>{const a=Math.abs(v),s=v<0?'-':'';return a>=1e7?s+(a/1e7).toFixed(2)+' Cr':a>=1e5?s+(a/1e5).toFixed(a>=1e6?1:2)+' L':a>=1e3?s+(a/1e3).toFixed(1)+'k':s+Math.round(a)};
 const csN=v=>Math.round(v||0).toLocaleString('en-IN');
