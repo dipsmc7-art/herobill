@@ -3578,7 +3578,7 @@ function demoWorld(){let s=7;const rng=()=>{s=(s*1103515245+12345)%2147483648;re
   const MIO=['Karim Uddin','Jamal Hossain','Shahin Alam'];
   const SH=['Rahman Pharmacy','Maa Medical Hall','Sonali Drug House','New Popular Pharmacy','Janata Medicine Corner','Bismillah Pharma','Hasan Medical Store','Shifa Pharmacy','Lazz Medicine Point','Al-Amin Drug House','Mukti Medical','Rupali Pharmacy','Bhai Bhai Medicine','Nirapad Pharma','Sheba Medical Hall','Amena Drug Store','Green Life Pharmacy','Desh Medical','Sathi Pharmacy','Royal Medicine Corner','City Drug House','Proshanti Medical','Nobin Pharmacy','Alif Medicine','Moumita Medical','Tasnim Pharmacy','Jononi Drug House','Arogya Pharmacy','Sufia Pharmacy','Nabil Medicine Corner','Hridoy Pharma','Uttara Pharmacy','Shapla Drug House','Kakoli Medical','Momota Pharmacy','Shuvo Medicine Point','Popular Diagnostic Pharmacy','Mayer Doa Medical','Ma Babar Doa Pharmacy','Sunrise Pharmacy','Tulip Medical','Ananda Pharmacy','Bondhu Medicine','Sabuj Pharma','Dhaka Drug House','Modina Medical','Nurjahan Pharmacy','Karim Medical Hall','Fatema Pharmacy','Life Care Pharmacy','Medi Point','Health Plus','Care Pharmacy','Akota Medical','Swastha Pharmacy','Dawa Ghar','Prottasha Pharmacy','Meghna Medical','Padma Drug House','Jamuna Pharmacy'];
   const rows=[],custs=[];let ci=0;
-  RT.forEach((r,ri)=>r[1].forEach(terr=>{for(let k=0;k<6;k++){const code='C'+(20100+ci);const name=SH[ci%SH.length];ci++;const mk=pick(r[4]);const mob='017'+String(10000000+ci*7919).slice(0,8);const typ=pick(['Chemist','Chemist','Chemist','Retail','Hospital']);
+  RT.forEach((r,ri)=>r[1].forEach(terr=>{for(let k=0;k<6;k++){const code='C'+(20100+ci);const name=SH[ci%SH.length];ci++;const mk=pick(r[4]);const mob='017'+String(10000000+ci*7919).slice(0,8);const typ=pick(['General','General','General','FCB','FCB']);
     const nInv=1+Math.floor(rng()*3);for(let j=0;j<nInv;j++){const days=Math.floor(3+rng()*(rng()<.25?110:50));rows.push({code,name,ctype:typ,market:mk,days,recv:Math.round((2000+rng()*30000)/10)*10,net:0,paid:0,route:terr,invoice:'INV-'+(81000+rows.length),invDate:'',depot:DEP,depotCode:'MD01',mio:MIO[ri%3],mioCode:'',area:'',zone:'',mobile:mob})}
     custs.push({code,name,address:`${10+ci} ${mk}, Model Town`,market:mk,route:terr,owner:'',mobile:mob,thana:'',district:'',status:'Approved'})}}));
   const F=[];RT.forEach(r=>r[4].forEach((mk,mi)=>{const pl=['Depot',mk+' Bus Stand',mk+' Bazar',mk+' Hospital More'];
@@ -3663,6 +3663,15 @@ try{if(!sessionStorage.getItem('hq_u'))sessionStorage.setItem('hq_u',DEMO_TOKEN_
     const L={};for(const d of Object.keys(S.ctColl))if(d.startsWith(lm))for(const [r,a] of Object.entries(ctAchieved(O.t2,d)))L[r]=(L[r]||0)+a.total;
     const f=[1.12,1.05,1.15,1.0,1.1,1.08];const routes={};let t=0;Object.keys(L).forEach((r,i)=>{const o=O.list.find(x=>x.route===r)||{};const v=Math.round(L[r]*f[i%f.length]/1000)*1000;routes[r]={target:v,sa:o.sa||'',out:o.out||0,over:o.over||0,inv:o.inv||0,chem:o.chem||0,lm:L[r]};t+=v});
     if(!t)return;M[mon]={amt:t,at:Date.now(),routes};await setKV('ctMonthly',M);if(typeof csRender==='function'&&$('dmCS'))csRender()}catch(e){console.error(e)}})();
+/* demo: customer types as in the real report (FCB, General) — one-time fix for demos seeded earlier */
+(async()=>{try{if(!localStorage.getItem('demoSeeded')||localStorage.getItem('demoCtype2'))return;const M={Chemist:'General',Retail:'FCB',Hospital:'FCB'};
+  const db2=await new Promise((ok,no)=>{const r=indexedDB.open('RouteCollectionDB_demo');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
+  if(db2.objectStoreNames.contains('reports')){const all=await new Promise(ok=>{const q=db2.transaction('reports').objectStore('reports').getAll();q.onsuccess=()=>ok(q.result||[])});
+    const t=db2.transaction('reports','readwrite'),st=t.objectStore('reports');for(const rep of all){(rep.rows||[]).forEach(r=>{if(M[r.ctype])r.ctype=M[r.ctype]});st.put(rep)}await new Promise(ok=>t.oncomplete=ok)}
+  db2.close();for(let i=0;i<80&&!(typeof db!=='undefined'&&db);i++)await new Promise(r=>setTimeout(r,250));
+  const T=await getKV('tcm');if(T&&T.list){Object.values(T.list).forEach(x=>{if(x.info&&M[x.info.type])x.info.type=M[x.info.type]});await setKV('tcm',T)}
+  const I=await getKV('mi');if(I&&I.cases){I.cases.forEach(c=>c.lines.forEach(l=>{if(M[l.ctype])l.ctype=M[l.ctype]}));await setKV('mi',I)}
+  localStorage.setItem('demoCtype2','1');if(DM&&DM.rwFrame){DM.rwFrame.remove();DM.rwFrame=null}}catch(e){console.error(e)}})();
 
 demoBootManager();</script></body>
 </html>
