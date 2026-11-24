@@ -2172,10 +2172,10 @@ function gdConnApply(code){const m=String(code||'').match(/DMC1\.([A-Za-z0-9_-]+
   const ok=gdConnApply(m[1]);setTimeout(()=>toast(ok?'✅ Connected to the head office':'Connection link is not valid'),600)})();
 const gdReady=()=>/^https:\/\/script\.google\.com\/.+\/exec$/.test(gdUrl());
 const gdSafe=s=>String(s||'').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'_').slice(0,60);
-async function gdLoad(){const c=await getKV('gdrive');if(c){GD.last=c.last||null;GD.err=c.err||'';GD.pc=c.pc||'';GD.hash=c.hash||'';GD.arch=c.arch||{}}
+async function gdLoad(){const c=await getKV('gdrive');if(c){GD.last=c.last||null;GD.err=c.err||'';GD.pc=c.pc||'';GD.hash=c.hash||'';GD.arch=c.arch||{};GD.collHash=c.collHash||''}
   if(!GD.pc){const a=new Uint8Array(3);crypto.getRandomValues(a);GD.pc='PC-'+[...a].map(x=>x.toString(16).padStart(2,'0')).join('').toUpperCase();await gdSave()}
   try{GD.dirty=localStorage.getItem('hbm_gd_dirty')==='1'}catch(x){}}
-async function gdSave(){await put('kv',{key:'gdrive',value:{last:GD.last,err:GD.err,pc:GD.pc,hash:GD.hash||'',arch:GD.arch||{}}})}
+async function gdSave(){await put('kv',{key:'gdrive',value:{last:GD.last,err:GD.err,pc:GD.pc,hash:GD.hash||'',arch:GD.arch||{},collHash:GD.collHash||''}})}
 function gdDirty(){if(!gdReady())return;GD.dirty=true;GD.seq++;try{localStorage.setItem('hbm_gd_dirty','1')}catch(x){}
   clearTimeout(GD.timer);GD.timer=setTimeout(()=>gdRun(),20000);gdChip()}
 /* backup size control: bills older than 6 months go to monthly archive files; only the latest 3 receivable reports are copied */
@@ -2192,13 +2192,19 @@ async function gdApi(action,extra,key){let r;
   catch(e){throw new Error(navigator.onLine?'Could not reach the head-office Drive':'No internet connection')}
   const t=await r.text();let j;try{j=JSON.parse(t)}catch(e){throw new Error(/<html/i.test(t)?'Head-office script is not shared as “Anyone”':'Unexpected reply from Google')}
   if(!j.ok)throw new Error(j.error||'Backup script error');return j}
+/* national dashboard feed: daily DA-collection totals (last 75 days) and monthly depot targets — sent only when changed */
+async function gdColl(){const C=(await getKV('ctColl'))||{},M=(await getKV('ctMonthly'))||{};const from=iso(new Date(Date.now()-75*864e5));const days={},monthly={};
+  for(const [d,day] of Object.entries(C)){if(d<from)continue;const o={sa:0,mio:0,total:0};for(const c of Object.values(day||{})){o.sa+=c.sa||0;o.mio+=c.mio||0;o.total+=c.total||0}if(o.total)days[d]={sa:Math.round(o.sa),mio:Math.round(o.mio),total:Math.round(o.total)}}
+  for(const [m,v] of Object.entries(M))if(v&&v.amt)monthly[m]={amt:Math.round(v.amt),routes:Object.keys(v.routes||{}).length};
+  const h=sha256(JSON.stringify({days,monthly,d:S.cfg.depot}));if(h===GD.collHash||(!Object.keys(days).length&&!Object.keys(monthly).length))return;
+  const j=await gdApi('coll',{payload:{days,monthly}});if(j&&j.ok)GD.collHash=h}
 async function gdRun(manual){
   if(!gdReady()){if(manual)toast('Head-office backup link is not set in this file');return false}
   if(GD.busy){GD.again=true;return false}
   clearTimeout(GD.timer);clearTimeout(GD.retry);
   if(!navigator.onLine){GD.err='No internet — will back up when online';gdChip();if(manual)toast(GD.err);return false}
   GD.busy=true;gdChip();const seq=GD.seq;
-  try{let archOK=true;try{await gdArchive()}catch(e){archOK=false;console.warn('archive skipped',e.message)}const snap=await gdSnapshot(false,!archOK);const json=JSON.stringify(snap);const nb=snap.bills.length;
+  try{try{await gdColl()}catch(e){console.warn('collection feed skipped',e.message)}let archOK=true;try{await gdArchive()}catch(e){archOK=false;console.warn('archive skipped',e.message)}const snap=await gdSnapshot(false,!archOK);const json=JSON.stringify(snap);const nb=snap.bills.length;
     const body={date:todayISO(),meta:{bills:S.bills.length,pending:snap.bills.filter(b=>b.status==='pending').length,heroes:snap.heroes.length,fares:snap.fares.length,
       lastBill:snap.bills.reduce((m,b)=>b.date>m?b.date:m,''),mgrPhone:S.cfg.mgrPhone||'',tr:snap.tracker?Object.fromEntries(snap.tracker.map(x=>[x.k,x.s+(x.note?' · '+x.note:'')])):null,upPending:snap.tracker?snap.tracker.filter(x=>x.s==='due'||x.s==='late').length:null}};
     /* nothing changed since the last backup → only refresh the status sheet */
