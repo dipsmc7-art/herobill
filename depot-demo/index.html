@@ -653,6 +653,9 @@ body.locked>*:not(#login):not(.overlay):not(.toast):not(#printArea){display:none
 .mitfoot{display:flex;justify-content:flex-end;gap:8px;border-top:1px solid var(--line);padding-top:8px;margin-top:6px}
 .miseg2{display:inline-flex;border:1px solid var(--line2);border-radius:10px;overflow:hidden;height:40px;background:#fff}.miseg2 button{border:0;background:none;padding:0 16px;font:inherit;font-size:13.5px;cursor:pointer;color:var(--ink2)}.miseg2 button+button{border-left:1px solid var(--line2)}.miseg2 button.on{background:#1b1850;color:#fff}
 .mitbl input.mibad{border-color:#e0565b!important;background:#fdecea!important}
+#miWrap .tcgrp td{background:#f9e8ee!important;border-top:2px solid #efc9d6}#miWrap .tcgrp:hover td{background:#f4dbe4!important}#miWrap .tctbl tfoot td{background:#fbf3f6}
+.mistbl tr.misoff td{opacity:.45}.mistbl td:first-child,.mistbl th:first-child{width:34px;text-align:center}.mistbl input[type=checkbox]{width:16px;height:16px;cursor:pointer}
+.midays{display:inline-block;min-width:34px;text-align:center;border-radius:6px;padding:1px 6px;font-weight:700;font-size:12px}.midays.d1{background:#fff4e0;color:#8a5300}.midays.d2{background:#fde3d3;color:#9a3b0c}.midays.d3{background:#fbd5d5;color:#8a1c25}
 .miempty{background:#fff;border:1px dashed var(--line2);border-radius:14px;padding:26px;text-align:center;color:var(--ink2);font-size:13.5px}
 .mikpis{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;margin-bottom:8px}.mikpis>div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 14px;display:flex;flex-direction:column}
 .mikpis b{font-size:18px}.mikpis span{font-size:11.5px;color:var(--ink3)}.mikpis .neg b{color:#b42318}.mikpis.big>div{flex:1;min-width:150px}
@@ -3333,30 +3336,54 @@ async function miSend(){const P=$('miPage');const A=await dmRWApi();const src=aw
   $('miTC').onclick=()=>{MI.allTypes=false;MI.types.clear();MI.loaded=null;miSend()};$('miTD').onclick=()=>{tp.hidden=true;MI.loaded=null;miSend()};
   $('miLoad').onclick=e=>{if(!MI.allTypes&&!MI.types.size){e.stopPropagation();toast('Select a customer type first');tp.hidden=false;$('miTQ').focus();return}tp.hidden=true;miLoadList()};
   if(MI.loaded)miLoadList();else $('miList').innerHTML=src?'<div class="miempty">Select a customer type and press <b>Load list</b>. Without a customer type, nothing is loaded.</div>':''}
+const MI_COLS=[['code','Code'],['name','Customer'],['route','Route · SA · MIO'],['invoice','Invoice'],['days','In transit'],['recv','Receivable']];
 async function miLoadList(){const A=await dmRWApi();const src=await miSource();if(!src)return;const rows=miFilter(src.rows);MI.loaded={rows,label:src.label};
-  const G=A.groups(rows,MI.group);if(!MI.sel||MI.selFor!==miFltLabel()+src.label){MI.sel=new Set(G.map(g=>g.key));MI.selFor=miFltLabel()+src.label}
-  const q=MI.q.toLowerCase(),hit=r=>!q||[r.code,r.name,r.market,r.invoice].some(v=>String(v||'').toLowerCase().includes(q));
-  const tot=sum(rows,r=>+r.recv||0),custs=new Set(rows.map(r=>r.code)).size,sel=G.filter(g=>MI.sel.has(g.key));
-  $('miList').innerHTML=rows.length?`<div class="mikpis"><div><b>${rows.length}</b><span>invoices</span></div><div><b>${custs}</b><span>customers</span></div><div><b>${tk(tot)}</b><span>receivable</span></div><div><b>${G.length}</b><span>routes</span></div>
-      <div class="mikact"><input id="miQ" placeholder="Search customer, market, invoice…" value="${esc(MI.q)}"><button class="btn ghost sm" id="miAll">${sel.length===G.length?'Clear all':'Select all'}</button>
-        <button class="btn primary" id="miGo" ${sel.length?'':'disabled'}>📤 Send for investigation · print ${sel.length} route sheet${sel.length===1?'':'s'}</button></div></div>
-    <div class="hint" style="margin:0 0 8px">${esc(miFltLabel())} · ${esc(src.label)}</div>
-    ${G.map(g=>{const R=g.terrs.flatMap(t=>t.rows.map(r=>Object.assign({terr:t.code,mio:t.mio},r))).filter(hit);if(q&&!R.length)return '';const o=MI.open.has(g.key);
-      return `<div class="migrp ${MI.sel.has(g.key)?'':'off'}"><div class="migh"><label><input type="checkbox" data-gk="${esc(g.key)}" ${MI.sel.has(g.key)?'checked':''}> <b>${esc(g.route)}</b></label><span class="muted">SA: ${esc(g.sa||'—')} · ${g.terrs.map(t=>esc(t.code)).join(', ')} · ${R.length} invoice(s) · ${g.custs} customer(s)</span><b class="num">${tk(sum(R,r=>+r.recv||0))}</b><button class="btn ghost sm" data-go="${esc(g.key)}">${o?'Hide ▴':'Show ▾'}</button></div>
-        ${o?`<div class="tw"><table class="tbl"><thead><tr><th>Customer code</th><th>Name</th><th>Type</th><th>Market</th><th>Phone</th><th class="r">In transit</th><th>Invoice</th><th class="r">Receivable</th></tr></thead><tbody>${R.map(r=>`<tr><td class="mono">${esc(r.code)}</td><td>${esc(r.name)}</td><td>${esc(r.ctype)}</td><td>${esc(r.market)}</td><td class="mono">${esc(r.phone||'')}</td><td class="r">${r.days}</td><td class="mono">${esc(r.invoice)}</td><td class="r num">${fmt(r.recv)}</td></tr>`).join('')}</tbody></table></div>`:''}</div>`}).join('')}`
-    :'<div class="miempty">No invoices match this filter.</div>';
-  if(!rows.length)return;
-  $('miQ').oninput=e=>{MI.q=e.target.value;clearTimeout(MI.qt);MI.qt=setTimeout(()=>{miLoadList().then(()=>{const i=$('miQ');i.focus();i.setSelectionRange(i.value.length,i.value.length)})},250)};
-  $('miAll').onclick=()=>{MI.sel=sel.length===G.length?new Set():new Set(G.map(g=>g.key));miLoadList()};
-  document.querySelectorAll('[data-gk]').forEach(c=>c.onchange=()=>{c.checked?MI.sel.add(c.dataset.gk):MI.sel.delete(c.dataset.gk);miLoadList()});
-  document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{const k=b.dataset.go;MI.open.has(k)?MI.open.delete(k):MI.open.add(k);miLoadList()});
-  $('miGo').onclick=async()=>{const keys=[...MI.sel];const chosen=G.filter(g=>MI.sel.has(g.key));
-    const lines=chosen.flatMap(g=>g.terrs.flatMap(t=>t.rows.map(r=>({k:miRowKey(r),route:g.route,sa:g.sa,terr:t.code,mio:r.mio||t.mio||'',code:r.code,name:r.name,ctype:r.ctype,market:r.market,address:r.address,phone:r.phone,
-      invoice:r.invoice,days:+r.days||0,sys:+r.recv||0,act:'',col:'',by:'',method:'',finding:'',remarks:''}))));
+  const G=A.groups(rows,MI.group);const key=miFltLabel()+src.label;if(!MI.sel||MI.selFor!==key){MI.sel=new Set(G.map(g=>g.key));MI.ex=new Set();MI.selFor=key}
+  MI.f=MI.f||{route:'',sa:'',mio:'',type:''};MI.sort=MI.sort||{k:'days',d:-1};MI.gclosed=MI.gclosed||new Set();
+  /* flat rows with their group */
+  const all=G.flatMap(g=>g.terrs.flatMap(t=>t.rows.map(r=>Object.assign({},r,{gk:g.key,groute:g.route,sa:g.sa||'',terr:t.code,mio:r.mio||t.mio||'',rk:miRowKey(r)}))));
+  const q=MI.q.toLowerCase(),F=MI.f;
+  const L=all.filter(r=>(!q||[r.code,r.name,r.market,r.invoice,r.phone,r.sa,r.mio].some(v=>String(v||'').toLowerCase().includes(q)))&&(!F.route||r.groute===F.route)&&(!F.sa||(r.sa||'—')===F.sa)&&(!F.mio||(r.mio||'—')===F.mio)&&(!F.type||(r.ctype||'—')===F.type));
+  const sk=MI.sort.k,sd=MI.sort.d;L.sort((a,b)=>{const x=a[sk==='route'?'groute':sk],y=b[sk==='route'?'groute':sk];return (typeof x==='number'&&typeof y==='number'?x-y:natCmp(String(x||''),String(y||'')))*sd});
+  const isSel=r=>MI.sel.has(r.gk)&&!MI.ex.has(r.rk);const S2=all.filter(isSel);
+  const tot=sum(S2,r=>+r.recv||0),custs=new Set(S2.map(r=>r.code)).size,gSel=G.filter(g=>MI.sel.has(g.key)&&all.some(r=>r.gk===g.key&&isSel(r))).length;
+  const opt=(g,vals,lab)=>`<select data-mif="${g}"><option value="">${lab}: all</option>${vals.map(v=>`<option value="${esc(v)}" ${F[g]===v?'selected':''}>${esc(v)}</option>`).join('')}</select>`;
+  const uniq=f=>[...new Set(all.map(f))].sort(natCmp);
+  const groups=[];for(const g of G){const R=L.filter(r=>r.gk===g.key);if(R.length)groups.push({g,R})}
+  if(!rows.length){$('miList').innerHTML='<div class="miempty">No invoices match this filter.</div>';return}
+  $('miList').innerHTML=`<div class="mikpis"><div><b>${S2.length}</b><span>invoices selected</span></div><div><b>${custs}</b><span>customers</span></div><div><b>${tk(tot)}</b><span>receivable</span></div><div><b>${gSel}</b><span>${MI.group==='territory'?'territories':'routes'}</span></div>
+      <div class="mikact"><button class="btn primary" id="miGo" ${S2.length?'':'disabled'}>📤 Send for investigation · print ${gSel} sheet${gSel===1?'':'s'}</button></div></div>
+    <div class="card ctctl tcctl"><div class="tcq"><span>🔍</span><input id="miQ" placeholder="Search code, name, market, invoice, phone, SA…" value="${esc(MI.q)}" aria-label="Search"></div>
+      ${opt('route',uniq(r=>r.groute),MI.group==='territory'?'Territory':'Route')}${opt('sa',uniq(r=>r.sa||'—'),'SA')}${opt('mio',uniq(r=>r.mio||'—'),'MIO')}${opt('type',uniq(r=>r.ctype||'—'),'Type')}
+      ${Object.values(F).some(Boolean)||MI.q?'<button class="btn ghost sm" id="miClr">✕ Clear</button>':''}<span style="flex:1"></span>
+      <button class="btn ghost sm" id="miAll">${S2.length===all.length?'☐ Select none':'☑ Select all'}</button><button class="btn ghost sm" id="miTog">${MI.gclosed.size?'▾ Expand all':'▸ Collapse all'}</button><button class="btn ghost sm" id="miXl">⬇ Excel</button></div>
+    <div class="hint" style="margin:6px 2px 8px">${L.length} of ${all.length} invoices shown · ${S2.length} selected · click a column to sort · ${esc(miFltLabel())} · ${esc(src.label)}</div>
+    <div class="card tcwrap"><table class="tbl tctbl mistbl"><thead><tr><th style="width:34px"></th>${MI_COLS.map(([k,l])=>`<th data-mis="${k}" class="${['days','recv'].includes(k)?'num':''}" tabindex="0" aria-sort="${MI.sort.k===k?(MI.sort.d>0?'ascending':'descending'):'none'}">${l}${MI.sort.k===k?(MI.sort.d>0?' ▲':' ▼'):''}</th>`).join('')}</tr></thead>
+      <tbody>${groups.map(({g,R})=>{const o=!MI.gclosed.has(g.key),on=MI.sel.has(g.key),ns=R.filter(isSel).length;
+        return `<tr class="tcgrp" data-mig="${esc(g.key)}"><td><input type="checkbox" data-gk="${esc(g.key)}" ${on&&ns?'checked':''} aria-label="Select ${esc(g.route)}"></td><td colspan="4"><span class="tcchev">${o?'▾':'▸'}</span> <b>${esc(g.route)}</b> <span class="muted">· ${R.length} invoice(s) · ${new Set(R.map(r=>r.code)).size} customer(s)${g.sa?' · SA: '+esc(g.sa):''} · ${on?ns+' selected':'not selected'}</span></td><td class="num"></td><td class="num"><b>${tk(sum(R,r=>+r.recv||0))}</b></td></tr>`+
+        R.map(r=>`<tr data-g="${esc(g.key)}" ${o?'':'hidden'} class="${isSel(r)?'':'misoff'}"><td><input type="checkbox" data-rk="${esc(r.rk)}" ${isSel(r)?'checked':''} ${on?'':'disabled'} aria-label="Select invoice ${esc(r.invoice)}"></td><td class="mono">${esc(r.code)}</td>
+          <td><b>${esc(r.name||'—')}</b><small class="tcsub">${esc([r.ctype,r.market,r.phone].filter(Boolean).join(' · '))}</small><small class="tcsub">${esc(r.address||'')}</small></td>
+          <td>${esc(r.groute)}<small class="tcsub">SA: ${esc(r.sa||'—')}</small><small class="tcsub">MIO: ${esc(r.mio||'—')}${MI.group==='route'?' · '+esc(r.terr):''}</small></td>
+          <td class="mono">${esc(r.invoice)}</td><td class="num"><span class="midays ${r.days>90?'d3':r.days>60?'d2':'d1'}">${r.days}</span></td><td class="num"><b>${tk(+r.recv||0)}</b></td></tr>`).join('')}).join('')||`<tr><td colspan="7" class="hint" style="text-align:center;padding:24px">No invoices match.</td></tr>`}</tbody>
+      <tfoot><tr><td></td><td colspan="4"><b>Selected · ${S2.length} invoices · ${custs} customers</b></td><td></td><td class="num"><b>${tk(tot)}</b></td></tr></tfoot></table></div>`;
+  let tq;$('miQ').oninput=e=>{MI.q=e.target.value;clearTimeout(tq);tq=setTimeout(()=>{miLoadList().then(()=>{const n=$('miQ');n.focus();n.setSelectionRange(n.value.length,n.value.length)})},250)};
+  document.querySelectorAll('[data-mif]').forEach(x=>x.onchange=()=>{MI.f[x.dataset.mif]=x.value;miLoadList()});
+  if($('miClr'))$('miClr').onclick=()=>{MI.q='';MI.f={route:'',sa:'',mio:'',type:''};miLoadList()};
+  document.querySelectorAll('[data-mis]').forEach(th=>{const go=()=>{const k=th.dataset.mis;MI.sort=MI.sort.k===k?{k,d:-MI.sort.d}:{k,d:['days','recv'].includes(k)?-1:1};miLoadList()};th.onclick=go;th.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}}});
+  document.querySelectorAll('[data-mig]').forEach(tr=>tr.onclick=e=>{if(e.target.matches('input'))return;const k=tr.dataset.mig;MI.gclosed.has(k)?MI.gclosed.delete(k):MI.gclosed.add(k);miLoadList()});
+  document.querySelectorAll('[data-gk]').forEach(c=>c.onchange=()=>{const k=c.dataset.gk;if(c.checked){MI.sel.add(k);all.filter(r=>r.gk===k).forEach(r=>MI.ex.delete(r.rk))}else MI.sel.delete(k);miLoadList()});
+  document.querySelectorAll('[data-rk]').forEach(c=>c.onchange=()=>{c.checked?MI.ex.delete(c.dataset.rk):MI.ex.add(c.dataset.rk);miLoadList()});
+  $('miAll').onclick=()=>{if(S2.length===all.length){MI.sel=new Set();}else{MI.sel=new Set(G.map(g=>g.key));MI.ex=new Set()}miLoadList()};
+  $('miTog').onclick=()=>{if(MI.gclosed.size)MI.gclosed.clear();else G.forEach(g=>MI.gclosed.add(g.key));miLoadList()};
+  $('miXl').onclick=()=>{const w=XLSX.utils.book_new();const H=['Selected',MI.group==='territory'?'Territory':'Route','SA','Territory','MIO','Customer Code','Customer Name','Customer Type','Market','Address','Phone','Invoice','In transit (days)','Receivable'];
+    const ws=XLSX.utils.aoa_to_sheet([H,...L.map(r=>[isSel(r)?'Yes':'No',r.groute,r.sa,r.terr,r.mio,r.code,r.name,r.ctype,r.market,r.address,r.phone,r.invoice,r.days,+r.recv||0])]);XLSX.utils.book_append_sheet(w,ws,'Investigation list');
+    XLSX.writeFile(w,`Market_Investigation_List_${(S.cfg.depot||'Depot').replace(/\W+/g,'_')}_${todayISO()}.xlsx`)};
+  $('miGo').onclick=async()=>{const chosen=G.filter(g=>all.some(r=>r.gk===g.key&&isSel(r)));const sel=all.filter(isSel);
+    const lines=sel.map(r=>({k:r.rk,route:r.groute,sa:r.sa,terr:r.terr,mio:r.mio,code:r.code,name:r.name,ctype:r.ctype,market:r.market,address:r.address,phone:r.phone,invoice:r.invoice,days:+r.days||0,sys:+r.recv||0,act:'',col:'',by:'',method:'',finding:'',remarks:''}));
     const n=MI.data.cases.filter(c=>c.created.slice(0,10)===todayISO()).length+1;
     const c={id:`MI-${todayISO().replace(/-/g,'')}-${n}`,created:new Date().toISOString(),source:MI.loaded.label,filter:miFltLabel(),routes:chosen.map(g=>g.route),group:MI.group,lines,status:'sent'};
-    MI.data.cases.unshift(c);await miSave();
-    miPrintSheet(A,MI.loaded.rows.filter(r=>chosen.some(g=>g.terrs.some(t=>t.rows.some(x=>miRowKey(x)===miRowKey(r))))),keys,MI.group,miFltLabel());
+    MI.data.cases.unshift(c);await miSave();const keep=new Set(sel.map(r=>r.rk));
+    miPrintSheet(A,MI.loaded.rows.filter(r=>keep.has(miRowKey(r))),chosen.map(g=>g.key),MI.group,miFltLabel());
     toast(`✅ ${c.id} saved — fill the results later in “Share investigation report”`)}}
 function miPrintSheet(A,rows,keys,mode,flt){const css=A.css().replace(/Ubuntu/g,'Inter');
   $('printArea').innerHTML=`<style>${css}.psheet{font-family:var(--appfont,Arial,sans-serif)}</style>`+A.sheets(rows,'Market Investigation Report',keys,flt||miFltLabel(),mode||'route');
