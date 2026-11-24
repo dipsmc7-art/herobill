@@ -1,5 +1,5 @@
 /* Depot Management service worker — works offline; updates when you replace files on the server */
-const VERSION = '32456fab9b';
+const VERSION = '17c2eaf59c';
 const SCOPE = new URL(self.registration.scope).pathname;
 const PREFIX = 'depotmgmt-' + SCOPE + '@';   /* each app (hero, depot, demos) keeps its own offline copy */
 const CACHE = PREFIX + VERSION;
