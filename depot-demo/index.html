@@ -2986,7 +2986,9 @@ function lgAnimBind(){AN_PREV.forEach(s=>s());AN_PREV=[];
 
 /* ---------- What's new (smart): only updates this PC hasn't seen, one feature per step, "Show me" takes you there.
    For every release add a NEW entry at the TOP of DM_WN. Item: [icon, title, text, action, flag]; action = cs|plan|mi|inv|rw|ct|tc|''; flag 'mi' = only when MI is on. ---------- */
-const DM_WN=[{v:'2026-11-24',d:'24 Nov 2026',items:[
+const DM_WN=[{v:'2026-11-24b',d:'24 Nov 2026',items:[
+  ['🔍','Market Investigation is live','Send overdue invoices for field checking, print the sheets, then record actual receivable, difference, collection and findings line by line. Submit and share the report with head office.','mi','mi']]},
+  {v:'2026-11-24',d:'24 Nov 2026',items:[
   ['📈','Collection status on Home','Yesterday and today by SA and MIO, compared with the same day last month, and your progress against the monthly target and time gone.','cs'],
   ['🗺️','Route-wise monthly collection plan','Set the month\'s target route by route. Fill it from outstanding, overdue or last month + %. It counts from the day you set it.','plan'],
   ['⚠️','Low-collection warning','When collection is behind time gone you get a warning, and routes that are behind are flagged ⚠️.','cs'],
@@ -3304,7 +3306,7 @@ async function csTargetDlg(mon){const M=(await getKV('ctMonthly'))||{};const cur
   $('ovPanel').classList.add('wide','xwide');bind()}
 
 /* =============== MARKET INVESTIGATION: send customers for field verification, then report line by line =============== */
-const MI_LIVE=false;   /* production shows the tool only when this is true; the demo always shows it */
+const MI_LIVE=true;   /* production shows the tool only when this is true; the demo always shows it */
 const MI={group:'route',typeInit:'',page:'send',src:'recv',up:null,mode:'gt',days:44,days2:90,types:new Set(),allTypes:false,tq:'',loaded:null,q:'',sel:null,open:new Set(),cur:null,closed:new Set()};
 const MI_BY=['DIC','SA','MIO'];
 const MI_METHOD=['Physically visited','Over phone','MIO confirmed by himself'];
