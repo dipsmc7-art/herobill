@@ -608,6 +608,23 @@ body.locked>*:not(#login):not(.overlay):not(.toast):not(#printArea){display:none
 .fontopt .fn{font-size:12.5px;font-weight:700}.fontopt .fn em{font-style:normal;font-size:10.5px;color:#0f766e;background:#e3f4ec;border-radius:6px;padding:1px 6px;margin-left:4px}
 .fontopt .fs{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}.fontopt .fb{font-size:14px}.fontopt .fd{font-size:11px;color:var(--ink3)}
 @media (max-width:700px){.fontopts{grid-template-columns:1fr}}
+.cs{margin:0 0 18px}.csgrid{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:14px;align-items:start}
+.csday,.csmon,.csrt,.csempty{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:0 1px 2px #1b18500a}
+.csh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}.csh b{font-size:14px}.cstag{font-size:10.5px;font-weight:700;color:#0f766e;background:#e3f4ec;border-radius:6px;padding:2px 7px}
+.csbig{font-size:24px;font-weight:700;letter-spacing:-.3px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.csbig small{font-size:13px;font-weight:500;color:var(--ink3)}
+.cssub{font-size:11.5px;color:var(--ink3);margin:2px 0 8px}
+.csrows{display:flex;flex-direction:column;gap:5px;border-top:1px dashed var(--line2);padding-top:8px;margin-top:6px}.csrows>div{display:flex;justify-content:space-between;gap:8px;font-size:12.5px}
+.csrows span{color:var(--ink3)}.csrows b{font-weight:600;text-align:right}.csrows small{font-weight:400;color:var(--ink3);font-size:11px}
+.csdl{font-size:12px;font-weight:700;border-radius:6px;padding:1px 6px;white-space:nowrap}.csdl.up{color:#0f766e;background:#e3f4ec}.csdl.dn{color:#b42318;background:#fdecea}.csdl.n{color:var(--ink3);background:#f2f1f7;font-weight:500}
+.cspc{font-style:normal;font-weight:700;font-size:12px;border-radius:6px;padding:1px 7px;display:inline-block}
+.cspc.g3{background:#1f9d55;color:#fff}.cspc.g2{background:#9fd8b5;color:#0b4a2a}.cspc.g1{background:#e3f4ec;color:#0f766e}.cspc.r1{background:#f9d9dc;color:#8a1c25}.cspc.r2{background:#e0565b;color:#fff}
+.csbar{position:relative;height:10px;background:#efedf7;border-radius:6px;margin:8px 0 4px}.csbar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#2e2a8f,#5a4fcf);border-radius:6px}
+.csbar em{position:absolute;top:-4px;bottom:-4px;width:2px;background:#d98a1a;border-radius:2px}.csnot{font-size:12.5px;color:var(--ink2);background:#fff8e6;border:1px solid #f3dfb0;border-radius:10px;padding:8px 10px;margin:4px 0}
+.csrt{margin-top:14px}.csrt .csh .hint{font-size:11.5px}.cstbl th.r,.cstbl td.r{text-align:right}.cstbl td,.cstbl th{white-space:nowrap}.cstbl .spk{display:block}.cstbl tfoot td{border-top:2px solid var(--line2);background:#faf9fd}
+.cswarn{font-size:12.5px;line-height:1.45;border-radius:10px;padding:8px 10px;margin:6px 0 2px}.cswarn.bad{background:#fdecea;color:#8a1c25;border:1px solid #f5c2c0}.cswarn.mid{background:#fff4e0;color:#8a5300;border:1px solid #f3d9a4}.cswarn.ok{background:#e9f7ef;color:#0f6b46;border:1px solid #bfe6cf}
+.cstbl tr.cslow td{background:#fff6f5}
+.csempty{display:flex;flex-direction:column;gap:8px}.csempty span{font-size:13px;color:var(--ink2)}
+@media (max-width:1100px){.csgrid{grid-template-columns:1fr 1fr}.csmon{grid-column:1/-1}}@media (max-width:700px){.csgrid{grid-template-columns:1fr}}
 html.opas .hbonly{display:none!important}html:not(.opas) .opasonly{display:none!important}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
@@ -2948,6 +2965,7 @@ async function dmShow(){
   $('dmHome').innerHTML=`<div class="dmtop"><div class="dmbrand"><img src="${LOGO_SRC}" alt=""><div><b>Depot Management</b><small>${esc(S.cfg.depot||'Depot')}</small></div></div>
       <span style="display:flex;gap:8px">${OPAS?'<button class="dmout" id="dmSet" title="Settings">⚙ Settings</button>':''}<button class="dmout" id="dmOut" title="Log out">⎋ Log out</button></span></div>
     <div class="dmmain"><div class="dmhi">${greet} 👋</div><div class="dmsub">${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})} · choose what to open</div>
+    <div class="dmsec">📈 Collection status</div><div class="cs" id="dmCS"><div class="hint">Loading collection status…</div></div>
     <div class="dmsec">🧰 Tools</div>
     <div class="dmcards">
       <button class="dmcard rw" id="dmRW"><div class="dmic">📍</div><div class="dmct"><b>Route Wise Receivable</b><span>Upload receivables, group by route, print collection sheets</span></div>${caHtml('rw',['rw'])}
@@ -2968,7 +2986,7 @@ async function dmShow(){
     <div class="dmmain dmtrkw"><div class="dmtrack" id="dmTrack"><div class="hint">Checking uploads…</div></div></div>
     <div class="dmwave" aria-hidden="true">${dmFlow()}
       <div class="dmfoot">Depot Management ${OPAS?'OPAS':'v1.0'} · Designed by: ABM Shafiquzzaman</div></div>`;
-  caBind($('dmHome'));trRender().then(p=>{if(p&&!DM.nudged){DM.nudged=true;trDailyNudge(p)}});if($('dmHB'))$('dmHB').onclick=()=>dmOpenHB();if($('dmSet'))$('dmSet').onclick=()=>{dmOpenHB();go('settings')};$('dmRW').onclick=()=>dmOpenRW();$('dmCT').onclick=()=>ctOpen('overview');ctCardStat();$('dmTC').onclick=()=>tcOpen('summary');tcCardStat();
+  caBind($('dmHome'));csRender().catch(e=>{const b=$('dmCS');if(b)b.innerHTML='<div class="hint">Could not load collection status</div>';console.error(e)});trRender().then(p=>{if(p&&!DM.nudged){DM.nudged=true;trDailyNudge(p)}});if($('dmHB'))$('dmHB').onclick=()=>dmOpenHB();if($('dmSet'))$('dmSet').onclick=()=>{dmOpenHB();go('settings')};$('dmRW').onclick=()=>dmOpenRW();$('dmCT').onclick=()=>ctOpen('overview');ctCardStat();$('dmTC').onclick=()=>tcOpen('summary');tcCardStat();
   $('dmOut').onclick=()=>dmLogout();const inv=$('dmINV');if(inv)inv.onclick=()=>toast('Inventory Counting & Month Closing is coming soon');
   const s=DM.rwSum||await rwSummary();DM.rwSum=s;const el=$('dmRwSt');if(!el)return;
   el.innerHTML=s?`<div><b>৳ ${kfmt(s.total)}</b><small>receivable</small></div><div><b>${s.cust}</b><small>customers · ${s.routes} territories</small></div><div><b>${fmtStamp(s.at).split(',')[0]}</b><small>last upload</small></div>`
@@ -3090,6 +3108,90 @@ async function gdTokDlg(){let k='';try{k=sessionStorage.getItem('hq_ok')||''}cat
       if(ok)try{await call('tstatus',{id,op});toast('Done')}catch(e){toast(e.message)}
       $('tkList').click()})}catch(e){fail(e)}};
   $('tkList').onclick=list}
+
+/* =============== HOME: COLLECTION STATUS (DA Collection report vs same day last month, monthly depot target, route-wise trend) =============== */
+const csK=v=>{const a=Math.abs(v),s=v<0?'-':'';return a>=1e7?s+(a/1e7).toFixed(2)+' Cr':a>=1e5?s+(a/1e5).toFixed(a>=1e6?1:2)+' L':a>=1e3?s+(a/1e3).toFixed(1)+'k':s+Math.round(a)};
+const csN=v=>Math.round(v||0).toLocaleString('en-IN');
+const csD=d=>new Date(d+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+const csMon=m=>new Date(m+'-01T12:00:00').toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+const csTot=day=>{const o={sa:0,mio:0,total:0};for(const c of Object.values(day||{})){o.sa+=c.sa||0;o.mio+=c.mio||0;o.total+=c.total||0}return o};
+/* same date last month (31 Oct on 31 Mar etc. clamps to month end) */
+function csLastMonth(d){const x=new Date(d+'T12:00:00');const day=x.getDate();const p=new Date(x.getFullYear(),x.getMonth()-1,1,12);const end=new Date(p.getFullYear(),p.getMonth()+1,0).getDate();p.setDate(Math.min(day,end));return iso(p)}
+/* the collection day to compare with: same date last month, else the nearest earlier day with data (up to 3 days) */
+function csMatch(dates,d){for(let i=0;i<4;i++){const x=new Date(d+'T12:00:00');x.setDate(x.getDate()-i);const k=iso(x);if(dates.has(k))return k}return null}
+const csWork=(from,to)=>{let n=0;for(const x=new Date(from+'T12:00:00'),e=new Date(to+'T12:00:00');x<=e;x.setDate(x.getDate()+1))if(x.getDay()!==5)n++;return n};
+const csPct=(a,b)=>b>0?(a-b)/b*100:null;
+const csDelta=(a,b,inv)=>{const p=csPct(a,b);if(p==null)return '<span class="csdl n">no data last month</span>';const up=p>=0;return `<span class="csdl ${up?'up':'dn'}">${up?'▲':'▼'} ${Math.abs(p).toFixed(0)}%</span>`};
+const csTone=p=>p==null?'':p>=90?'g3':p>=75?'g2':p>=60?'g1':p>=45?'r1':'r2';
+
+/* warning when collection runs behind time gone */
+function csWarn(pr,tg,due,left){const gap=tg-pr;if(gap<=0)return `<div class="cswarn ok">✅ On track — collection ${pr.toFixed(1)}% is ahead of time gone ${tg.toFixed(1)}%.</div>`;
+  const per=left?` Collect <b>৳ ${csN(due/left)}</b> per working day to reach the target.`:'';
+  return gap>10?`<div class="cswarn bad">⚠️ <b>Low collection:</b> only ${pr.toFixed(1)}% collected but ${tg.toFixed(1)}% of the month is gone (${gap.toFixed(1)} points behind).${per}</div>`
+    :`<div class="cswarn mid">⚠️ <b>Slightly behind:</b> ${pr.toFixed(1)}% collected vs ${tg.toFixed(1)}% time gone.${per}</div>`}
+async function csRender(){const box=$('dmCS');if(!box)return;await ctLoad();const M=(await getKV('ctMonthly'))||{};
+  const dates=Object.keys(S.ctColl).filter(d=>csTot(S.ctColl[d]).total>0).sort();const have=new Set(dates);
+  if(!dates.length){box.innerHTML=`<div class="csempty"><b>No collection data yet</b><span>Upload the DA Collection report in Collection Target. To compare with last month from day one, upload last month's report once as well.</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary sm" id="csUp">⬆ Upload DA Collection report</button><button class="btn ghost sm" id="csSet">🎯 Set monthly target</button></div></div>`;
+    $('csUp').onclick=()=>ctOpen('upload');$('csSet').onclick=()=>csTargetDlg();return}
+  const d0=dates[dates.length-1],d1=dates.length>1?dates[dates.length-2]:null;const mon=d0.slice(0,7);
+  /* day cards */
+  const dayCard=d=>{if(!d)return '';const t=csTot(S.ctColl[d]),lm=csMatch(have,csLastMonth(d)),l=lm?csTot(S.ctColl[lm]):null;const sp=t.total?t.sa/t.total*100:0,lsp=l&&l.total?l.sa/l.total*100:null;
+    return `<div class="csday"><div class="csh"><b>${csD(d)}</b>${d===d0?'<span class="cstag">latest</span>':''}</div>
+      <div class="csbig">৳ ${csK(t.total)} ${l?csDelta(t.total,l.total):csDelta(0,0)}</div>
+      <div class="cssub">${l?`same day last month (${csD(lm)}): ৳ ${csK(l.total)}`:'no collection found for the same day last month'}</div>
+      <div class="csrows"><div><span>Collected by SA</span><b>৳ ${csN(t.sa)}</b></div><div><span>Collected by MIO</span><b>৳ ${csN(t.mio)}</b></div>
+        <div><span>SA collection %</span><b><i class="cspc ${csTone(sp)}">${sp.toFixed(0)}%</i>${lsp!=null?` <small>vs ${lsp.toFixed(0)}%</small>`:''}</b></div></div></div>`};
+  /* month: from the 1st to the latest collection day, whenever the target was set */
+  const mStart=mon+'-01',inM=dates.filter(d=>d>=mStart&&d<=d0);const mtd=inM.reduce((o,d)=>{const t=csTot(S.ctColl[d]);o.sa+=t.sa;o.mio+=t.mio;o.total+=t.total;return o},{sa:0,mio:0,total:0});
+  const lmEnd=csLastMonth(d0),lmStart=lmEnd.slice(0,8)+'01';const lmD=dates.filter(d=>d>=lmStart&&d<=lmEnd);const lmt=lmD.reduce((s,d)=>s+csTot(S.ctColl[d]).total,0);
+  const tg=M[mon]&&M[mon].amt||0;const monEnd=iso(new Date(+mon.slice(0,4),+mon.slice(5,7),0,12));
+  const nextDay=(()=>{const x=new Date(d0+'T12:00:00');x.setDate(x.getDate()+1);return iso(x)})();const left=nextDay<=monEnd?csWork(nextDay,monEnd):0;const due=Math.max(0,tg-mtd.total);
+  const pr=tg?mtd.total/tg*100:0;const expP=tg?csWork(mStart,d0)/Math.max(1,csWork(mStart,monEnd))*100:0;
+  const monthCard=`<div class="csmon"><div class="csh"><b>🎯 ${csMon(mon)} target</b><button class="btn ghost sm" id="csSet">${tg?'✎ Edit':'＋ Set target'}</button></div>
+    ${tg?`<div class="csbig">৳ ${csK(mtd.total)} <small>of ৳ ${csK(tg)}</small></div>
+      <div class="csbar"><i style="width:${Math.min(100,pr).toFixed(1)}%"></i><em style="left:${Math.min(100,expP).toFixed(1)}%" title="Time gone: ${expP.toFixed(0)}% of working days"></em></div>
+      ${csWarn(pr,expP,due,left)}
+      <div class="csrows"><div><span>Collection progress</span><b><i class="cspc ${pr>=expP?'g3':pr>=expP-5?'g1':'r2'}">${pr.toFixed(1)}%</i></b></div>
+        <div><span>Time gone</span><b>${expP.toFixed(1)}% <small>${csWork(mStart,d0)} of ${csWork(mStart,monEnd)} working days</small></b></div>
+        <div><span>Due to collect</span><b>৳ ${csN(due)}</b></div>
+        <div><span>Needed per day</span><b>${left?`৳ ${csN(due/left)} <small>× ${left} working days</small>`:'month ended'}</b></div>`
+     :`<div class="csnot">No target set for ${csMon(mon)}. Set it any day: collection from the 1st of the month is always counted.</div><div class="csrows"><div><span>Collected this month</span><b>৳ ${csN(mtd.total)}</b></div>`}
+        <div><span>SA / MIO this month</span><b>৳ ${csK(mtd.sa)} / ৳ ${csK(mtd.mio)}</b></div>
+        <div><span>vs last month (1–${+lmEnd.slice(8)} ${new Date(lmEnd+'T12:00:00').toLocaleDateString('en-GB',{month:'short'})})</span><b>${lmt?`${csDelta(mtd.total,lmt)} <small>${mtd.total>=lmt?'+':'−'}৳ ${csN(Math.abs(mtd.total-lmt))}</small>`:'<span class="csdl n">no data</span>'}</b></div></div></div>`;
+  /* route-wise trend */
+  const t2=await ctRouteMaster();const last7=dates.slice(-7);const routes=new Map();
+  const R=name=>{let o=routes.get(name);if(!o){o={name,sa:'',d0:0,d0sa:0,lm0:0,seq:{},mtd:0,lmtd:0,tgt:null,ach:0};routes.set(name,o)}return o};
+  const add=(d,fn)=>{const A=ctAchieved(t2,d);for(const [r,a] of Object.entries(A)){const o=R(r);if(a.da&&!o.sa)o.sa=a.da;fn(o,a)}};
+  add(d0,(o,a)=>{o.d0=a.total;o.d0sa=a.sa});const lm0=csMatch(have,csLastMonth(d0));if(lm0)add(lm0,(o,a)=>{o.lm0=a.total});
+  last7.forEach(d=>add(d,(o,a)=>{o.seq[d]=a.total}));inM.forEach(d=>add(d,(o,a)=>{o.mtd+=a.total}));lmD.forEach(d=>add(d,(o,a)=>{o.lmtd+=a.total}));
+  const T=S.ctTargets[d0];if(T)for(const [r,x] of Object.entries(T.routes||{})){const o=R(r);o.tgt=x.target||0;if(!o.sa)o.sa=x.sa||''}
+  for(const o of routes.values()){if(!o.sa){const t=Object.values(t2).find(v=>v.route===o.name);if(t)o.sa=t.sa||''}}
+  const rows=[...routes.values()].filter(o=>o.mtd||o.d0||o.tgt).sort((a,b)=>b.mtd-a.mtd);
+  const table=`<div class="csrt"><div class="csh"><b>📍 Route-wise collection</b><span class="hint">latest day ${csD(d0)} · trend = last ${last7.length} collection days · target = set for ${csD(d0)}</span></div>
+    <div class="tw"><table class="tbl cstbl"><thead><tr><th>Route</th><th>SA</th><th class="r">${csD(d0)}</th><th class="r">Same day last month</th><th class="r">SA %</th><th>Trend</th><th class="r">Target</th><th class="r">Achieved</th><th class="r">This month</th><th class="r">vs last month</th></tr></thead><tbody>
+    ${rows.map(o=>{const sp=o.d0?o.d0sa/o.d0*100:null,ach=o.tgt?o.d0/o.tgt*100:null,g=csPct(o.mtd,o.lmtd);
+      return `<tr${ach!=null&&ach<60?' class="cslow"':''}><td>${ach!=null&&ach<60?'<span title="Low collection: under 60% of today\'s target">⚠️</span> ':''}<b>${esc(o.name)}</b></td><td>${esc(o.sa||'—')}</td><td class="r num">${csN(o.d0)}</td><td class="r num">${lm0?csN(o.lm0):'—'}</td>
+        <td class="r">${sp!=null?`<i class="cspc ${csTone(sp)}">${sp.toFixed(0)}%</i>`:'—'}</td><td>${spark(last7.map(d=>o.seq[d]??0),'#2e2a8f')}</td>
+        <td class="r num">${o.tgt!=null?csN(o.tgt):'<span class="muted">not set</span>'}</td><td class="r">${ach!=null?`<i class="cspc ${csTone(ach)}">${ach.toFixed(0)}%</i>`:'—'}</td>
+        <td class="r num">${csN(o.mtd)}</td><td class="r">${g==null?'<span class="muted">—</span>':`<span class="csdl ${g>=0?'up':'dn'}">${g>=0?'▲':'▼'} ${Math.abs(g).toFixed(0)}%</span>`}</td></tr>`}).join('')}
+    </tbody><tfoot><tr><td colspan="2"><b>Depot total</b></td><td class="r num"><b>${csN(sum(rows,x=>x.d0))}</b></td><td class="r num"><b>${lm0?csN(sum(rows,x=>x.lm0)):'—'}</b></td><td></td><td></td>
+      <td class="r num"><b>${T?csN(sum(rows,x=>x.tgt||0)):'—'}</b></td><td class="r">${T&&sum(rows,x=>x.tgt||0)?`<b>${(sum(rows,x=>x.d0)/sum(rows,x=>x.tgt||0)*100).toFixed(0)}%</b>`:''}</td>
+      <td class="r num"><b>${csN(mtd.total)}</b></td><td class="r">${lmt?csDelta(mtd.total,lmt):''}</td></tr></tfoot></table></div></div>`;
+  box.innerHTML=`<div class="csgrid">${dayCard(d1)}${dayCard(d0)}${monthCard}</div>${rows.length?table:''}`;
+  $('csSet').onclick=()=>csTargetDlg(mon)}
+
+async function csTargetDlg(mon){const M=(await getKV('ctMonthly'))||{};const cur=todayISO().slice(0,7);mon=mon||cur;
+  const nx=(()=>{const x=new Date(cur+'-01T12:00:00');x.setMonth(x.getMonth()+1);return iso(x).slice(0,7)})();const opts=[...new Set([cur,mon,nx])].sort();
+  modal('Monthly collection target',`<p class="hint" style="margin:0 0 12px">Total collection the depot should achieve in the month (SA + MIO). It can be set or changed any day; collection from the 1st of the month always counts toward it.</p>
+    <div class="fgrid"><div class="field"><label>Month</label><select id="mtM">${opts.map(m=>`<option value="${m}" ${m===mon?'selected':''}>${csMon(m)}</option>`).join('')}</select></div>
+    <div class="field"><label>Target (৳)</label><input id="mtA" inputmode="numeric" placeholder="e.g. 6079973" value="${M[mon]&&M[mon].amt||''}"></div></div>
+    <div class="hint" id="mtH" style="margin-top:6px"></div>`,[{l:'Cancel'},{l:'Save target',cls:'primary',fn:async()=>{const m=$('mtM').value,a=Math.round(ctNum($('mtA').value));if(!a){toast('Enter the target amount');return false}
+    M[m]={amt:a,at:Date.now()};await setKV('ctMonthly',M);toast('✅ Target saved for '+csMon(m));setTimeout(csRender,50);return true}}]);
+  const show=()=>{const m=$('mtM').value,a=ctNum($('mtA').value);const end=iso(new Date(+m.slice(0,4),+m.slice(5,7),0,12));$('mtH').innerHTML=a?`৳ ${csN(a)} · about ৳ ${csN(a/csWork(m+'-01',end))} per working day (${csWork(m+'-01',end)} working days, Fridays off)`:''};
+  $('mtM').onchange=()=>{const m=$('mtM').value;$('mtA').value=M[m]&&M[m].amt||'';show()};$('mtA').oninput=show;show();
+}
+
 
 /* =============== Boot =============== */
 async function loadAll(){S.cfg={...DEF,...(await getKV('cfg')||{})};S.cfg.mgrPhone=normPhone(S.cfg.mgrPhone);S.fares=await getAll('fares');S.heroes=(await getAll('heroes')).map(h=>({...h,phone:normPhone(h.phone)}));S.bills=await getAll('bills');if(await purgeDemoManager().catch(()=>0))toast('Old demo / sample data removed');S.legKm=await getKV('legKm')||{};if(gateDepot())S.cfg.depot=gateDepot();rebuildIndex()}
