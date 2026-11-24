@@ -626,6 +626,12 @@ body.locked>*:not(#login):not(.overlay):not(.toast):not(#printArea){display:none
 #ovPanel.xwide{max-width:1180px!important}
 .cspfill{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px}.cspfill .field{margin:0}.cspfill select{min-width:180px}
 .cstbl th,.cstbl td{padding:8px 9px;font-size:12.5px}.cstbl th{font-size:10.5px;line-height:1.25;white-space:normal;vertical-align:bottom}.csplan td{padding:6px 9px}
+.csone{display:grid;grid-template-columns:1fr 1.15fr;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 2px #1b18500a;overflow:hidden}
+.csone .csdays{display:flex;flex-direction:column;border-right:1px solid var(--line)}.csone .csday{flex:1;border:0;border-radius:0;box-shadow:none;padding:14px 18px;display:flex;flex-direction:column;justify-content:center}
+.csone .csday+.csday{border-top:1px solid var(--line)}.csone .csmon{border:0;border-radius:0;box-shadow:none;padding:14px 18px}
+.csmini{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}.csmini>div{background:#f8f7fc;border-radius:10px;padding:7px 10px;display:flex;flex-direction:column;gap:2px}
+.csmini span{font-size:11px;color:var(--ink3)}.csmini b{font-size:14px;font-weight:700}.csmini small{font-weight:400;color:var(--ink3);font-size:11px}
+@media (max-width:900px){.csone{grid-template-columns:1fr}.csone .csdays{border-right:0;border-bottom:1px solid var(--line)}}
 .csempty{display:flex;flex-direction:column;gap:8px}.csempty span{font-size:13px;color:var(--ink2)}
 @media (max-width:1100px){.csgrid{grid-template-columns:1fr 1fr}.csmon{grid-column:1/-1}}@media (max-width:700px){.csgrid{grid-template-columns:1fr}}
 html.opas .hbonly{display:none!important}html:not(.opas) .opasonly{display:none!important}
@@ -3144,7 +3150,7 @@ async function csRender(){const box=$('dmCS');if(!box)return;await ctLoad();cons
     return `<div class="csday"><div class="csh"><b>${csD(d)}</b>${d===d0?'<span class="cstag">latest</span>':''}</div>
       <div class="csbig">৳ ${csK(t.total)} ${l?csDelta(t.total,l.total):csDelta(0,0)}</div>
       <div class="cssub">${l?`same day last month (${csD(lm)}): ৳ ${csK(l.total)}`:'no collection found for the same day last month'}</div>
-      <div class="csrows"><div><span>Collected by SA</span><b>৳ ${csN(t.sa)}</b></div><div><span>Collected by MIO</span><b>৳ ${csN(t.mio)}</b></div>
+      <div class="csmini"><div><span>Collected by SA</span><b>৳ ${csN(t.sa)}</b></div><div><span>Collected by MIO</span><b>৳ ${csN(t.mio)}</b></div>
         <div><span>SA collection %</span><b><i class="cspc ${csTone(sp)}">${sp.toFixed(0)}%</i>${lsp!=null?` <small>vs ${lsp.toFixed(0)}%</small>`:''}</b></div></div></div>`};
   /* month: from the 1st to the latest collection day, whenever the target was set */
   const mStart=mon+'-01',inM=dates.filter(d=>d>=mStart&&d<=d0);const mtd=inM.reduce((o,d)=>{const t=csTot(S.ctColl[d]);o.sa+=t.sa;o.mio+=t.mio;o.total+=t.total;return o},{sa:0,mio:0,total:0});
@@ -3185,7 +3191,7 @@ async function csRender(){const box=$('dmCS');if(!box)return;await ctLoad();cons
       <td class="r num"><b>${T?csN(sum(rows,x=>x.tgt||0)):'—'}</b></td><td class="r">${T&&sum(rows,x=>x.tgt||0)?`<b>${(sum(rows,x=>x.d0)/sum(rows,x=>x.tgt||0)*100).toFixed(0)}%</b>`:''}</td>
       ${hasMT?`<td class="r num"><b>${csN(sum(rows,x=>x.mt||0))}</b></td>`:''}<td class="r num"><b>${csN(mtd.total)}</b></td>${hasMT?`<td class="r">${tg?`<b>${pr.toFixed(0)}%</b>`:''}</td>`:''}<td class="r">${lmt?csDelta(mtd.total,lmt):''}</td></tr></tfoot></table></div></div>`;
   const behindR=rows.filter(o=>o.mt&&expP-o.mtd/o.mt*100>10);const bh=behindR.length?`<div class="cswarn bad" style="margin-top:6px">📍 <b>${behindR.length} route${behindR.length>1?'s':''} behind:</b> ${behindR.map(o=>`${esc(o.name)} (${(o.mtd/o.mt*100).toFixed(0)}%)`).join(', ')}</div>`:'';
-  box.innerHTML=`<div class="csgrid">${dayCard(d1)}${dayCard(d0)}${monthCard.replace('${CSBEHIND}',bh)}</div>${rows.length?table:''}`;
+  box.innerHTML=`<div class="csone"><div class="csdays">${dayCard(d1)}${dayCard(d0)}</div>${monthCard.replace('${CSBEHIND}',bh)}</div>${rows.length?table:''}`;
   $('csSet').onclick=()=>csTargetDlg(mon)}
 
 /* ---------- monthly collection plan: route-wise targets, depot target = their total ---------- */
